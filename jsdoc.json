@@ -1,0 +1,36 @@
+{
+    "plugins": [
+        "plugins/markdown",
+        "plugins/underscore",
+        "jsdoc-plugin-intersection",
+        "jsdoc-plugin-typescript",
+        "jsdoc-plugin-typescript-new"
+    ],
+    "source": {
+        "include": [
+            "./"
+        ],
+        "exclude": [
+            "./node_modules",
+            "./old",
+            "./assets"
+        ],
+        "includePattern": ".+\\.js(doc|x)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "typescript": {
+        "moduleRoot": "./"
+    },
+    "opts": {
+        "destination": "./docs/",
+        "recurse": true
+    },
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false
+    },
+    "metadata": {
+        "title": "Flight Control: Runway",
+        "logo": "logo.png"
+    }
+}
