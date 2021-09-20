@@ -6,8 +6,4 @@ describe('#constructor', () => {
         expect(new ModelConfiguration('abc').resource).toBe('abc');
         expect(new ModelConfiguration({}).resource).toEqual({});
     });
-    it('sets the "pk" from the constructor.', () => {
-        expect(new ModelConfiguration().pk).toEqual([]);
-        expect(new ModelConfiguration('abc', '1', 'b', 'a').pk).toEqual(['1', 'b', 'a']);
-    });
 });

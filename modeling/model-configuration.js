@@ -57,11 +57,10 @@ export default class ModelConfiguration {
     /**
      * Creates a new `ModelConfiguration` instance that defines rules for how a model should be processed by StashKu
      * in a request & response.
-     * @param {ModelConfigurationResource|String} resource The StashKu resource (name).
-     * @param  {...String} pk - The "primary key" (identifier) property name(s) that uniquely identify the model 
-     * among others.
+     * @param {ModelConfigurationResource|String} resource - The StashKu resource (name).
+     * @param {ModelConfigurationOverride} overrides - The overrides to various request types to apply when the model is being used.
      */
-    constructor(resource, ...pk) {
+    constructor(resource, overrides) {
 
         /**
          * The StashKu resource (name) that contains objects like this model.
@@ -74,30 +73,12 @@ export default class ModelConfiguration {
         this.resource = resource || null;
 
         /**
-         * The key property name(s) that uniquely identify the model among others.
-         * @type {String|Array.<String>}
-         */
-        this.pk = pk;
-
-        /**
          * Allows an override of requests and responses through callbacks for either when a *request* is about to be
          * processed (`request`) or after a *response* has been processed but not yet handed back to the requestor
          * (`response`).
          * @type {ModelConfigurationOverride}
          */
-        this.override = null;
+        this.override = overrides || null;
 
-        /**
-         * A mapping of property names from the model to the property (a.k.a. field, column, etc.) name in the
-         * storage medium. If the map is not specified, the property names will be used verbatim.
-         * 
-         * - When a `Map` object the `key` is the model property name, and the `value` is the name in the storage 
-         * medium.
-         * - When an object is specified, it's properties and values are converted into a `Map`. The property names
-         * should match properties on the model, with the values matching those in the storage medium.
-         * - When a callback, the default `Map` of the model is passed in the `mapping` argument and can be modified.
-         * @type {Map.<String, String>|{}|ModelConfigurationMapCallback}
-         */
-        this.map = null;
     }
 }
