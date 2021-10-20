@@ -26,6 +26,11 @@ describe('#configure', () => {
         engine.configure();
         expect(engine.config.limit).toBe(0);
     });
+    it('sets a default caseSensitive property value of false.', () => {
+        let engine = new MemoryStorageEngine();
+        engine.configure();
+        expect(engine.config.caseSensitive).toBe(false);
+    });
     it('sets the limit property from an object.', () => {
         let engine = new MemoryStorageEngine();
         engine.configure({ limit: 100 });
@@ -38,6 +43,13 @@ describe('#configure', () => {
         expect(engine.config.limit).toBe(100);
         delete process.env.STASHKU_MEMORY_LIMIT;
     });
+    it('sets the caseSensitive property from a the environmental variable.', () => {
+        let engine = new MemoryStorageEngine();
+        process.env.STASHKU_MEMORY_CASESENSITIVE = true;
+        engine.configure();
+        expect(engine.config.caseSensitive).toBe(true);
+        delete process.env.STASHKU_MEMORY_CASESENSITIVE;
+    });
 });
 
 describe('#resources', () => {
@@ -45,12 +57,20 @@ describe('#resources', () => {
         let engine = new MemoryStorageEngine();
         await expect(engine.resources()).resolves.toEqual([]);
     });
-    it('returns an array of available resources.', async () => {
+    it('returns an array of available resources in case-sensitive state.', async () => {
         let engine = new MemoryStorageEngine();
+        engine.configure({ caseSensitive: true });
         await engine.post(new PostRequest().to('A').objects({ a: 1 }));
         await engine.post(new PostRequest().to('B').objects({ b: 2 }));
         await engine.post(new PostRequest().to('C').objects({ c: 3 }));
         await expect(engine.resources()).resolves.toEqual(['A', 'B', 'C']);
+    });
+    it('returns an array of available resources in case-insensitive state (default).', async () => {
+        let engine = new MemoryStorageEngine();
+        await engine.post(new PostRequest().to('A').objects({ a: 1 }));
+        await engine.post(new PostRequest().to('B').objects({ b: 2 }));
+        await engine.post(new PostRequest().to('C').objects({ c: 3 }));
+        await expect(engine.resources()).resolves.toEqual(['a', 'b', 'c']);
     });
 });
 
@@ -170,6 +190,29 @@ describe('#get', () => {
         expect(res.returned).toBe(100);
         for (let o of res.data) {
             expect(o.ID).toBeUndefined();
+            expect(o.Name).not.toBeUndefined();
+            expect(o.HexCode).not.toBeUndefined();
+        }
+    });
+    it('returns values from a defined model.', async () => {
+        class Theme {
+            static get ID() { return 'ID'; }
+            static get Name() { return 'Name'; }
+        }
+        let res = await memory.get(new GetRequest().model(Theme));
+        expect(res).toBeInstanceOf(Response);
+        expect(res.data.length).toBe(100);
+        expect(res.total).toBe(100);
+        expect(res.affected).toBe(0);
+        expect(res.returned).toBe(100);
+        for (let o of res.data) {
+            expect(o.ID).not.toBeUndefined();
+            expect(o.Name).not.toBeUndefined();
+            expect(o.HexCode).toBeUndefined();
+        }
+        res = await memory.get(new GetRequest().model(Theme).properties('HexCode'));
+        for (let o of res.data) {
+            expect(o.ID).not.toBeUndefined();
             expect(o.Name).not.toBeUndefined();
             expect(o.HexCode).not.toBeUndefined();
         }

@@ -1,6 +1,17 @@
 # StashKu
 StashKu is a data storage framework provides mechanisms for model extraction, injection, diffs, and RESTful operations against common data storage engines & mediums.
 
+## Planned Features for Next Release
+- [ ] Provide better documentation of features and usage by publishing jsdoc.
+- [ ] Support for a new request OPTIONS, which will return a schema of the target resource. 
+- [ ] Full support for model usage in all reques types (GET, POST, PUT, DELETE).
+- [ ] Support schema to model generation through a new `generate` function on stashku instances.
+  - [ ] Allow `generate` to export to a folder-based export to model directory.
+
+### Memory Engine
+- [ ] Add support for new OPTIONS requests.
+- [x] Case-insensitive memory storage resource name support by default.
+
 # Running
 StashKu can be run as a globally installed package with a CLI available to perform a number of operations.
 

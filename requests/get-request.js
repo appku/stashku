@@ -58,9 +58,7 @@ export default class GetRequest {
             if (this.metadata.from === null) {
                 this.from(ModelUtility.resource(modelType, this.method));
             }
-            if (this.metadata.properties === null) {
-                //TODO
-            }
+            this.properties(...ModelUtility.map(modelType).keys());
         }
         return this;
     }

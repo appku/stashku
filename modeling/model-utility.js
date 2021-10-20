@@ -1,3 +1,4 @@
+import pluralize from 'pluralize';
 
 /**
  * @typedef AnyModelType
@@ -138,8 +139,8 @@ export default class ModelUtility {
                 }
                 //fallback to null if resource is present but no valid match
             } else {
-                //no resource property, so default to the class/constructor name.
-                return modelType.name || null;
+                //no resource property, so default to the class/constructor name pluralized
+                return pluralize.plural(modelType.name) || null;
             }
         }
         return null;

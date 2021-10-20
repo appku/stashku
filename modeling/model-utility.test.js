@@ -155,10 +155,10 @@ describe('.resource', () => {
             }
         }
     });
-    it('falls-back to the class/constructor name when no resource property is present.', () => {
+    it('falls-back to the plural of the class/constructor name when no resource property is present.', () => {
         for (let action of methods) {
-            expect(ModelUtility.resource(class TestModel { }, action)).toBe('TestModel');
-            expect(ModelUtility.resource(function TestModel2() { }, action)).toBe('TestModel2');
+            expect(ModelUtility.resource(class TestModel { }, action)).toBe('TestModels');
+            expect(ModelUtility.resource(function TestModel2() { }, action)).toBe('TestModel2s');
         }
     });
     it('returns null when the resource is a non-supported value.', () => {

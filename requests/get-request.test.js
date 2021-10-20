@@ -36,7 +36,7 @@ describe('#model', () => {
         let r = new GetRequest().model(MyModel);
         expect(r.metadata.model).toBe(MyModel);
     });
-    it('sets the metadata "from" property.', () => {
+    it('sets the metadata "from" property using the model resource name.', () => {
         class MyModel {
             static get $stashku() {
                 return { resource: 'abc' };
@@ -44,6 +44,16 @@ describe('#model', () => {
         }
         let r = new GetRequest().model(MyModel);
         expect(r.metadata.from).toBe('abc');
+        r = new GetRequest().model(class TestModel {});
+        expect(r.metadata.from).toBe('TestModels');
+    });
+    it('adds to the metadata "properties" property.', () => {
+        class MyModel {
+            static get hello() {return 'hello';}
+            static get abc() {return 'abc';}
+        }
+        let r = new GetRequest().model(MyModel);
+        expect(r.metadata.properties).toEqual(['hello', 'abc']);
     });
 });
 
@@ -124,6 +134,13 @@ describe('#properties', () => {
         r.properties('a', 'b', 'c');
         r.properties(null);
         expect(r.metadata.properties.length).toBe(0);
+    });
+    it('adds to properties already defined in a model.', ()=> {
+        class TestModel {
+            static get hello() {return 'hello'; }
+        }
+        expect(new GetRequest().model(TestModel).properties('ID', 'Moose').metadata.properties)
+            .toEqual(['hello', 'ID', 'Moose'])
     });
 });
 

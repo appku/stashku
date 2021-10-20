@@ -11,6 +11,12 @@ import RESTError from './rest-error.js';
 import deepEqual from 'deep-is';
 
 /**
+ * @typedef MemoryStorageEngineConfiguration
+ * @property {Boolean} caseSensitive
+ * @property {Number} limit
+ */
+
+/**
  * This StashKu engine is built-in and provides an in-memory data store with support for all StashKu RESTful actions
  * and operations. 
  */
@@ -25,20 +31,32 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
          * @type {Map.<String, Array>}
          */
         this.data = new Map();
+
+        /**
+         * @type {MemoryStorageEngineConfiguration}
+         */
+        this.config = {
+            caseSensitive: false,
+            limit: 0
+        };
     }
 
     /**
      * @inheritdoc
-     * @param {*} config - The configuration object for the storage engine.
+     * @param {MemoryStorageEngineConfiguration} config - The configuration object for the storage engine.
      */
     configure(config) {
         super.configure(config);
         this.config = Object.assign({
+            caseSensitive: false,
             limit: 0
         }, config);
         let limit = parseInt(process.env.STASHKU_MEMORY_LIMIT);
         if (limit) {
             this.config.limit = limit;
+        }
+        if (process.env.STASHKU_MEMORY_CASESENSITIVE) {
+            this.config.caseSensitive = !!process.env.STASHKU_MEMORY_CASESENSITIVE.match(/^[tTyY1]/);
         }
     }
 
@@ -60,11 +78,12 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
         //validate
         await super.get(request);
         let meta = request.metadata;
-        if (this.data.has(meta.from) === false) {
+        let from = this.config.caseSensitive ? meta.from : meta.from?.toLowerCase();
+        if (this.data.has(from) === false) {
             throw new RESTError(404, `The requested resource "${meta.from}" was not found.`);
         }
         //find objects
-        let matches = this.data.get(meta.from);
+        let matches = this.data.get(from);
         if (meta.where && Filter.isEmpty(meta.where) === false) {
             matches = matches.filter(v => meta.where.test(v));
         }
@@ -130,10 +149,11 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
         //process
         let meta = request.metadata;
         if (meta.objects && meta.objects.length) {
-            if (this.data.has(meta.to) === false) {
-                this.data.set(meta.to, []);
+            let to = this.config.caseSensitive ? meta.to : meta.to?.toLowerCase();
+            if (this.data.has(to) === false) {
+                this.data.set(to, []);
             }
-            let resource = this.data.get(meta.to);
+            let resource = this.data.get(to);
             let storageClones = meta.objects.map(v => Object.assign({}, v));
             let responseClones = meta.objects.map(v => Object.assign({}, v));
             if (this.config && this.config.limit && resource.length + storageClones.length > this.config.limit) {
@@ -161,12 +181,13 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
         //validate
         await super.put(request);
         let meta = request.metadata;
-        if (this.data.has(meta.to) === false) {
+        let to = this.config.caseSensitive ? meta.to : meta.to?.toLowerCase();
+        if (this.data.has(to) === false) {
             throw new RESTError(404, `The requested resource "${meta.to}" was not found.`);
         }
         //process
         if (meta.objects && meta.objects.length) {
-            let resource = this.data.get(meta.to);
+            let resource = this.data.get(to);
             let res = new Response();
             for (let o of meta.objects) {
                 //find existing
@@ -202,11 +223,12 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
         //validate
         await super.patch(request);
         let meta = request.metadata;
-        if (this.data.has(meta.to) === false) {
+        let to = this.config.caseSensitive ? meta.to : meta.to?.toLowerCase();
+        if (this.data.has(to) === false) {
             throw new RESTError(404, `The requested resource "${meta.to}" was not found.`);
         }
         //find objects
-        let matches = this.data.get(meta.to);
+        let matches = this.data.get(to);
         if (meta.where && Filter.isEmpty(meta.where) === false) {
             matches = matches.filter(v => meta.where.test(v));
         }
@@ -232,16 +254,17 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
         //validate
         await super.delete(request);
         let meta = request.metadata;
-        if (this.data.has(meta.from) === false) {
+        let from = this.config.caseSensitive ? meta.from : meta.from?.toLowerCase();
+        if (this.data.has(from) === false) {
             throw new RESTError(404, `The requested resource "${meta.from}" was not found.`);
         }
         //find objects
-        let matches = this.data.get(meta.from);
+        let matches = this.data.get(from);
         if (meta.where && Filter.isEmpty(meta.where) === false) {
             matches = matches.filter(v => meta.where.test(v));
         }
         //perform delete
-        let storage = this.data.get(meta.from);
+        let storage = this.data.get(from);
         for (let m of matches) {
             let index = storage.findIndex(v => v === m);
             if (index >= 0) {

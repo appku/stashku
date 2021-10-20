@@ -375,10 +375,9 @@ class StashKu {
      * 
      * @throws Error if the `modelType` argument missing or falsey.
      * @throws Error if the `modelType` argument is not a class or constructor function.
-     * @template MI
      * @template MT
-     * @param {Constructor.<MI> | MT} modelType - The model "class" or constructor function.
-     * @returns {StashKu.<MT, MI>}
+     * @param {MT} modelType - The model "class" or constructor function.
+     * @returns {StashKu.<MT, InstanceType.<MT>}
      */
     model(modelType) {
         let parent = this;
