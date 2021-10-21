@@ -19,8 +19,8 @@ export default class DeleteRequest {
             from: null,
             /** @type {Boolean} */
             count: false,
-            /** @type {Object} */
-            headers: {}
+            /** @type {Map.<String,String>} */
+            headers: new Map()
         };
     }
 
@@ -146,7 +146,40 @@ export default class DeleteRequest {
         this.metadata.all = false;
         this.metadata.where = null;
         this.metadata.from = null;
-        this.metadata.headers = {};
+        this.metadata.headers.clear();
+        return this;
+    }
+
+    /**
+     * Sets or clears headers on the request that can be used to set engine-specific options for the request.
+     * If a `null` value is passed, the headers are cleared.
+     * @throws Error when the dictionary argument uses a non-string key.
+     * @throws Error when the dictionary argument is not an object, null, or a Map.
+     * @param {Object | Map.<String, *>} dictionary - A map or object defining the headers and values.
+     * @returns {DeleteRequest}
+     */
+    headers(dictionary) {
+        if (dictionary === null) {
+            this.metadata.headers.clear();
+        } else if (dictionary instanceof Map || dictionary) {
+            let iterable = dictionary;
+            if ((dictionary instanceof Map) === false) {
+                iterable = Object.entries(dictionary);
+            }
+            for (let [k, v] of dictionary) {
+                if (k !== null && typeof k !== 'undefined') {
+                    if (typeof k !== 'string') {
+                        throw new Error('An invalid non-string key value was provided in the "dictionary" argument. Only string-based keys may be used.');
+                    }
+                    if (v !== null && typeof v !== 'undefined') {
+                        this.metadata.headers.delete(k);
+                    }
+                    this.metadata.headers.set(k, v);
+                }
+            }
+        } else {
+            throw new Error('The "dictionary" argument must be null, a Map, or an object.');
+        }
         return this;
     }
 
