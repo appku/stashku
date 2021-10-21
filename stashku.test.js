@@ -5,7 +5,19 @@ import PutRequest from './requests/put-request.js';
 import PatchRequest from './requests/patch-request.js';
 import DeleteRequest from './requests/delete-request.js';
 import Response from './response.js';
+import Files from './utilities/files.js';
 import jest from 'jest-mock';
+
+const samples = {
+    products: Files.including('./test/memory-storage-engine/data-products.json').parse().readSync()[0].data,
+    themes: Files.including('./test/memory-storage-engine/data-themes.json').parse().readSync()[0].data
+};
+
+class Theme {
+    static get ID() { return 'ID'; }
+    static get Name() { return 'Name'; }
+    static get HexCode() { return 'HexCode'; }
+}
 
 describe('~exports', () => {
     it('exports the GetRequest class', () => {
@@ -255,6 +267,16 @@ describe('#get', () => {
         });
         await expect(stash.get(new GetRequest().from('test'))).rejects.toThrow(/cannot find module/i);
     });
+    it('returns data as model type instances when a model is defined on the request.', async () => {
+        let stash = new StashKu();
+        for (let p in samples) {
+            stash.engine.data.set(p, samples[p]);
+        }
+        let res = await stash.model(Theme).get();
+        for (let m of res.data) {
+            expect(m).toBeInstanceOf(Theme);
+        }
+    });
 });
 
 describe('#post', () => {
@@ -263,6 +285,24 @@ describe('#post', () => {
             engine: 'blargh'
         });
         await expect(stash.post(new PostRequest().to('test'))).rejects.toThrow(/cannot find module/i);
+    });
+    it('returns data as model type instances when a model is defined on the request.', async () => {
+        let stash = new StashKu();
+        for (let p in samples) {
+            stash.engine.data.set(p, samples[p]);
+        }
+        let res = await stash.model(Theme).post((r, m) => r
+            .objects(
+                { ID: 155, Name: 'Cobbler' },
+                { ID: 156, Name: 'Cobbler' },
+                { ID: 157, Name: 'Cobbler' }
+            )
+        );
+        expect(res.total).toBe(3);
+        for (let m of res.data) {
+            expect(m.Name).toBe('Cobbler');
+            expect(m).toBeInstanceOf(Theme);
+        }
     });
 });
 
@@ -273,6 +313,24 @@ describe('#put', () => {
         });
         await expect(stash.put(new PutRequest().to('test'))).rejects.toThrow(/cannot find module/i);
     });
+    it('returns data as model type instances when a model is defined on the request.', async () => {
+        let stash = new StashKu();
+        for (let p in samples) {
+            stash.engine.data.set(p, samples[p]);
+        }
+        let res = await stash.model(Theme).put((r, m) => r
+            .pk(m.ID)
+            .objects({
+                ID: 5,
+                Name: 'Banana Toast'
+            })
+        );
+        expect(res.total).toBe(1);
+        for (let m of res.data) {
+            expect(m.Name).toBe('Banana Toast');
+            expect(m).toBeInstanceOf(Theme);
+        }
+    });
 });
 
 describe('#patch', () => {
@@ -282,6 +340,23 @@ describe('#patch', () => {
         });
         await expect(stash.patch(new PatchRequest().to('test'))).rejects.toThrow(/cannot find module/i);
     });
+    it('returns data as model type instances when a model is defined on the request.', async () => {
+        let stash = new StashKu();
+        for (let p in samples) {
+            stash.engine.data.set(p, samples[p]);
+        }
+        let res = await stash.model(Theme).patch((r, m) => r
+            .template({
+                Name: 'Hello Neptune'
+            })
+            .where(f => f.and(m.ID, f.OP.EQUALS, 6))
+        );
+        expect(res.total).toBe(1);
+        for (let m of res.data) {
+            expect(m.Name).toBe('Hello Neptune');
+            expect(m).toBeInstanceOf(Theme);
+        }
+    });
 });
 
 describe('#delete', () => {
@@ -290,5 +365,18 @@ describe('#delete', () => {
             engine: 'blargh'
         });
         await expect(stash.delete(new DeleteRequest().from('test'))).rejects.toThrow(/cannot find module/i);
+    });
+    it('returns data as model type instances when a model is defined on the request.', async () => {
+        let stash = new StashKu();
+        for (let p in samples) {
+            stash.engine.data.set(p, samples[p]);
+        }
+        let res = await stash.model(Theme).delete((r, m) => r
+            .where(f => f.and(m.ID, f.OP.LESSTHAN, 5))
+        );
+        expect(res.total).toBe(4);
+        for (let m of res.data) {
+            expect(m).toBeInstanceOf(Theme);
+        }
     });
 });

@@ -38,6 +38,7 @@ export default class PostRequest {
      * @throws Error when the `modelType` argument is not `null`, a class, or a constructor object.
      * @param {*} modelType - The model "class" or constructor function.
      * @returns {PostRequest}
+     * @private
      */
     model(modelType) {
         if (modelType !== null && ModelUtility.isValidType(modelType) === false) {

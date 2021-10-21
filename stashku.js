@@ -377,7 +377,7 @@ class StashKu {
      * @throws Error if the `modelType` argument is not a class or constructor function.
      * @template MT
      * @param {MT} modelType - The model "class" or constructor function.
-     * @returns {StashKu.<MT, InstanceType.<MT>}
+     * @returns {StashKu.<MT, InstanceType.<MT>>}
      */
     model(modelType) {
         let parent = this;
@@ -420,11 +420,11 @@ class StashKu {
      * 
      * @throws Error if the storage engine fails to return a response.
      * @throws Error if the storage engine returns an invalid response object.
-     * @param {GetRequest | GetRequestCallback} request - The GET request to send to the storage engine.
+     * @param {GetRequest | GetRequestCallback} [request] - The GET request to send to the storage engine.
      * @returns {Response.<I>} Returns the data objects from storage matching request criteria.
      */
     async get(request) {
-        return await this._handle(request, GetRequest);
+        return await this._handle(request ?? new GetRequest(), GetRequest);
     }
 
     /**
@@ -459,6 +459,7 @@ class StashKu {
     /**
      * @callback PutRequestCallback
      * @param {PutRequest} request
+     * @param {M} [model]
      */
 
     /**

@@ -3,14 +3,24 @@ StashKu is a data storage framework provides mechanisms for model extraction, in
 
 ## Planned Features for Next Release
 - [ ] Provide better documentation of features and usage by publishing jsdoc.
-- [ ] Support for a new request OPTIONS, which will return a schema of the target resource. 
-- [ ] Full support for model usage in all reques types (GET, POST, PUT, DELETE).
+- [ ] Support for a new OPTIONS request, which should return a schema of the target resource. 
+- [x] Full support for model usage in all request types:
+  - [x] GET
+  - [x] POST
+  - [x] PUT
+  - [x] DELETE
+- [x] Support empty GET request calls (to retrieve all data).
+- [ ] Support models with validation rules.
+- [ ] Support request `headers` for per-request, per-engine configuration options.
 - [ ] Support schema to model generation through a new `generate` function on stashku instances.
   - [ ] Allow `generate` to export to a folder-based export to model directory.
 
 ### Memory Engine
 - [ ] Add support for new OPTIONS requests.
 - [x] Case-insensitive memory storage resource name support by default.
+
+### Breaking Changes
+- [x] Remove depreciated `key` and `keys` functions on PUT requestsion (use `pk` instead).
 
 # Running
 StashKu can be run as a globally installed package with a CLI available to perform a number of operations.

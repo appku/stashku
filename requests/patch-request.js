@@ -47,6 +47,7 @@ export default class PatchRequest {
      * @throws Error when the `modelType` argument is not `null`, a class, or a constructor object.
      * @param {*} modelType - The model "class" or constructor function.
      * @returns {PatchRequest}
+     * @private
      */
     model(modelType) {
         if (modelType !== null && ModelUtility.isValidType(modelType) === false) {
@@ -67,7 +68,7 @@ export default class PatchRequest {
      * This will result in a `Response` with an empty `data` array and may result in faster query execution if you
      * only need the resulting numbers.
      * 
-     * Calling this function without an argument *enables* the flag.
+     * Calling this function without an argument *enables* counting without data.
      * @param {Boolean} [enabled=true] - A `true` enables the count-only result. A `false` disables it.
      * @returns {GetRequest}
      */
@@ -84,8 +85,9 @@ export default class PatchRequest {
      * Enables the update of all objects in data storage if no `where` conditions are specified. If conditions are
      * specified, this setting will be ignored.
      * 
-     * Caling this method without an argument will set the request to *enable* the deletion of all objects.
-     * @param {Boolean} [enabled=true] - Enable or disable the deletion of all records.
+     * Calling this method without an argument will set the request to *enable* the deletion of all objects.
+     * @param {Boolean} [enabled=true] - Enable or disable the deletion of all records when no `where` filters have
+     * been defined.
      * @returns {DeleteRequest}
      */
     all(enabled) {

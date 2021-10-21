@@ -45,6 +45,7 @@ export default class PutRequest {
      * @throws Error when the `modelType` argument is not `null`, a class, or a constructor object.
      * @param {*} modelType - The model "class" or constructor function.
      * @returns {PutRequest}
+     * @private
      */
     model(modelType) {
         if (modelType !== null && ModelUtility.isValidType(modelType) === false) {
@@ -79,30 +80,6 @@ export default class PutRequest {
             this.metadata.count = !!enabled;
         }
         return this;
-    }
-
-    /**
-     * Defines the key property name used to uniquely identify each object defined in the request and storage
-     * resource.
-     * If a `null` value is passed, all keys are cleared from the request.
-     * @param  {String} key - The property name used to uniquely identify each object.
-     * @returns {PutRequest}
-     * @deprecated This function has been deprieciated and will be removed in a future release. Use `pk` instead.
-     */
-    key(key) {
-        return this.pk(key);
-    }
-
-    /**
-     * Defines the key property name(s) used to uniquely identify each object defined in the request and storage
-     * resource.    
-     * If a `null` value is passed, all keys are cleared from the request.
-     * @param  {...String} keys - Spread of property names used to uniquely identify each object.
-     * @returns {PutRequest}
-     * @deprecated This function has been deprieciated and will be removed in a future release. Use `pk` instead.
-     */
-    keys(...keys) {
-        return this.pk(...keys);
     }
 
     /**

@@ -30,6 +30,28 @@ export default class DeleteRequest {
     }
 
     /**
+     * Applies a StahKu-compatible model's metadata & configuration *not already defined* to this request.
+     * 
+     * If a `null` value is passed, the model is removed - but metadata on the request will remain.
+     * @throws Error when the `modelType` argument is not `null`, a class, or a constructor object.
+     * @param {*} modelType - The model "class" or constructor function.
+     * @returns {DeleteRequest}
+     * @private
+     */
+    model(modelType) {
+        if (modelType !== null && ModelUtility.isValidType(modelType) === false) {
+            throw new Error('Invalid "modelType" argument. The value must be null, a class, or a constructor object');
+        }
+        this.metadata.model = modelType;
+        if (modelType) {
+            if (this.metadata.from === null) {
+                this.from(ModelUtility.resource(modelType, this.method));
+            }
+        }
+        return this;
+    }
+
+    /**
      * Requests that the response return count numbers (total, affected, returned, etc.) but not objects.
      * 
      * This will result in a `Response` with an empty `data` array and may result in faster query execution if you

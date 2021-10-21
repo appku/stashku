@@ -194,7 +194,7 @@ describe('#get', () => {
             expect(o.HexCode).not.toBeUndefined();
         }
     });
-    it('returns values from a defined model.', async () => {
+    it('responds with property values derrived from a defined model.', async () => {
         class Theme {
             static get ID() { return 'ID'; }
             static get Name() { return 'Name'; }
@@ -210,11 +210,22 @@ describe('#get', () => {
             expect(o.Name).not.toBeUndefined();
             expect(o.HexCode).toBeUndefined();
         }
+        //handles additional properties
         res = await memory.get(new GetRequest().model(Theme).properties('HexCode'));
         for (let o of res.data) {
             expect(o.ID).not.toBeUndefined();
             expect(o.Name).not.toBeUndefined();
             expect(o.HexCode).not.toBeUndefined();
+        }
+    });
+    it('responds with plain data objects (stashku handles model conversion post response).', async () => {
+        class Theme {
+            static get ID() { return 'ID'; }
+            static get Name() { return 'Name'; }
+        }
+        let res = await memory.get(new GetRequest().model(Theme));
+        for (let o of res.data) {
+            expect(o).not.toBeInstanceOf(Theme);
         }
     });
 });
@@ -290,6 +301,23 @@ describe('#post', () => {
         expect(res.affected).toBe(3);
         expect(res.returned).toBe(3);
     });
+    it('responds with plain data objects (stashku handles model conversion post response).', async () => {
+        class Theme {
+            static get ID() { return 'ID'; }
+            static get Name() { return 'Name'; }
+        }
+        let m = new Theme();
+        m.ID = 100;
+        m.Name = 'NeverSeeMe';
+        let mem = new MemoryStorageEngine();
+        let res = await mem.post(new PostRequest()
+            .model(Theme)
+            .objects(m)
+        );
+        for (let o of res.data) {
+            expect(o).not.toBeInstanceOf(Theme);
+        }
+    });
 });
 
 describe('#put', () => {
@@ -316,7 +344,7 @@ describe('#put', () => {
         try {
             await memory.put(new PutRequest()
                 .to('test')
-                .key('ID')
+                .pk('ID')
             );
         } catch (err) {
             expect(err.toString()).toMatch(/resource.+not found/i);
@@ -327,7 +355,7 @@ describe('#put', () => {
         let res = await memory.put(new PutRequest()
             .to('themes')
             .objects()
-            .key('ID')
+            .pk('ID')
         );
         expect(res).toEqual(Response.empty());
     });
@@ -335,7 +363,7 @@ describe('#put', () => {
         let res = await memory.put(new PutRequest()
             .to('themes')
             .objects({ ID: 1, value: 111 }, { ID: 9999, value: 9999 }, { ID: 3, value: 333 })
-            .key('ID')
+            .pk('ID')
         );
         expect(res).toBeInstanceOf(Response);
         expect(res.data.length).toBe(2);
@@ -349,7 +377,7 @@ describe('#put', () => {
         let res = await memory.put(new PutRequest()
             .to('themes')
             .objects({ ID: 1, value: 111 }, { ID: 9999, value: 9999 }, { ID: 3, value: 333 })
-            .key('ID')
+            .pk('ID')
             .count()
         );
         expect(res).toBeInstanceOf(Response);
@@ -362,7 +390,7 @@ describe('#put', () => {
         let res = await memory.put(new PutRequest()
             .to('themes')
             .objects({ ID: 2, HexCode: '#0D98BA', value: 222 }, { ID: 9999, value: 9999 }, { ID: 3, HexCode: 'test', value: 333 })
-            .keys('ID', 'HexCode')
+            .pk('ID', 'HexCode')
         );
         expect(res).toBeInstanceOf(Response);
         expect(res.data.length).toBe(1);

@@ -48,6 +48,7 @@ export default class GetRequest {
      * @throws Error when the `modelType` argument is not `null`, a class, or a constructor object.
      * @param {*} modelType - The model "class" or constructor function.
      * @returns {GetRequest}
+     * @private
      */
     model(modelType) {
         if (modelType !== null && ModelUtility.isValidType(modelType) === false) {
