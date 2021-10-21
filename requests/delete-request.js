@@ -18,7 +18,9 @@ export default class DeleteRequest {
             /** @type {String} */
             from: null,
             /** @type {Boolean} */
-            count: false
+            count: false,
+            /** @type {Object} */
+            headers: {}
         };
     }
 
@@ -144,6 +146,7 @@ export default class DeleteRequest {
         this.metadata.all = false;
         this.metadata.where = null;
         this.metadata.from = null;
+        this.metadata.headers = {};
         return this;
     }
 
@@ -153,6 +156,7 @@ export default class DeleteRequest {
      * @throws Error when a standardized request metadata property name is specified.
      * @param {*} metadata - An object with properties and values to set as request metadata for engine-specific functionality.
      * @returns {DeleteRequest}
+     * @deprecated Use new `headers` function for engine-specific options per-request.
      */
     meta(metadata) {
         if (metadata === null) {

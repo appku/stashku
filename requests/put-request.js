@@ -22,7 +22,9 @@ export default class PutRequest {
             /** @type {Boolean} */
             count: false,
             /** @type {*} */
-            model: null
+            model: null,
+            /** @type {Object} */
+            headers: {}
         };
 
         if (Array.isArray(pk)) {
@@ -168,6 +170,7 @@ export default class PutRequest {
         this.metadata.pk = [];
         this.metadata.objects = [];
         this.metadata.to = null;
+        this.metadata.headers = {};
         return this;
     }
 
@@ -177,6 +180,7 @@ export default class PutRequest {
      * @throws Error when a standardized request metadata property name is specified.
      * @param {*} metadata - An object with properties and values to set as request metadata for engine-specific functionality.
      * @returns {PutRequest}
+     * @deprecated Use new `headers` function for engine-specific options per-request.
      */
     meta(metadata) {
         if (metadata === null) {

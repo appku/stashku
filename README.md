@@ -21,6 +21,7 @@ StashKu is a data storage framework provides mechanisms for model extraction, in
 
 ### Breaking Changes
 - [x] Remove depreciated `key` and `keys` functions on PUT requestsion (use `pk` instead).
+- [x] The `meta` function on all request types has been depreciated in lieu of `headers`. It will be removed in a future release.
 
 # Running
 StashKu can be run as a globally installed package with a CLI available to perform a number of operations.

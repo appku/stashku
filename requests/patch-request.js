@@ -25,7 +25,9 @@ export default class PatchRequest {
             /** @type {Boolean} */
             count: false,
             /** @type {*} */
-            model: null
+            model: null,
+            /** @type {Object} */
+            headers: {}
         };
 
         if (template) {
@@ -175,6 +177,7 @@ export default class PatchRequest {
         this.metadata.template = null;
         this.metadata.where = null;
         this.metadata.to = null;
+        this.metadata.headers = {};
         return this;
     }
 
@@ -184,6 +187,7 @@ export default class PatchRequest {
      * @throws Error when a standardized request metadata property name is specified.
      * @param {*} metadata - An object with properties and values to set as request metadata for engine-specific functionality.
      * @returns {PatchRequest}
+     * @deprecated Use new `headers` function for engine-specific options per-request.
      */
     meta(metadata) {
         if (metadata === null) {

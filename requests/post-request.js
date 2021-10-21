@@ -18,7 +18,9 @@ export default class PostRequest {
             /** @type {Boolean} */
             count: false,
             /** @type {*} */
-            model: null
+            model: null,
+            /** @type {Object} */
+            headers: {}
         };
 
         this.objects(...objects);
@@ -129,6 +131,7 @@ export default class PostRequest {
         }
         this.metadata.objects = [];
         this.metadata.to = null;
+        this.metadata.headers = {};
         return this;
     }
 
@@ -138,6 +141,7 @@ export default class PostRequest {
      * @throws Error when a standardized request metadata property name is specified.
      * @param {*} metadata - An object with properties and values to set as request metadata for engine-specific functionality.
      * @returns {PostRequest}
+     * @deprecated Use new `headers` function for engine-specific options per-request.
      */
     meta(metadata) {
         if (metadata === null) {
