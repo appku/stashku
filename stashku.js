@@ -3,6 +3,7 @@ import PostRequest from './requests/post-request.js';
 import PutRequest from './requests/put-request.js';
 import PatchRequest from './requests/patch-request.js';
 import DeleteRequest from './requests/delete-request.js';
+import OptionsRequest from './requests/options-request.js';
 import BaseStorageEngine from './base-storage-engine.js';
 import Filter from './filter.js';
 import Sort from './sort.js';
@@ -15,7 +16,7 @@ import Files from './utilities/files.js';
 import Randomization from './utilities/randomization.js';
 import ModelUtility from './modeling/model-utility.js';
 
-const SUPPORTED_METHODS = ['all', '*', 'get', 'post', 'put', 'patch', 'delete'];
+const SUPPORTED_METHODS = ['all', '*', 'get', 'post', 'put', 'patch', 'delete', 'options'];
 const SUPPORTED_STATES = ['log', 'request', 'response', 'done'];
 
 /**
@@ -23,7 +24,7 @@ const SUPPORTED_STATES = ['log', 'request', 'response', 'done'];
  * @param {StashKu} stashku - The StashKu instance making the middleware call.
  * @param {BaseStorageEngine} engine - The storage engine instance that is processing the request.
  * @param {String} method - The name of the request method being carried out, typically "get", "post", "put", "patch",
- * or "delete".
+ * "delete", "options".
  * @param {GetRequest|PostRequest|PutRequest|PatchRequest|DeleteRequest} request - The request object being specified.
  * @param {Response} response - The response object (`null` if not prepared yet).
  * @param {String} state 
@@ -526,7 +527,7 @@ class StashKu {
      */
 
     /**
-     * Run a PATCH `request` to deleted any matching objects with the specified template properties and values.
+     * Run a DELETE `request` to delete any matching objects with the specified template properties and values.
      * This operation will respond with the objects deleted.
      * 
      * @example
@@ -544,6 +545,28 @@ class StashKu {
         return await this._handle(request, DeleteRequest);
     }
 
+    /**
+     * @callback OptionsRequestCallback
+     * @param {OptionsRequest} request
+     * @param {M} [model]
+     */
+
+    /**
+     * Run an OPTIONS `request` to return a schema object that defines a resource's properties and configuration.
+     * @example
+     * let sk = new StashKu();
+     * ...
+     * await sk.options(r => r
+     *     .from('Runners')
+     * );
+     * @throws Error if the "request" argument is not a callback function or `OptionsRequest` instance.
+     * @param {OptionsRequest | OptionsRequestCallback} request - The OPTIONS request to send to the storage engine.
+     * @returns {Response.<I>} Returns the data objects from storage that were deleted with the request criteria.
+     */
+    async options(request) {
+        return await this._handle(request ?? new OptionsRequest(), OptionsRequest);
+    }
+
 }
 
 export {
@@ -553,6 +576,7 @@ export {
     PutRequest,
     PatchRequest,
     DeleteRequest,
+    OptionsRequest,
     BaseStorageEngine,
     Response,
     RESTError,

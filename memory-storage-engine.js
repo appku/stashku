@@ -96,7 +96,7 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
         if (typeof this.config.caseSensitive !== 'undefined' && this.config.caseSensitive !== null) {
             caseSensitive = this.config.caseSensitive;
         }
-        return caseSensitive ? target : target.toLowerCase();
+        return caseSensitive ? target : target?.toLowerCase();
     }
 
     /**
