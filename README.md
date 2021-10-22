@@ -24,11 +24,11 @@ StashKu is a data storage framework provides mechanisms for model extraction, in
 
 #### Memory Engine
 - [ ] Add support for new OPTIONS requests.
-- [ ] Add support for header `caseSensitive`.
+- [x] Add support for header `caseSensitive`.
 - [x] Case-insensitive memory storage resource name support by default.
 
 #### Breaking Changes
-- [x] Remove depreciated `key` and `keys` functions on PUT requestsion (use `pk` instead).
+- [x] Remove depreciated `key` and `keys` functions on PUT request (use `pk` instead).
 - [x] The `meta` function on all request types has been depreciated in lieu of `headers`. It will be removed in a future release.
 
 # Running

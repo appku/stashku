@@ -26,10 +26,10 @@ describe('#configure', () => {
         engine.configure();
         expect(engine.config.limit).toBe(0);
     });
-    it('sets a default caseSensitive property value of false.', () => {
+    it('sets a default caseSensitive property value to null.', () => {
         let engine = new MemoryStorageEngine();
         engine.configure();
-        expect(engine.config.caseSensitive).toBe(false);
+        expect(engine.config.caseSensitive).toBeNull();
     });
     it('sets the limit property from an object.', () => {
         let engine = new MemoryStorageEngine();
@@ -71,6 +71,39 @@ describe('#resources', () => {
         await engine.post(new PostRequest().to('B').objects({ b: 2 }));
         await engine.post(new PostRequest().to('C').objects({ c: 3 }));
         await expect(engine.resources()).resolves.toEqual(['a', 'b', 'c']);
+    });
+});
+
+describe('#resourceOf', () => {
+    it('returns all resource names lower-case by default with no headers or configuration.', async () => {
+        let engine = new MemoryStorageEngine();
+        expect(engine.resourceOf(new DeleteRequest().from('Test'))).toBe('test');
+        expect(engine.resourceOf(new GetRequest().from('Test'))).toBe('test');
+        expect(engine.resourceOf(new PostRequest().to('Test'))).toBe('test');
+        expect(engine.resourceOf(new PutRequest().to('Test'))).toBe('test');
+        expect(engine.resourceOf(new PatchRequest().to('Test'))).toBe('test');
+    });
+    it('returns all resource names regular-case when the case-sensitive is enabled in configuration.', async () => {
+        let engine = new MemoryStorageEngine();
+        engine.configure({ caseSensitive: true });
+        expect(engine.resourceOf(new DeleteRequest().from('Test'))).toBe('Test');
+        expect(engine.resourceOf(new GetRequest().from('Test'))).toBe('Test');
+        expect(engine.resourceOf(new PostRequest().to('Test'))).toBe('Test');
+        expect(engine.resourceOf(new PutRequest().to('Test'))).toBe('Test');
+        expect(engine.resourceOf(new PatchRequest().to('Test'))).toBe('Test');
+    });
+    it('returns resource names as lower-case or regular-case depending on request header.', async () => {
+        let engine = new MemoryStorageEngine();
+        expect(engine.resourceOf(new DeleteRequest().from('Test').headers({ caseSensitive: true }))).toBe('Test');
+        expect(engine.resourceOf(new GetRequest().from('Test').headers({ caseSensitive: true }))).toBe('Test');
+        expect(engine.resourceOf(new PostRequest().to('Test').headers({ caseSensitive: true }))).toBe('Test');
+        expect(engine.resourceOf(new PutRequest().to('Test').headers({ caseSensitive: true }))).toBe('Test');
+        expect(engine.resourceOf(new PatchRequest().to('Test').headers({ caseSensitive: true }))).toBe('Test');
+        expect(engine.resourceOf(new DeleteRequest().from('Test').headers({ caseSensitive: false }))).toBe('test');
+        expect(engine.resourceOf(new GetRequest().from('Test').headers({ caseSensitive: false }))).toBe('test');
+        expect(engine.resourceOf(new PostRequest().to('Test').headers({ caseSensitive: false }))).toBe('test');
+        expect(engine.resourceOf(new PutRequest().to('Test').headers({ caseSensitive: false }))).toBe('test');
+        expect(engine.resourceOf(new PatchRequest().to('Test').headers({ caseSensitive: false }))).toBe('test');
     });
 });
 

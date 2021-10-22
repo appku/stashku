@@ -12,8 +12,19 @@ import deepEqual from 'deep-is';
 
 /**
  * @typedef MemoryStorageEngineConfiguration
- * @property {Boolean} caseSensitive
- * @property {Number} limit
+ * @property {Boolean} caseSensitive - Controls whether all resource names are stored in lower-case, and tracked
+ * case-insensitively or not. By default this is unset in the configuration which will default to `false` internally
+ * and allow it to be overridden by request headers. If set explicitly, the request header's `caseSensitive` flag 
+ * will be ignored.
+ * @property {Number} limit - Limits the maximum number of objects that can be stored in the memory engine per resource
+ * name. If this limit is reached, POST requests will throw an error.
+ */
+
+/**
+ * @typedef MemoryStorageRequestHeader
+ * @property {Boolean} caseSensitive - Instructs the memory storage engine to search for a resource by its lower-case
+ * name (`false`) or regular-case (`true`). This will be ignored if the same flag (`caseSensitive`) is set on the 
+ * memory storage configuration.
  */
 
 /**
@@ -36,7 +47,7 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
          * @type {MemoryStorageEngineConfiguration}
          */
         this.config = {
-            caseSensitive: false,
+            caseSensitive: null,
             limit: 0
         };
     }
@@ -48,7 +59,7 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
     configure(config) {
         super.configure(config);
         this.config = Object.assign({
-            caseSensitive: false,
+            caseSensitive: null,
             limit: 0
         }, config);
         let limit = parseInt(process.env.STASHKU_MEMORY_LIMIT);
@@ -69,6 +80,26 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
     }
 
     /**
+     * Finds and adjusts the resource name of the given request with consideration to the case-sensitivity setting
+     * on the storage engine or per-request.
+     * @param {GetRequest | PatchRequest | PostRequest | PutRequest} request 
+     * @returns {String}
+     * @protected
+     */
+    resourceOf(request) {
+        let meta = request.metadata;
+        let target = meta.from || meta.to;
+        let caseSensitive = null;
+        if (meta.headers && meta.headers.has('caseSensitive')) {
+            caseSensitive = meta.headers.get('caseSensitive');
+        }
+        if (typeof this.config.caseSensitive !== 'undefined' && this.config.caseSensitive !== null) {
+            caseSensitive = this.config.caseSensitive;
+        }
+        return caseSensitive ? target : target.toLowerCase();
+    }
+
+    /**
      * @override
      * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {GetRequest} request - The GET request to send to the storage engine.
@@ -78,7 +109,7 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
         //validate
         await super.get(request);
         let meta = request.metadata;
-        let from = this.config.caseSensitive ? meta.from : meta.from?.toLowerCase();
+        let from = this.resourceOf(request);
         if (this.data.has(from) === false) {
             throw new RESTError(404, `The requested resource "${meta.from}" was not found.`);
         }
@@ -149,7 +180,7 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
         //process
         let meta = request.metadata;
         if (meta.objects && meta.objects.length) {
-            let to = this.config.caseSensitive ? meta.to : meta.to?.toLowerCase();
+            let to = this.resourceOf(request);
             if (this.data.has(to) === false) {
                 this.data.set(to, []);
             }
@@ -181,7 +212,7 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
         //validate
         await super.put(request);
         let meta = request.metadata;
-        let to = this.config.caseSensitive ? meta.to : meta.to?.toLowerCase();
+        let to = this.resourceOf(request);
         if (this.data.has(to) === false) {
             throw new RESTError(404, `The requested resource "${meta.to}" was not found.`);
         }
@@ -223,7 +254,7 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
         //validate
         await super.patch(request);
         let meta = request.metadata;
-        let to = this.config.caseSensitive ? meta.to : meta.to?.toLowerCase();
+        let to = this.resourceOf(request);
         if (this.data.has(to) === false) {
             throw new RESTError(404, `The requested resource "${meta.to}" was not found.`);
         }
@@ -254,7 +285,7 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
         //validate
         await super.delete(request);
         let meta = request.metadata;
-        let from = this.config.caseSensitive ? meta.from : meta.from?.toLowerCase();
+        let from = this.resourceOf(request);
         if (this.data.has(from) === false) {
             throw new RESTError(404, `The requested resource "${meta.from}" was not found.`);
         }
