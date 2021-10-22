@@ -8,6 +8,7 @@ StashKu is a data storage framework provides mechanisms for model extraction, in
   - [x] Requests
   - [ ] Utilities
   - [ ] Base Classes
+- [ ] CLI interface to support generating and refreshing schema model exports.
 
 ### Next Release
 - [ ] Support for a new OPTIONS request, which should return a schema of the target resource. 
