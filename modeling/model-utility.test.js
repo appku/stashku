@@ -204,7 +204,7 @@ describe('.pk', () => {
         }
         expect(ModelUtility.pk(TestModel)).toEqual(['test1', 'test3']);
     });
-    it('uses a target name if it is presetn.', () => {
+    it('uses a target name if it is present.', () => {
         class TestModel {
             static get test1() {
                 return { pk: true, target: 'apples' };

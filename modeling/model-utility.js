@@ -157,11 +157,7 @@ export default class ModelUtility {
             let mapping = ModelUtility.map(modelType);
             for (let [k, v] of mapping) {
                 if (v && v.pk) {
-                    if (v.target) {
-                        primaryKeys.push(v.target);
-                    } else {
-                        primaryKeys.push(k);
-                    }
+                    primaryKeys.push(v.target);
                 }
             }
         }
