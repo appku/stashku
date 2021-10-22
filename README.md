@@ -11,12 +11,13 @@ StashKu is a data storage framework provides mechanisms for model extraction, in
   - [x] DELETE
 - [x] Support empty GET request calls (to retrieve all data).
 - [ ] Support models with validation rules.
-- [ ] Support request `headers` for per-request, per-engine configuration options.
+- [x] Support request `headers` for per-request, per-engine configuration options.
 - [ ] Support schema to model generation through a new `generate` function on stashku instances.
   - [ ] Allow `generate` to export to a folder-based export to model directory.
 
 ### Memory Engine
 - [ ] Add support for new OPTIONS requests.
+- [ ] Add support for header `caseSensitive`.
 - [x] Case-insensitive memory storage resource name support by default.
 
 ### Breaking Changes

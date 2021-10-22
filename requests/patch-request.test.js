@@ -34,6 +34,11 @@ describe('#model', () => {
         let r = new PatchRequest().model(MyModel);
         expect(r.metadata.model).toBe(MyModel);
     });
+    it('removes the metadata "model" property when null is passed.', () => {
+        let r = new PatchRequest().model(class MyModel { });
+        r.model(null);
+        expect(r.metadata.model).toBeNull();
+    });
     it('sets the metadata "to" property.', () => {
         class MyModel {
             static get $stashku() {
@@ -171,6 +176,7 @@ describe('#clear', () => {
         expect(r.metadata.template).toBeNull();
         expect(r.metadata.where).toBeNull();
         expect(r.metadata.to).toBeNull();
+        expect(r.metadata.headers).toBeNull();
     });
     it('recreates the metadata object if it is null', () => {
         let r = new PatchRequest();
@@ -182,6 +188,101 @@ describe('#clear', () => {
     it('returns the request instance in any valid call.', () => {
         let r = new PatchRequest();
         expect(r.clear()).toBe(r);
+    });
+});
+
+describe('#headers', () => {
+    it('throws when the dictionary argument is missing.', () => {
+        expect(() => new PatchRequest().headers()).toThrow(/dictionary.+argument/);
+    });
+    it('throws when the dictionary argument is not a Map, object, or null.', () => {
+        expect(() => new PatchRequest().headers(244)).toThrow(/dictionary.+argument/);
+        expect(() => new PatchRequest().headers(true)).toThrow(/dictionary.+argument/);
+        expect(() => new PatchRequest().headers(undefined)).toThrow(/dictionary.+argument/);
+    });
+    it('throws when the a non-string key is defined.', () => {
+        let m = new Map();
+        m.set('ok', true);
+        m.set(123, true);
+        expect(() => new PatchRequest().headers(m)).toThrow(/key.+argument/);
+    });
+    it('skips null or undefined keys.', () => {
+        let m = new Map();
+        m.set(null, true);
+        m.set('ok', true);
+        expect(new PatchRequest().headers(m).metadata.headers.size).toBe(1);
+    });
+    it('deletes the header if the value for the key is null or undefined.', () => {
+        let r = new PatchRequest();
+        r.headers({ a: 1, b: 'hi', c: true });
+        expect(r.metadata.headers.size).toBe(3);
+        r.headers({ b: null });
+        expect(r.metadata.headers.size).toBe(2);
+        expect(r.metadata.headers.get('b')).toBeUndefined();
+        r.headers({ c: undefined });
+        expect(r.metadata.headers.size).toBe(1);
+        expect(r.metadata.headers.get('c')).toBeUndefined();
+    });
+    it('creates a header map from an object.', () => {
+        let r = new PatchRequest();
+        r.headers({
+            a: 1,
+            b: 'hi',
+            c: true,
+            z: { complex: new Date() }
+        });
+        expect(r.metadata.headers).toBeInstanceOf(Map);
+        expect(r.metadata.headers.size).toBe(4);
+        expect(r.metadata.headers.get('a')).toBe(1);
+        expect(r.metadata.headers.get('b')).toBe('hi');
+        expect(r.metadata.headers.get('c')).toBe(true);
+        expect(r.metadata.headers.get('z')).toBeTruthy();
+        expect(r.metadata.headers.get('z').complex).toBeInstanceOf(Date);
+    });
+    it('creates a header map from a Map.', () => {
+        let r = new PatchRequest();
+        let myMap = new Map();
+        myMap.set('a', 1);
+        myMap.set('b', 'hi');
+        myMap.set('c', true);
+        myMap.set('z', { complex: new Date() });
+        r.headers(myMap);
+        expect(r.metadata.headers).toBeInstanceOf(Map);
+        expect(r.metadata.headers.size).toBe(4);
+        expect(r.metadata.headers.get('a')).toBe(1);
+        expect(r.metadata.headers.get('b')).toBe('hi');
+        expect(r.metadata.headers.get('c')).toBe(true);
+        expect(r.metadata.headers.get('z')).toBeTruthy();
+        expect(r.metadata.headers.get('z').complex).toBeInstanceOf(Date);
+    });
+    it('merges properties from subsequent calls.', () => {
+        let r = new PatchRequest();
+        let myMap = new Map();
+        myMap.set('a', 1);
+        myMap.set('b', 'hi');
+        myMap.set('c', true);
+        r.headers(myMap);
+        r.headers({ z: { complex: new Date() } });
+        r.headers({ b: 'dinosaurs' });
+        expect(r.metadata.headers).toBeInstanceOf(Map);
+        expect(r.metadata.headers.size).toBe(4);
+        expect(r.metadata.headers.get('a')).toBe(1);
+        expect(r.metadata.headers.get('b')).toBe('dinosaurs');
+        expect(r.metadata.headers.get('c')).toBe(true);
+        expect(r.metadata.headers.get('z')).toBeTruthy();
+        expect(r.metadata.headers.get('z').complex).toBeInstanceOf(Date);
+    });
+    it('should clear any headers when null is passed.', () => {
+        let r = new PatchRequest();
+        r.headers({ a: 1, b: 'hi', c: true });
+        expect(r.headers(null).metadata.headers).toBeInstanceOf(Map);
+        expect(r.metadata.headers.size).toBe(0);
+    });
+    it('returns the request instance in any valid call.', () => {
+        let r = new PatchRequest();
+        expect(r.headers({})).toBe(r);
+        expect(r.headers(new Map())).toBe(r);
+        expect(r.headers(null)).toBe(r);
     });
 });
 

@@ -19,8 +19,8 @@ export default class PostRequest {
             count: false,
             /** @type {*} */
             model: null,
-            /** @type {Object} */
-            headers: {}
+            /** @type {Map.<String, *>} */
+            headers: null
         };
 
         this.objects(...objects);
@@ -48,9 +48,7 @@ export default class PostRequest {
         }
         this.metadata.model = modelType;
         if (modelType) {
-            if (this.metadata.to === null) {
-                this.to(ModelUtility.resource(modelType, this.method));
-            }
+            this.to(ModelUtility.resource(modelType, this.method));
         }
         return this;
     }
@@ -131,7 +129,44 @@ export default class PostRequest {
         }
         this.metadata.objects = [];
         this.metadata.to = null;
-        this.metadata.headers = {};
+        this.metadata.headers = null;
+        return this;
+    }
+
+    /**
+     * Sets or clears headers on the request that can be used to set engine-specific options for the request.
+     * If a `null` value is passed, the headers are cleared.
+     * @throws Error when the dictionary argument uses a non-string key.
+     * @throws Error when the dictionary argument is not an object, null, or a Map.
+     * @param {Object | Map.<String, *>} dictionary - A map or object defining the headers and values.
+     * @returns {DeleteRequest}
+     */
+    headers(dictionary) {
+        if (!this.metadata.headers) {
+            this.metadata.headers = new Map();
+        }
+        if (dictionary === null) {
+            this.metadata.headers.clear();
+        } else if (dictionary instanceof Map || typeof dictionary === 'object') {
+            let iterable = dictionary;
+            if ((dictionary instanceof Map) === false) {
+                iterable = Object.entries(dictionary);
+            }
+            for (let [k, v] of iterable) {
+                if (k !== null && typeof k !== 'undefined') {
+                    if (typeof k !== 'string') {
+                        throw new Error('An invalid non-string key value was provided in the "dictionary" argument. Only string-based keys may be used.');
+                    }
+                    if (v === null || typeof v === 'undefined') {
+                        this.metadata.headers.delete(k);
+                    } else {
+                        this.metadata.headers.set(k, v);
+                    }
+                }
+            }
+        } else {
+            throw new Error('The "dictionary" argument must be null, a Map, or an object.');
+        }
         return this;
     }
 

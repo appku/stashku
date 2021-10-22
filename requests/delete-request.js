@@ -19,8 +19,8 @@ export default class DeleteRequest {
             from: null,
             /** @type {Boolean} */
             count: false,
-            /** @type {Map.<String,String>} */
-            headers: new Map()
+            /** @type {Map.<String, *>} */
+            headers: null
         };
     }
 
@@ -45,10 +45,8 @@ export default class DeleteRequest {
             throw new Error('Invalid "modelType" argument. The value must be null, a class, or a constructor object');
         }
         this.metadata.model = modelType;
-        if (modelType) {
-            if (this.metadata.from === null) {
-                this.from(ModelUtility.resource(modelType, this.method));
-            }
+        if (modelType !== null) {
+            this.from(ModelUtility.resource(modelType, this.method));
         }
         return this;
     }
@@ -146,7 +144,7 @@ export default class DeleteRequest {
         this.metadata.all = false;
         this.metadata.where = null;
         this.metadata.from = null;
-        this.metadata.headers.clear();
+        this.metadata.headers = null;
         return this;
     }
 
@@ -159,22 +157,26 @@ export default class DeleteRequest {
      * @returns {DeleteRequest}
      */
     headers(dictionary) {
+        if (!this.metadata.headers) {
+            this.metadata.headers = new Map();
+        }
         if (dictionary === null) {
             this.metadata.headers.clear();
-        } else if (dictionary instanceof Map || dictionary) {
+        } else if (dictionary instanceof Map || typeof dictionary === 'object') {
             let iterable = dictionary;
             if ((dictionary instanceof Map) === false) {
                 iterable = Object.entries(dictionary);
             }
-            for (let [k, v] of dictionary) {
+            for (let [k, v] of iterable) {
                 if (k !== null && typeof k !== 'undefined') {
                     if (typeof k !== 'string') {
                         throw new Error('An invalid non-string key value was provided in the "dictionary" argument. Only string-based keys may be used.');
                     }
-                    if (v !== null && typeof v !== 'undefined') {
+                    if (v === null || typeof v === 'undefined') {
                         this.metadata.headers.delete(k);
+                    } else {
+                        this.metadata.headers.set(k, v);
                     }
-                    this.metadata.headers.set(k, v);
                 }
             }
         } else {

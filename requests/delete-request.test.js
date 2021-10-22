@@ -15,32 +15,38 @@ describe('#method', () => {
     });
 });
 
-// describe('#model', () => {
-//     it('throws on a non-object, non-null model type.', () => {
-//         expect(() => new DeleteRequest().model()).toThrow(/modelType.+object/i);
-//         expect(() => new DeleteRequest().model(123)).toThrow(/modelType.+object/i);
-//         expect(() => new DeleteRequest().model(true)).toThrow(/modelType.+object/i);
-//         expect(() => new DeleteRequest().model('abc')).toThrow(/modelType.+object/i);
-//     });
-//     it('returns the request for chaining.', () => {
-//         let r = new DeleteRequest();
-//         expect(r.model(class MyModel { })).toBe(r);
-//     });
-//     it('sets the metadata "model" property.', () => {
-//         class MyModel { }
-//         let r = new DeleteRequest().model(MyModel);
-//         expect(r.metadata.model).toBe(MyModel);
-//     });
-//     it('sets the metadata "from" property.', () => {
-//         class MyModel {
-//             static get $stashku() {
-//                 return { resource: 'abc' };
-//             }
-//         }
-//         let r = new DeleteRequest().model(MyModel);
-//         expect(r.metadata.from).toBe('abc');
-//     });
-// });
+describe('#model', () => {
+    it('throws on a non-object, non-null model type.', () => {
+        expect(() => new DeleteRequest().model()).toThrow(/modelType.+object/i);
+        expect(() => new DeleteRequest().model(123)).toThrow(/modelType.+object/i);
+        expect(() => new DeleteRequest().model(true)).toThrow(/modelType.+object/i);
+        expect(() => new DeleteRequest().model('abc')).toThrow(/modelType.+object/i);
+    });
+    it('returns the request for chaining.', () => {
+        let r = new DeleteRequest();
+        expect(r.model(class MyModel { })).toBe(r);
+    });
+    it('sets the metadata "model" property.', () => {
+        class MyModel { }
+        let r = new DeleteRequest().model(MyModel);
+        expect(r.metadata.model).toBe(MyModel);
+    });
+    it('removes the metadata "model" property when null is passed.', () => {
+        let r = new DeleteRequest().model(class MyModel { });
+        r.model(null);
+        expect(r.metadata.model).toBeNull();
+    });
+    it('sets the metadata "from" property.', () => {
+        class MyModel {
+            static get $stashku() {
+                return { resource: 'abc' };
+            }
+        }
+        let r = new DeleteRequest();
+        r.model(MyModel);
+        expect(r.metadata.from).toBe('abc');
+    });
+});
 
 describe('#count', () => {
     it('is disabled by default.', () => {
@@ -151,6 +157,7 @@ describe('#clear', () => {
         r.clear();
         expect(r.metadata.where).toBeNull();
         expect(r.metadata.from).toBeNull();
+        expect(r.metadata.headers).toBeNull();
     });
     it('recreates the metadata object if it is null', () => {
         let r = new DeleteRequest();
@@ -162,6 +169,101 @@ describe('#clear', () => {
     it('returns the request instance in any valid call.', () => {
         let r = new DeleteRequest();
         expect(r.clear()).toBe(r);
+    });
+});
+
+describe('#headers', () => {
+    it('throws when the dictionary argument is missing.', () => {
+        expect(() => new DeleteRequest().headers()).toThrow(/dictionary.+argument/);
+    });
+    it('throws when the dictionary argument is not a Map, object, or null.', () => {
+        expect(() => new DeleteRequest().headers(244)).toThrow(/dictionary.+argument/);
+        expect(() => new DeleteRequest().headers(true)).toThrow(/dictionary.+argument/);
+        expect(() => new DeleteRequest().headers(undefined)).toThrow(/dictionary.+argument/);
+    });
+    it('throws when the a non-string key is defined.', () => {
+        let m = new Map();
+        m.set('ok', true);
+        m.set(123, true);
+        expect(() => new DeleteRequest().headers(m)).toThrow(/key.+argument/);
+    });
+    it('skips null or undefined keys.', () => {
+        let m = new Map();
+        m.set(null, true);
+        m.set('ok', true);
+        expect(new DeleteRequest().headers(m).metadata.headers.size).toBe(1);
+    });
+    it('deletes the header if the value for the key is null or undefined.', () => {
+        let r = new DeleteRequest();
+        r.headers({ a: 1, b: 'hi', c: true });
+        expect(r.metadata.headers.size).toBe(3);
+        r.headers({ b: null });
+        expect(r.metadata.headers.size).toBe(2);
+        expect(r.metadata.headers.get('b')).toBeUndefined();
+        r.headers({ c: undefined });
+        expect(r.metadata.headers.size).toBe(1);
+        expect(r.metadata.headers.get('c')).toBeUndefined();
+    });
+    it('creates a header map from an object.', () => {
+        let r = new DeleteRequest();
+        r.headers({
+            a: 1,
+            b: 'hi',
+            c: true,
+            z: { complex: new Date() }
+        });
+        expect(r.metadata.headers).toBeInstanceOf(Map);
+        expect(r.metadata.headers.size).toBe(4);
+        expect(r.metadata.headers.get('a')).toBe(1);
+        expect(r.metadata.headers.get('b')).toBe('hi');
+        expect(r.metadata.headers.get('c')).toBe(true);
+        expect(r.metadata.headers.get('z')).toBeTruthy();
+        expect(r.metadata.headers.get('z').complex).toBeInstanceOf(Date);
+    });
+    it('creates a header map from a Map.', () => {
+        let r = new DeleteRequest();
+        let myMap = new Map();
+        myMap.set('a', 1);
+        myMap.set('b', 'hi');
+        myMap.set('c', true);
+        myMap.set('z', { complex: new Date() });
+        r.headers(myMap);
+        expect(r.metadata.headers).toBeInstanceOf(Map);
+        expect(r.metadata.headers.size).toBe(4);
+        expect(r.metadata.headers.get('a')).toBe(1);
+        expect(r.metadata.headers.get('b')).toBe('hi');
+        expect(r.metadata.headers.get('c')).toBe(true);
+        expect(r.metadata.headers.get('z')).toBeTruthy();
+        expect(r.metadata.headers.get('z').complex).toBeInstanceOf(Date);
+    });
+    it('merges properties from subsequent calls.', () => {
+        let r = new DeleteRequest();
+        let myMap = new Map();
+        myMap.set('a', 1);
+        myMap.set('b', 'hi');
+        myMap.set('c', true);
+        r.headers(myMap);
+        r.headers({ z: { complex: new Date() } });
+        r.headers({ b: 'dinosaurs' });
+        expect(r.metadata.headers).toBeInstanceOf(Map);
+        expect(r.metadata.headers.size).toBe(4);
+        expect(r.metadata.headers.get('a')).toBe(1);
+        expect(r.metadata.headers.get('b')).toBe('dinosaurs');
+        expect(r.metadata.headers.get('c')).toBe(true);
+        expect(r.metadata.headers.get('z')).toBeTruthy();
+        expect(r.metadata.headers.get('z').complex).toBeInstanceOf(Date);
+    });
+    it('should clear any headers when null is passed.', () => {
+        let r = new DeleteRequest();
+        r.headers({ a: 1, b: 'hi', c: true });
+        expect(r.headers(null).metadata.headers).toBeInstanceOf(Map);
+        expect(r.metadata.headers.size).toBe(0);
+    });
+    it('returns the request instance in any valid call.', () => {
+        let r = new DeleteRequest();
+        expect(r.headers({})).toBe(r);
+        expect(r.headers(new Map())).toBe(r);
+        expect(r.headers(null)).toBe(r);
     });
 });
 
