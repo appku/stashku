@@ -1,8 +1,19 @@
 import pluralize from 'pluralize';
+import RESTError from '../rest-error.js';
+import ModelConfiguration from './model-configuration.js';
+import Strings from '../utilities/strings.js';
 
 /**
  * @typedef AnyModelType
  * @property {import('./model-configuration.js').default} [$stashku]
+ */
+
+/**
+ * @typedef ModelProperty
+ * @property {String} target
+ * @property {*} [default]
+ * @property {Boolean} [pk=false]
+ * @property {Boolean} [nullable=true]
  */
 
 /**
@@ -147,7 +158,7 @@ export default class ModelUtility {
     }
 
     /**
-     * Returns the "primary key" property names as specified in the model's `$stashku.pk` property.
+     * Returns the "primary key" property names as specified on a model configuration type.
      * @param {AnyModelType} modelType - The model "class" or constructor function.
      * @returns {Array.<String>}
      */
@@ -181,6 +192,64 @@ export default class ModelUtility {
                 }
             }
         }
+    }
+
+    /**
+     * Generates a model type class dynamically utilizing the given properties and configuration.
+     * 
+     * @throws Error if the "typeName" argument is missing.
+     * @throws Error if the "properties" argument is missing.
+     * @throws Error if the "properties" argument is not a Map instance.
+     * @throws Error if the "configuration" argument is not a ModelConfiguration instance.
+     * @param {String} resource - The name of the target resource.
+     * @param {Map.<String, ModelProperty>} properties - The map of all properties definable for the model.
+     * @param {ModelConfiguration} [configuration] - The $stashku model configuration.
+     * @param {String} [className] - Optional argument to utilize a specific class name instead of generating one 
+     * from the resource name.
+     * @returns {*}
+     */
+    static generateModelType(resource, properties, configuration, className) {
+        if (!resource) {
+            throw new RESTError(500, 'The "resource" argument is required.');
+        } else if (!properties) {
+            throw new RESTError(500, 'The "properties" argument is required.');
+        } else if ((properties instanceof Map) === false) {
+            throw new RESTError(500, 'The "properties" argument must be of type Map.');
+        } else if (configuration && (configuration instanceof ModelConfiguration) === false) {
+            throw new RESTError(500, 'The "configuration" argument must be of type ModelConfiguration.');
+        }
+        //create model type closure
+        let mtConstructor = function () {
+            for (let [k, v] of properties) {
+                let typeOfValue = typeof v;
+                if (v === null || typeOfValue === 'undefined') {
+                    this[k] = null;
+                } else if (typeOfValue === 'object') {
+                    this[k] = typeof v.default !== 'undefined' ? v.default : null;
+                }
+            }
+        };
+        let mt = class DynamicModel {
+            constructor() { mtConstructor.call(this); }
+        };
+        if (!className) {
+            className = Strings.camelify(pluralize.singular(resource), true) + 'Model';
+        }
+        Object.defineProperty(mt, 'name', { value: className });
+        //add static properties
+        if (!configuration) {
+            mt.$stashku = new ModelConfiguration(resource);
+        } else {
+            mt.$stashku = configuration;
+        }
+        for (let [k, v] of properties) {
+            if (v === null || typeof v === 'undefined') {
+                mt[k] = {};
+            } else {
+                mt[k] = v;
+            }
+        }
+        return mt;
     }
 
     /**

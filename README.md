@@ -24,7 +24,7 @@ StashKu is a data storage framework provides mechanisms for model extraction, in
   - [ ] Allow `generate` to export to a folder-based export to model directory.
 
 #### Memory Engine
-- [ ] Add support for new OPTIONS requests.
+- [x] Add support for new OPTIONS requests.
 - [x] Add support for header `caseSensitive`.
 - [x] Case-insensitive memory storage resource name support by default.
 

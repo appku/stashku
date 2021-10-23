@@ -1,5 +1,7 @@
 import ModelUtility from './model-utility.js';
 import jest from 'jest-mock';
+import ModelConfiguration from './model-configuration.js';
+import { config } from 'dotenv';
 
 const invalidModelTypeValues = [
     new Date(),
@@ -262,6 +264,62 @@ describe('.override', () => {
         expect(() => ModelUtility.override({})).not.toThrow();
         expect(() => ModelUtility.override(true)).not.toThrow();
         expect(() => ModelUtility.override(123)).not.toThrow();
+    });
+});
+
+describe('.generateModelType', () => {
+    it('throws an error if the "typeName" argument is missing.', () => {
+        expect(() => { ModelUtility.generateModelType('', new Map(), new ModelConfiguration()); }).toThrow(/resource.+required/);
+        expect(() => { ModelUtility.generateModelType(null, new Map(), new ModelConfiguration()); }).toThrow(/resource.+required/);
+        expect(() => { ModelUtility.generateModelType(undefined, new Map(), new ModelConfiguration()); }).toThrow(/resource.+required/);
+    });
+    it('throws an error if the "properties" argument is missing.', () => {
+        expect(() => { ModelUtility.generateModelType('Test', null, new ModelConfiguration()); }).toThrow(/properties.+required/);
+        expect(() => { ModelUtility.generateModelType('Test', undefined, new ModelConfiguration()); }).toThrow(/properties.+required/);
+    });
+    it('throws an error if the "properties" argument is not a Map instance.', () => {
+        expect(() => { ModelUtility.generateModelType('Test', new Date(), new ModelConfiguration()); }).toThrow(/properties.+Map/);
+        expect(() => { ModelUtility.generateModelType('Test', [[], []], new ModelConfiguration()); }).toThrow(/properties.+Map/);
+        expect(() => { ModelUtility.generateModelType('Test', 'hello', new ModelConfiguration()); }).toThrow(/properties.+Map/);
+        expect(() => { ModelUtility.generateModelType('Test', true, new ModelConfiguration()); }).toThrow(/properties.+Map/);
+    });
+    it('throws an error if the "configuration" argument is not a ModelConfiguration instance.', () => {
+        expect(() => { ModelUtility.generateModelType('Test', new Map(), new Date()); }).toThrow(/configuration.+ModelConfiguration/);
+        expect(() => { ModelUtility.generateModelType('Test', new Map(), 'hello'); }).toThrow(/configuration.+ModelConfiguration/);
+        expect(() => { ModelUtility.generateModelType('Test', new Map(), true); }).toThrow(/configuration.+ModelConfiguration/);
+        expect(() => { ModelUtility.generateModelType('Test', new Map(), []); }).toThrow(/configuration.+ModelConfiguration/);
+    });
+    let properties = new Map(Object.entries({
+        a: {},
+        b: { pk: false },
+        c: null,
+        d: { target: 'z', default: 4949, nullable: true },
+        e: { pk: true }
+    }));
+    it('returns a class type with the proper configuration.', () => {
+        let configs = [null, new ModelConfiguration('testa-bits')];
+        for (let mc of configs) {
+            let dynamicModel = ModelUtility.generateModelType('testa-bits', properties, mc);
+            expect(dynamicModel).toBeTruthy();
+            expect(dynamicModel.name).toBe('TestaBitModel');
+            expect(dynamicModel.$stashku.resource).toBe('testa-bits');
+            expect(dynamicModel.a).toEqual({});
+            expect(dynamicModel.b).toEqual({ pk: false });
+            expect(dynamicModel.c).toEqual({});
+            expect(dynamicModel.d).toEqual({ target: 'z', default: 4949, nullable: true });
+            expect(dynamicModel.e).toEqual({ pk: true });
+        }
+    });
+    it('returns a class type that constructs with defined properties.', () => {
+        let mc = new ModelConfiguration('testa-bits');
+        let TestaBitModel = ModelUtility.generateModelType('testa-bits', properties, mc);
+        let model = new TestaBitModel();
+        expect(model).toBeInstanceOf(TestaBitModel);
+        expect(model.a).toBe(null);
+        expect(model.b).toBe(null);
+        expect(model.c).toBe(null);
+        expect(model.d).toBe(4949);
+        expect(model.e).toBe(null);
     });
 });
 

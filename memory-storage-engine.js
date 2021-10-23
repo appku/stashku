@@ -9,6 +9,9 @@ import Filter from './filter.js';
 import thenby from 'thenby';
 import RESTError from './rest-error.js';
 import deepEqual from 'deep-is';
+import ModelUtility from './modeling/model-utility.js';
+import ModelConfiguration from './modeling/model-configuration.js';
+import OptionsRequest from './requests/options-request.js';
 
 /**
  * @typedef MemoryStorageEngineConfiguration
@@ -82,7 +85,8 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
     /**
      * Finds and adjusts the resource name of the given request with consideration to the case-sensitivity setting
      * on the storage engine or per-request.
-     * @param {GetRequest | PatchRequest | PostRequest | PutRequest} request 
+     * @param {GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest} request - The request to extract
+     * the resource (target) name from.
      * @returns {String}
      * @protected
      */
@@ -282,8 +286,7 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
      * @returns {Response} Returns the data objects from storage that were deleted with the request criteria.
      */
     async delete(request) {
-        //validate
-        await super.delete(request);
+        await super.delete(request); //validate
         let meta = request.metadata;
         let from = this.resourceOf(request);
         if (this.data.has(from) === false) {
@@ -307,6 +310,62 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
         } else {
             return new Response(matches, matches.length, matches.length, matches.length);
         }
+    }
+
+    /**
+     * @override
+     * @throws 404 Error when the requested resource is has not been stored in memory.
+     * @param {OptionsRequest} request - The OPTIONS request to send to the storage engine.
+     * @returns {Response} Returns a response with a single data object- the dynamically created model configuration.
+     */
+    async options(request) {
+        //validate
+        await super.options(request);
+        let meta = request.metadata;
+        let from = this.resourceOf(request);
+        if (this.data.has(from) === false) {
+            throw new RESTError(404, `The requested resource "${meta.from}" was not found.`);
+        }
+        let properties = new Map();
+        let matches = this.data.get(from);
+        //find properties - evaluate all records in resource
+        for (let m of matches) {
+            let keys = Object.keys(m);
+            for (let k of keys) {
+                let isNullOrUndefined = (m[k] === null || typeof m[k] === 'undefined');
+                if (properties.has(k) === false) {
+                    properties.set(k, { 
+                        target: k,
+                        type: m[k]?.constructor?.name || null,
+                        nullable: isNullOrUndefined
+                    });
+                } else {
+                    let v = properties.get(k);
+                    if (v.nullable === false && isNullOrUndefined) {
+                        v.nullable = true;
+                    }
+                }
+            }
+        }
+        //set defaults on non-null types
+        for (let [k, v] of properties) {
+            if (v.nullable === false) {
+                switch (v.type) {
+                    case 'Number': v.default = 0; break;
+                    case 'String': v.default = ''; break;
+                    case 'Boolean': v.default = false; break;
+                    case 'Array': v.default = []; break;
+                    case 'Date': v.default = new Date(); break;
+                    case 'Map': v.default = new Map(); break;
+                    case 'Set': v.default = new Set(); break;
+                    case 'Buffer': v.default = Buffer.alloc(0); break;
+                    case 'ArrayBuffer': v.default = new ArrayBuffer(0); break;
+                }
+            }
+        }
+        //generate model type and return
+        let mt = ModelUtility.generateModelType(meta.from, properties, new ModelConfiguration(from));
+        return new Response([mt], 1, 0, 1);
     }
 
 }

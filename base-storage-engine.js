@@ -3,10 +3,15 @@ import PostRequest from './requests/post-request.js';
 import PutRequest from './requests/put-request.js';
 import PatchRequest from './requests/patch-request.js';
 import DeleteRequest from './requests/delete-request.js';
+import OptionsRequest from './requests/options-request.js';
 import Filter from './filter.js';
 import RESTError from './rest-error.js';
 import Logger from './logger.js';
 import Objects from './utilities/objects.js';
+
+/**
+ * @typedef
+ */
 
 /**
  * This abstract base class defines the structure of a StashKu-compatible storage engine. All StashKu storage engines
@@ -236,6 +241,35 @@ export default class BaseStorageEngine {
             } else if (!request.metadata.all && (!request.metadata.where || Filter.isEmpty(request.metadata.where))) {
                 throw new RESTError(400, 'The request is missing "where" conditions to match objects in storage and is not enabled to affect all objects.');
             }
+        }
+    }
+
+    /**
+     * Run an OPTIONS `request` which returns a dynamically constructed model type which defines how StashKu can 
+     * interact with the target (`from`) resource. 
+     * 
+     * @throws A 501 REST error if not overriden and supported by the storage engine.
+     * @throws A 400 REST error if the request is missing or not a `OptionsRequest`.
+     * @throws A 400 REST error if the request missing required metadata.
+     * @throws A 400 REST error if the request metadata is missing a required "from" value.
+     * @throws A 400 REST error if the request metadata is missing "where" conditions to match objects in storage and
+     * is not enabled to affect all objects.
+     * @param {OptionsRequest} request - The OPTIONS request to send to the storage engine.
+     * @returns {Response} Returns a response with a single data object- the dynamically created model configuration.
+     * @abstract
+     */
+    async options(request) {
+        if (!Objects.getPrototype(this, BaseStorageEngine) || this.options === BaseStorageEngine.prototype.options) {
+            throw new RESTError(501, `The OPTIONS action is not supported on the StashKu "${this.name}" storage engine.`);
+        } else {
+            //perform request validations
+            if (!request || (request instanceof OptionsRequest) === false) {
+                throw new RESTError(400, 'The "request" argument is required and must be a OptionsRequest.');
+            } else if (!request.metadata) {
+                throw new RESTError(400, 'The "request" argument is incomplete and missing required metadata.');
+            } else if (!request.metadata.from) {
+                throw new RESTError(400, 'The request is missing a required "from" value.');
+            } 
         }
     }
 

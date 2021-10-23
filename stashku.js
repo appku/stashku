@@ -552,7 +552,8 @@ class StashKu {
      */
 
     /**
-     * Run an OPTIONS `request` to return a schema object that defines a resource's properties and configuration.
+     * Run an OPTIONS `request` which returns a dynamically constructed model type which defines how StashKu can 
+     * interact with the target (`from`) resource. 
      * @example
      * let sk = new StashKu();
      * ...
@@ -561,7 +562,8 @@ class StashKu {
      * );
      * @throws Error if the "request" argument is not a callback function or `OptionsRequest` instance.
      * @param {OptionsRequest | OptionsRequestCallback} request - The OPTIONS request to send to the storage engine.
-     * @returns {Response.<I>} Returns the data objects from storage that were deleted with the request criteria.
+     * @returns {Response.<I>} Returns a response with a single data object- the dynamically created model 
+     * configuration.
      */
     async options(request) {
         return await this._handle(request ?? new OptionsRequest(), OptionsRequest);

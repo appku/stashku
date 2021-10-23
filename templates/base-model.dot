@@ -13,6 +13,10 @@ class Base{{= it.metadata.name}} {
         this.{{= prop}} = {{=it.defaultValue(it.properties[prop], true)}};
         {{ } }}
     }
+
+    static get $stashku() {
+        return {};
+    }
     
 }
 

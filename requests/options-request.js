@@ -9,11 +9,13 @@ export default class OptionsRequest {
     /**
      * Creates a new `OptionsRequest` instance. A OPTIONS request that instructs StashKu to gather the schema for
      * models from a particular resource.
+     * @param {String} [from] - The target resource name for the OPTIONS request.
      */
-    constructor() {
+    constructor(from) {
+        
         this.metadata = {
             /** @type {String} */
-            from: null,
+            from: from || null,
             /** @type {Map.<String, *>} */
             headers: null
         };

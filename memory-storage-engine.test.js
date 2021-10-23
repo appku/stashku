@@ -5,9 +5,11 @@ import PostRequest from './requests/post-request.js';
 import PutRequest from './requests/put-request.js';
 import PatchRequest from './requests/patch-request.js';
 import DeleteRequest from './requests/delete-request.js';
+import OptionsRequest from './requests/options-request.js';
 import Response from './response.js';
 import Sort from './sort.js';
 import Filter from './filter.js';
+import ModelConfiguration from './modeling/model-configuration.js';
 
 const samples = {
     products: Files.including('./test/memory-storage-engine/data-products.json').parse().readSync()[0].data,
@@ -563,5 +565,36 @@ describe('#delete', () => {
         expect(res.total).toBe(100);
         expect(res.affected).toBe(100);
         expect(res.returned).toBe(100);
+    });
+});
+
+describe('#options', () => {
+    //create pre-populated engine
+    let memory = new MemoryStorageEngine();
+    for (let p in samples) {
+        memory.data.set(p, samples[p]);
+    }
+    it('throws a 404 when an invalid resource is specified.', async () => {
+        expect.assertions(2);
+        try {
+            await memory.options(new OptionsRequest()
+                .from('test')
+            );
+        } catch (err) {
+            expect(err.toString()).toMatch(/resource.+not found/i);
+            expect(err.code).toBe(404);
+        }
+    });
+    it('returns a model type with a proper model configuration.', async () => {
+        let res = await memory.options(new OptionsRequest('Themes'));
+        expect(res.code).toBe(200);
+        expect(res.data.length).toBe(1);
+        expect(res.data[0].ID.target).toBe('ID');
+        expect(res.data[0].ID.default).toBe(0);
+        expect(res.data[0].Name.target).toBe('Name');
+        expect(res.data[0].Name.default).toBe('');
+        expect(res.data[0].HexCode.target).toBe('HexCode');
+        expect(res.data[0].HexCode.default).toBe('');
+        expect(res.data[0].$stashku).toBeInstanceOf(ModelConfiguration);
     });
 });
