@@ -78,6 +78,14 @@ class Files {
     }
 
     /**
+     * The runtime OS's directory path seperator character string.
+     * @type {String}
+     */
+    static get sep() {
+        return path.sep;
+    }
+
+    /**
      * Join all arguments together and normalize the resulting path.
      * Arguments must be strings. Non-string arguments throw an exception.
      * 
@@ -129,6 +137,17 @@ class Files {
      */
     static resolve(...pathSegments) {
         return path.resolve(...pathSegments);
+    }
+
+    /**
+     * Returns the extension of the path, from the last '.' to end of string in the last portion of the path.
+     * If there is no '.' in the last portion of the path or the first character of it is '.', then it returns an
+     * empty string.
+     * @param {String} p - The path to evaluate.
+     * @returns {String}
+     */
+    static extname(p) {
+        return path.extname(p);
     }
 
     /**
@@ -553,9 +572,10 @@ class Files {
 
     /**
      * Unlinks the matching files and returns `true` if successfully unlinked (otherwise `false`).
+     * @param {Boolean} [dirs=false] - If true, directory paths will also be recursivelly deleted.
      * @returns {Promise.<Array.<{filePath:String, unlinked:Boolean}>>}
      */
-    async unlink() {
+    async unlink(dirs) {
         let filePaths = await this.find();
         let fnullify = this._nullify;
         let fensure = this._ensure;
@@ -567,9 +587,17 @@ class Files {
                 fs.unlink(filePath, (err) => {
                     let unlinked = true;
                     if (err) {
-                        if (!fnullify) {
+                        if (err.code == 'EISDIR' && dirs) {
+                            try {
+                                fs.rmdirSync(filePath, { recursive: true, force: true });
+                                err = null;
+                            } catch (derr) {
+                                err = derr;
+                            }
+                        }
+                        if (err && !fnullify) {
                             return reject(err);
-                        } else {
+                        } else if (err) {
                             unlinked = false;
                         }
                     }
