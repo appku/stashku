@@ -20,6 +20,7 @@ StashKu is a data storage framework provides mechanisms for model extraction, in
 - [x] Support empty GET request calls (to retrieve all data).
 - [ ] Support models with validation rules.
 - [x] Support request `headers` for per-request, per-engine configuration options.
+- [x] Support exporting model instances to yaml, toml, or json using the new `export` function.
 - [ ] Support schema to model generation through a new `export` function on stashku instances.
   - [ ] Allow `export` to export to a folder-based export to model directory.
 
