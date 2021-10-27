@@ -3,34 +3,16 @@ StashKu is a data storage framework provides mechanisms for model extraction, in
 
 ## Planned Features
 - [ ] Provide better documentation of features and usage by publishing jsdoc.
+
+\* CLI and migration features have been moved to [StashKu Migrate](https://github.com/appku/stashku-migrate).
+
+### Next Release
 - [ ] Support in-browser use of StashKu (core).
 - [ ] 100% line unit-test coverage on all files.
   - [x] Modeling
   - [x] Requests
   - [ ] Utilities
   - [ ] Base Classes
-
-\* CLI and migration features have been moved to [StashKu Migrate](https://github.com/appku/stashku-migrate).
-
-### Next Release
-- [x] Support for a new OPTIONS request, which should return a schema of the target resource. 
-- [x] Full support for model usage in all request types:
-  - [x] GET
-  - [x] POST
-  - [x] PUT
-  - [x] DELETE
-- [x] Support empty GET request calls (to retrieve all data).
-- [x] Support request `headers` for per-request, per-engine configuration options.
-- [x] Support exporting model instances to yaml, toml, or json using the new `export` function.
-
-#### Memory Engine
-- [x] Add support for new OPTIONS requests.
-- [x] Add support for header `caseSensitive`.
-- [x] Case-insensitive memory storage resource name support by default.
-
-#### Breaking Changes
-- [x] Remove depreciated `key` and `keys` functions on PUT request (use `pk` instead).
-- [x] The `meta` function on all request types has been depreciated in lieu of `headers`. It will be removed in a future release.
 
 # Running
 This is the core StashKu package and doesn not provide a CLI interface, as it is meant to be leveraged as a package. See the 

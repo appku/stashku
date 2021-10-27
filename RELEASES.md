@@ -1,3 +1,22 @@
+# v-0.4.0: Models
+- Support for a new OPTIONS request, which should return a schema of the target resource. 
+- Full support for model usage in all request types:
+  - GET
+  - POST
+  - PUT
+  - DELETE
+- Support empty GET request calls (to retrieve all data).
+- Support request `headers` for per-request, per-engine configuration options.
+- Support exporting model instances to yaml, toml, or json using the new `export` function.
+
+## Memory Engine
+- Add support for new OPTIONS requests.
+- Add support for header `caseSensitive`.
+- Case-insensitive memory storage resource name support by default.
+
+## Breaking Changes
+- Remove depreciated `key` and `keys` functions on PUT request (use `pk` instead).
+- The `meta` function on all request types has been depreciated in lieu of `headers`. It will be removed in a future release.
 
 # v-0.3.28: Baseline
 This is the final 0.3.x release and completes the baseline release of StashKu, performing exceptionally well in production scenarios. The Append team is super happy to release this amazing package to the world under an open-source license.
