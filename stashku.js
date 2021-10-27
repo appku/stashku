@@ -12,9 +12,10 @@ import RESTError from './rest-error.js';
 import MemoryStorageEngine from './memory-storage-engine.js';
 import Logger from './logger.js';
 import ModelConfiguration from './modeling/model-configuration.js';
-import Files from './utilities/files.js';
 import Randomization from './utilities/randomization.js';
 import ModelUtility from './modeling/model-utility.js';
+import fs from 'fs';
+import path from 'path';
 
 const SUPPORTED_METHODS = ['all', '*', 'get', 'post', 'put', 'patch', 'delete', 'options'];
 const SUPPORTED_STATES = ['log', 'request', 'response', 'done'];
@@ -185,11 +186,8 @@ class StashKu {
         } else if (typeof this.config.engine === 'string') {
             let enginePackageName = this.config.engine;
             //check if the configured engine is the same name as the package in current directory (if any).
-            let local = Files.including(Files.join(process.cwd(), 'package.json'))
-                .nullify()
-                .parse()
-                .readSync();
-            if (local[0].read && local[0].data && local[0].data.name === this.config.engine) {
+            let localPackage = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'));
+            if (localPackage.name === this.config.engine) {
                 enginePackageName = process.cwd();
             }
             this.engine = import(enginePackageName)
@@ -567,62 +565,6 @@ class StashKu {
      */
     async options(request) {
         return await this._handle(request ?? new OptionsRequest(), OptionsRequest);
-    }
-
-    /**
-     * Exports a model or model type to folder or file.
-     * 
-     * When exporting a *model*, it will be written with all keys and values into JSON (default), YAML, or TOML,
-     * depending on the file extension used. If a directory is given, the model will be exported using the primary 
-     * key(s) as a file name (*.json). If no primary keys are defined, it will be exported using a random file name.
-     * 
-     * When exporting a *model type*, the `exportPath` must be a new or existing directory path, the model type will 
-     * be written as JavaScript base and inherited class file when a file is targetted. If the inherited class 
-     * file already exists, it will not be altered.
-     * 
-     * @throws Error if the `m` argument is missing.
-     * @throws Error when passing a model and specifying an invalid "format" argument value.
-     * @param {*} m - The model or model type to export.
-     * @param {String} exportPath - The file or folder to write the model or model type to.
-     * @param {String} [format=json] - Optional format for models being written when specifying a target directory. 
-     * Can be `json`, `yaml`, or `toml`.
-     * @returns {Array.<String>} Returns the file path(s) of the file(s) written or checked. When a model type is
-     * given, the file at index `0` will be the inheriting model class, and the file at index `1` will be the
-     * base model class.
-     */
-    async export(m, exportPath, format) {
-        let filePaths = [];
-        if (!exportPath) {
-            throw new RESTError(500, 'The "exportPath" argument is required.');
-        }
-        if (m) {
-            let pathInfo = await Files.including(exportPath).nullify().stat();
-            if (m.$stashku || m.constructor.name === 'Function') {
-                //model type
-
-            } else {
-                //model
-                if ((pathInfo.stat && pathInfo.stat.isDir) || exportPath.endsWith(Files.sep)) { //directory
-                    let pks = ModelUtility.pk(m.constructor);
-                    let fileName;
-                    format = format ? format : 'json';
-                    if (format && !format.match(/json|toml|yaml/)) {
-                        throw new RESTError(500, `Invalid "format" argument: expected "json", "yaml", or "toml", but found "${format}".`);
-                    }
-                    if (pks && pks.length) {
-                        fileName = `${pks.reduce((pv, cv) => m[cv], '')}.${format}`;
-                    } else {
-                        fileName = `${Randomization.uuidv4()}.${format}`;
-                    }
-                    exportPath = Files.join(exportPath, fileName);
-                }
-                await Files.including(exportPath).ensure().stringify().write(m);
-                filePaths.push(Files.resolve(exportPath));
-            }
-        } else {
-            throw new RESTError(500, 'The first argument (model or model-type) is required.');
-        }
-        return filePaths;
     }
 
 }

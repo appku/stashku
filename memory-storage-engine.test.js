@@ -1,5 +1,4 @@
 import MemoryStorageEngine from './memory-storage-engine.js';
-import Files from './utilities/files.js';
 import GetRequest from './requests/get-request.js';
 import PostRequest from './requests/post-request.js';
 import PutRequest from './requests/put-request.js';
@@ -10,11 +9,17 @@ import Response from './response.js';
 import Sort from './sort.js';
 import Filter from './filter.js';
 import ModelConfiguration from './modeling/model-configuration.js';
+import fs from 'fs/promises';
 
 const samples = {
-    products: Files.including('./test/memory-storage-engine/data-products.json').parse().readSync()[0].data,
-    themes: Files.including('./test/memory-storage-engine/data-themes.json').parse().readSync()[0].data
+    products: null,
+    themes: null
 };
+
+beforeAll(async () => {
+    samples.products = JSON.parse(await fs.readFile('./test/memory-storage-engine/data-products.json', 'utf8'));
+    samples.themes = JSON.parse(await fs.readFile('./test/memory-storage-engine/data-themes.json', 'utf8'));
+});
 
 describe('#constructor', () => {
     it('sets the engine name to "memory".', () => {
@@ -112,9 +117,11 @@ describe('#resourceOf', () => {
 describe('#get', () => {
     //create pre-populated engine
     let memory = new MemoryStorageEngine();
-    for (let p in samples) {
-        memory.data.set(p, samples[p]);
-    }
+    beforeAll(() => {
+        for (let p in samples) {
+            memory.data.set(p, samples[p]);
+        }
+    });
     it('throws when the resource is not present.', async () => {
         await expect(memory.get(new GetRequest().from('lalala'))).rejects.toThrow(/resource.+not found/gi);
     });
@@ -358,9 +365,11 @@ describe('#post', () => {
 describe('#put', () => {
     //create pre-populated engine
     let memory = new MemoryStorageEngine();
-    for (let p in samples) {
-        memory.data.set(p, samples[p]);
-    }
+    beforeAll(() => {
+        for (let p in samples) {
+            memory.data.set(p, samples[p]);
+        }
+    });
     it('throws a 409 multiple matches error when the primary keys match to more than one record in storage.', async () => {
         expect.assertions(2);
         try {
@@ -439,9 +448,11 @@ describe('#put', () => {
 describe('#patch', () => {
     //create pre-populated engine
     let memory = new MemoryStorageEngine();
-    for (let p in samples) {
-        memory.data.set(p, samples[p]);
-    }
+    beforeAll(() => {
+        for (let p in samples) {
+            memory.data.set(p, samples[p]);
+        }
+    });
     it('throws a 404 when an invalid resource is specified.', async () => {
         expect.assertions(2);
         try {
@@ -510,9 +521,11 @@ describe('#patch', () => {
 describe('#delete', () => {
     //create pre-populated engine
     let memory = new MemoryStorageEngine();
-    for (let p in samples) {
-        memory.data.set(p, samples[p]);
-    }
+    beforeAll(() => {
+        for (let p in samples) {
+            memory.data.set(p, samples[p]);
+        }
+    });
     it('throws a 404 when an invalid resource is specified.', async () => {
         expect.assertions(2);
         try {
@@ -571,9 +584,11 @@ describe('#delete', () => {
 describe('#options', () => {
     //create pre-populated engine
     let memory = new MemoryStorageEngine();
-    for (let p in samples) {
-        memory.data.set(p, samples[p]);
-    }
+    beforeAll(() => {
+        for (let p in samples) {
+            memory.data.set(p, samples[p]);
+        }
+    });
     it('throws a 404 when an invalid resource is specified.', async () => {
         expect.assertions(2);
         try {

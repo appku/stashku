@@ -55,7 +55,6 @@ export default class PutRequest {
         }
         this.metadata.model = modelType;
         if (modelType) {
-            console.log('pk', ModelUtility.pk(modelType));
             this
                 .to(ModelUtility.resource(modelType, this.method))
                 .pk(null)

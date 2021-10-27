@@ -1,16 +1,18 @@
 # StashKu
-StashKu is a data storage framework provides mechanisms for model extraction, injection, diffs, and RESTful operations against common data storage engines & mediums.
+StashKu is a data storage framework provides mechanisms for model extraction, injection, diffs, and RESTful operations against common data storage engines & mediums. This is the core packaged library that provides the RESTful and standardized interface for all plugins and middleware.
 
 ## Planned Features
 - [ ] Provide better documentation of features and usage by publishing jsdoc.
+- [ ] Support in-browser use of StashKu (core).
 - [ ] 100% line unit-test coverage on all files.
   - [x] Modeling
   - [x] Requests
   - [ ] Utilities
   - [ ] Base Classes
 
+\* CLI and migration features have been moved to [StashKu Migrate](https://github.com/appku/stashku-migrate).
+
 ### Next Release
-- [ ] CLI interface to support generating and refreshing schema model exports.
 - [x] Support for a new OPTIONS request, which should return a schema of the target resource. 
 - [x] Full support for model usage in all request types:
   - [x] GET
@@ -18,11 +20,8 @@ StashKu is a data storage framework provides mechanisms for model extraction, in
   - [x] PUT
   - [x] DELETE
 - [x] Support empty GET request calls (to retrieve all data).
-- [ ] Support models with validation rules.
 - [x] Support request `headers` for per-request, per-engine configuration options.
 - [x] Support exporting model instances to yaml, toml, or json using the new `export` function.
-- [ ] Support schema to model generation through a new `export` function on stashku instances.
-  - [ ] Allow `export` to export to a folder-based export to model directory.
 
 #### Memory Engine
 - [x] Add support for new OPTIONS requests.
@@ -34,9 +33,8 @@ StashKu is a data storage framework provides mechanisms for model extraction, in
 - [x] The `meta` function on all request types has been depreciated in lieu of `headers`. It will be removed in a future release.
 
 # Running
-StashKu can be run as a globally installed package with a CLI available to perform a number of operations.
-
-You can also run `npm start` and pass arguments directly within this project.
+This is the core StashKu package and doesn not provide a CLI interface, as it is meant to be leveraged as a package. See the 
+[StashKu Migrate](https://github.com/appku/stashku-migrate) for the `stashku` CLI tool.
 
 # Configuration
 StashKu can be configured using environmental variables.
