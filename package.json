@@ -24,7 +24,8 @@
         "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --verbose --coverage",
         "test-ci": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --verbose -ci",
         "lint": "./node_modules/.bin/eslint ./",
-        "docs": "./node_modules/jsdoc/jsdoc.js -c jsdoc.json --readme README.md"
+        "docs": "./node_modules/jsdoc/jsdoc.js -c jsdoc.json --readme README.md",
+        "prepare": "husky install"
     },
     "jest": {
         "testEnvironment": "node",
