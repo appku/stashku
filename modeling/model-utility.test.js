@@ -1,7 +1,6 @@
 import ModelUtility from './model-utility.js';
 import jest from 'jest-mock';
 import ModelConfiguration from './model-configuration.js';
-import { config } from 'dotenv';
 
 const invalidModelTypeValues = [
     new Date(),

@@ -13,6 +13,18 @@ rollup.*
 coverage/
 *.code-workspace
 *.ignore.*
+coverage/
+coverage/**/*
+docs/
+docs/**/*
+deploy/
+deploy/**/*
+dist/
+dist/**/*
+.husky/
+.husky/**/*
+@Compiled/
+@Compiled/**/*
 
 #IIS/IISNode
 iisnode
