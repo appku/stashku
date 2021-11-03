@@ -381,3 +381,22 @@ describe('#_filterCondition', () => {
         expect(new Filter()._filterCondition('abc', Filter.OP.ISNULL)).toEqual({ field: 'abc', op: Filter.OP.ISNULL });
     });
 });
+
+describe('.parse', () => {
+    it.only('returns a new Filter instance created from a valid input string.', () => {
+        Filter.parse('[test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR (([test3] ISNULL AND [test4] EQ 4) OR [test5] IN "1,2,3,4,5,6" OR [test5] IN {"abc",null,123,undefined,true})');
+        Filter.parse('(((([test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3))))');
+        Filter.parse('(((())))');
+        Filter.parse('[test0] EQ 1 AND ([test1] EQ 2 OR [test2] EQ 3)');
+    });
+    it('throws a SyntaxError when the input string contains errors.', () => {
+        
+    });
+    it('Returns null if unparsable.', () => {
+        let tries = [null, undefined, '', 0, false];
+        for (let t of tries) {
+            let s = Filter.parse(t);
+            expect(s).toBeNull();
+        }
+    });
+});

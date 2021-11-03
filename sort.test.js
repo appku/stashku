@@ -43,7 +43,7 @@ describe('.desc', () => {
     });
 });
 
-describe('.fromString', () => {
+describe('.parse', () => {
     it('returns a new Sort instance created from just a property name.', () => {
         let tries = [
             { input: 'test', expected: { property: 'test', dir: Sort.DIR.ASC } },
@@ -54,7 +54,7 @@ describe('.fromString', () => {
             { input: 'test ASC', expected: { property: 'test', dir: Sort.DIR.ASC } }
         ];
         for (let t of tries) {
-            let s = Sort.fromString(t.input);
+            let s = Sort.parse(t.input);
             expect(s).toBeInstanceOf(Sort);
             expect(s.property).toBe(t.expected.property);
             expect(s.dir).toBe(t.expected.dir);
@@ -68,7 +68,7 @@ describe('.fromString', () => {
             { input: 'test addesc', expected: { property: 'test addesc', dir: Sort.DIR.ASC } }
         ];
         for (let t of tries) {
-            let s = Sort.fromString(t.input);
+            let s = Sort.parse(t.input);
             expect(s).toBeInstanceOf(Sort);
             expect(s.property).toBe(t.expected.property);
             expect(s.dir).toBe(t.expected.dir);
@@ -77,7 +77,7 @@ describe('.fromString', () => {
     it('Returns null if unparsable.', () => {
         let tries = [null, undefined, '', 0, false];
         for (let t of tries) {
-            let s = Sort.fromString(t);
+            let s = Sort.parse(t);
             expect(s).toBeNull();
         }
     });

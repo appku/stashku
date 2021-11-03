@@ -14,8 +14,8 @@ StashKu is a data storage framework provides mechanisms for model extraction, in
 
 ### Next Release
 - [ ] Expose custom `toJSON` and `fromJSON` functions in all requests to save and load requests to/from standardized JSON definitions.
-- [x] Add `toString` and static `fromString` functions to `Sort` class.
-- [ ] Add `toString` and static `fromString` functions to `Filter` class.
+- [x] Add `toString` and static `parse` functions to `Sort` class.
+- [ ] Add `toString` and static `parse` functions to `Filter` class.
 
 # Running
 This is the core StashKu package and doesn not provide a CLI interface, as it is meant to be leveraged as a package. See the 

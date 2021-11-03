@@ -52,10 +52,10 @@ export default class Sort {
      * //is equivalent to
      * let myOrderBy = new Sort('FirstName', 'desc');
      * @param {String} input - The string to deconstruct.
-     * @returns {Sort} Returns a `Sort` instance when an input is given. If the input is `null`, `undefined`, or
-     * falsey, then `null` is returned.
+     * @returns {Sort} Returns a `Sort` instance when an input is given. If the input is `null` then `null` is
+     * returned.
      */
-    static fromString(input) {
+    static parse(input) {
         if (input) {
             let s = new Sort();
             let m = /(.+)\s+(asc|desc)(?:ending)?$/gi.exec(input);

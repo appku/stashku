@@ -409,7 +409,7 @@ class Filter {
                             } else {
                                 return v.toString();
                             }
-                        }).join(',') +'}';
+                        }).join(',') + '}';
                     } else if (typeof fg.value === 'string') {
                         strValue = `"${fg.value}"`;
                     } else if (fg.value === null) {
@@ -426,6 +426,226 @@ class Filter {
             s = this.toString(this.tree);
         }
         return s;
+    }
+
+    /**
+     * Attempts to parse a string containing a filter declaration into a new `Filter` instance and returns it.
+     * @throws SyntaxError if the string is unparsable.
+     * @param {String} input - The input string to parse into a new `Filter` instance.
+     * @returns {Filter} Returns a `Filter` instance when an input is given. If the input is `null` then `null` 
+     * is returned.
+     */
+    static parse(input) {
+        if (input !== null) {
+            if (typeof input !== 'string') {
+                throw new SyntaxError('Invalid "input" argument, the value is not a string.');
+            }
+            let f = new Filter();
+            //parse this
+            //[test0] EQ 1 OR [test1] EQ 2
+            //'([test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR (([test3] ISNULL AND [test4] EQ 4) OR [test5] IN "1,2,3,4,5,6" OR [test5] IN {"abc",null,123,undefined,true}))'
+            //ignore [ and ]
+            //( indicates start of group
+            //) indicates end of last group
+            //AND and OR are the only logic supported
+            let isNewLogicalGroupRegEx = /^\s*\(/;
+            let isEndingLogicalGroupRegEx = /^\s*\)/;
+            let isLogicalOr = /^OR\s/i;
+            let isLogicalAnd = /^AND\s/i;
+            let tree = { logic: null, filters: [] };
+            let group = tree;
+            //strip outermost parenthesis, if any.
+            if (/^\(.*\)$/.test(input)) {
+                input = input.substr(1, input.length - 2);
+            }
+            //start walk
+            for (let i = 0; i < input.length; i++) {
+                if (isNewLogicalGroupRegEx.test(input[i])) {
+                    let newGroup = {
+                        logic: null,
+                        filters: []
+                    };
+                    Object.defineProperty(newGroup, 'parent', { value: group, enumerable: false });
+                    group.filters.push(newGroup);
+                    group = newGroup;
+                } else if (isEndingLogicalGroupRegEx.test(input[i])) {
+                    if (tree === group) {
+                        throw new SyntaxError(`Error parsing filter group, mismatched grouping: Found no starting "(" for ending ")" at position ${i}.`);
+                    } else {
+                        //final group check
+                        if (!group.logic) {
+                            group.logic = Filter.LOGIC.AND;
+                        }
+                        //pop to parent
+                        group = group.parent;
+                    }
+                } else if (input[i] === '[') {
+                    let parseResult = Filter._parseCondition(input, i);
+                    group.filters.push(parseResult.condition);
+                    i = parseResult.indexTo;
+                } else if (isLogicalOr.test(input.substr(i, 3))) {
+                    if (!group.logic) {
+                        group.logic = Filter.LOGIC.OR;
+                    } else if (group.logic !== Filter.LOGIC.OR) {
+                        throw new SyntaxError(`Error parsing filter at position ${i}, logical comparison has changed from "${group.logic}" to "${Filter.LOGIC.OR}" without starting a new group (parenthesis).`);
+                    }
+                    i += 2;
+                } else if (isLogicalAnd.test(input.substr(i, 4))) {
+                    if (!group.logic) {
+                        group.logic = Filter.LOGIC.AND;
+                    } else if (group.logic !== Filter.LOGIC.AND) {
+                        throw new SyntaxError(`Error parsing filter at position ${i}, logical comparison has changed from "${group.logic}" to "${Filter.LOGIC.AND}" without starting a new group (parenthesis).`);
+                    }
+                    i += 3;
+                }
+            }
+            if (tree !== group) {
+                throw new SyntaxError('Error parsing filter group, mismatched grouping: Found starting "(" but no corresponding ending ")".');
+            }
+            if (!tree.logic) {
+                tree.logic = Filter.LOGIC.AND;
+            }
+            console.log(JSON.stringify(tree, null, 4));
+            return f;
+        }
+        return null;
+    }
+
+    /**
+     * Extracts a filter condition object from the given string, up to any ending value determination.
+     * @param {String} input - the full input string being parsed.
+     * @param {Number} startIndex - the current index in the parser walk.
+     * @returns {FilterCondition}
+     * @private
+     */
+    static _parseCondition(input, startIndex) {
+        let c = {
+            field: '',
+            op: ''
+        };
+        let noValueOps = [Filter.OP.ISNULL, Filter.OP.ISNOTNULL, Filter.OP.ISEMPTY, Filter.OP.ISNOTEMPTY];
+        let prop = 'field';
+        let isQuoted = false;
+        let isSingleQuoted = false;
+        let isBraced = false;
+        let i = startIndex;
+        for (; i < input.length; i++) {
+            if (prop === 'field') {
+                if (input[i] === '[') {
+                    continue;
+                } else if (input[i] === ']') {
+                    prop = 'op';
+                } else if (i === input.length - 1) {
+                    throw new SyntaxError(`Error parsing filter condition starting at ${startIndex}, unterminated property name: Found no "]" for starting "[".`);
+                } else {
+                    c.field += input[i];
+                }
+            } else if (prop === 'op') {
+                if (!c.op && /\s/.test(input[i])) {
+                    continue;
+                } else if (c.op && /\s/.test(input[i])) {
+                    if (noValueOps.indexOf(c.op.toLowerCase()) > -1) {
+                        break;
+                    } else {
+                        prop = 'value';
+                    }
+                } else if (i === input.length - 1) {
+                    throw new SyntaxError(`Error parsing filter condition starting at ${startIndex}, could not determine operator.`);
+                } else {
+                    c.op += input[i];
+                }
+            } else { //value
+                let missing = (typeof c.value === 'undefined');
+                if (missing && /\s/.test(input[i])) {
+                    continue;
+                } else if (missing && /null/i.test(input.substr(i, 4))) {
+                    c.value = null;
+                    i += 4;
+                    break;
+                } else if (missing && /undefined/i.test(input.substr(i, 9))) {
+                    i += 9;
+                    break;
+                } else if (missing && input[i] === '"') {
+                    isQuoted = true;
+                    c.value = '';
+                } else if (missing && input[i] === '\'') {
+                    isSingleQuoted = true;
+                    c.value = '';
+                } else if (missing && input[i] === '{') {
+                    isBraced = true;
+                    c.value = [];
+                } else if (missing) {
+                    c.value = input[i];
+                } else if (!missing && isQuoted && input[i] === '"' && input[i - 1] !== '\\') { //end of string value
+                    isQuoted = false;
+                    break;
+                } else if (!missing && isSingleQuoted && input[i] === '\'' && input[i - 1] !== '\\') { //end of string value
+                    isSingleQuoted = false;
+                    break;
+                } else if (!missing && isBraced && input[i] === '}') { //end of array value
+                    isBraced = false;
+                    c.value = c.value.split(',').map(v => Filter._parseValueString(v));
+                    break;
+                } else if (!missing && isQuoted === false && isSingleQuoted === false && isBraced === false && /\s|\)/.test(input[i])) { //end of indeterminate value
+                    c.value = Filter._parseValueString(c.value);
+                    i--;
+                    break;
+                } else {
+                    c.value += input[i];
+                }
+            }
+        }
+        if (isQuoted) {
+            throw new SyntaxError(`Error parsing filter condition starting at ${startIndex}, unterminated double-quoted value.`);
+        } else if (isSingleQuoted) {
+            throw new SyntaxError(`Error parsing filter condition starting at ${startIndex}, unterminated single-quoted value.`);
+        } else if (isBraced) {
+            throw new SyntaxError(`Error parsing filter condition starting at ${startIndex}, unterminated array ({...}) value.`);
+        }
+        return {
+            indexTo: i,
+            condition: c
+        };
+    }
+
+    /**
+     * Parses a singlular supported string representation of a value into a typed value, either a Number, String, 
+     * Date (from ISO8601, full), or Boolean. This method will remove outermost double or single quotes if found on
+     * a String value.
+     * @throws SyntaxError if there is an outermost starting or ending single or double quote without the opposite.
+     * @param {String} value - the value to be parsed.
+     * @returns {Number|String|Date|Boolean}
+     * @private
+     */
+    static _parseValueString(value) {
+        const ISO8601Date = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
+        if (value) {
+            if (/^-?\d*(\.\d+)?$/.test(value)) {
+                let tryValue = parseFloat(value);
+                if (isNaN(tryValue) === false) {
+                    return tryValue;
+                }
+            } else if (/^true$/i.test(value)) {
+                return true;
+            } else if (/^false$/i.test(value)) {
+                return false;
+            } else if (/^null$/i.test(value)) {
+                return null;
+            } else if (/^undefined$/i.test(value)) {
+                return undefined;
+            } else if (ISO8601Date.test(value)) {
+                return new Date(value);
+            } else if (/^(""|'')$/.test(value)) { //empty string
+                return '';
+            } else if (/^".+[^\\]"$/.test(value) || /^'.+[^\\]'$/.test(value)) { //strip quotes
+                return value.substr(1, value.length - 2);
+            } else if (/^".+([^"]|\\")$/.test(value) || /^([^"]|\\").+[^\\]"$/.test(value)) {
+                throw new SyntaxError(`Error parsing filter value "${value}", unterminated double-quoted value.`);
+            } else if (/^'.+([^']|\\')$/.test(value) || /^([^']|\\').+[^\\]'$/.test(value)) {
+                throw new SyntaxError(`Error parsing filter value "${value}", unterminated single-quoted value.`);
+            }
+        }
+        return value;
     }
 
 }
