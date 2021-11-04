@@ -1,16 +1,19 @@
 
 /**
- * @typedef {Object} Filter.FilterCondition
+ * @typedef FilterCondition
  * @property {String} field - The field name from the schema affected by the filter.
  * @property {String} op - The filter operator.
  * @property {*} [value] - The value used by the operator on the field value.
  */
 
 /**
- * @typedef {Object} Filter.FilterLogicalGroup
+ * @typedef FilterLogicalGroup
  * @property {String} logic - The logical operator to apply to the filters.
- * @property {Array.<Filter.FilterCondition|Filter.FilterLogicalGroup>} filters - The filter items and groups under the logical operator.
+ * @property {Array.<FilterCondition|FilterLogicalGroup>} filters - The filter items and groups under the logical operator.
  */
+
+const ISO8601Date = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
+const NakedValueTokenTerminator = /\s|\)|\(|\[|\]/;
 
 /**
  * Represents a tree of conditions that can be used to filter objects and data based on "fields", "operations", and
@@ -19,17 +22,17 @@
 class Filter {
     /**
      * Creates a new `Filter` instance.
-     * @param {Filter|Filter.FilterLogicalGroup} [tree] - Create the filter with an existing filter tree object.
+     * @param {Filter|FilterLogicalGroup} [tree] - Create the filter with an existing filter tree object.
      */
     constructor(tree) {
 
         /**
-         * @type {Filter.FilterLogicalGroup}
+         * @type {FilterLogicalGroup}
          */
         this.tree = null;
 
         /**
-         * @type {Filter.FilterLogicalGroup}
+         * @type {FilterLogicalGroup}
          * @private
          */
         this._current = null;
@@ -75,7 +78,7 @@ class Filter {
 
     /**
      * Create a new `Filter` instance and opening with a logical "and" operator.
-     * @param {String|Filter|Filter.FilterLogicalGroup} field - The field affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup} field - The field affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the field value.
      * @returns {Filter}
@@ -86,7 +89,7 @@ class Filter {
 
     /**
      * Create a new `Filter` instance and opening with a logical "or" operator.
-     * @param {String|Filter|Filter.FilterLogicalGroup} field - The field affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup} field - The field affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the field value.
      * @returns {Filter}
@@ -98,7 +101,7 @@ class Filter {
     /**
      * Checks if the specified filter is empty (contains no logical conditions) and returns a `true` if empty, `false`
      * if not.
-     * @param {Filter|Filter.FilterLogicalGroup} filter - The filter to check.
+     * @param {Filter|FilterLogicalGroup} filter - The filter to check.
      * @returns {Boolean}
      */
     static isEmpty(filter) {
@@ -122,7 +125,7 @@ class Filter {
 
     /**
      * Adds a new condition using a logical "or" operator.
-     * @param {String|Filter|Filter.FilterLogicalGroup} field - The field affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup} field - The field affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the field value.
      * @returns {Filter}
@@ -133,7 +136,7 @@ class Filter {
 
     /**
      * Adds a new condition using a logical "or" operator.
-     * @param {String|Filter|Filter.FilterLogicalGroup} field - The field affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup} field - The field affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the field value.
      * @returns {Filter}
@@ -145,7 +148,7 @@ class Filter {
     /**
      * Adds a new condition or filter group to the tree using the given logical operator.
      * @param {String} logic - The logical operator.
-     * @param {String|Filter|Filter.FilterLogicalGroup} field - The field affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup} field - The field affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the field value.
      * @returns {Filter} 
@@ -191,7 +194,7 @@ class Filter {
     /**
      * Creates a new logical group object.
      * @param {String} logic - The logical operator.
-     * @returns {Filter.FilterLogicalGroup}
+     * @returns {FilterLogicalGroup}
      * @private
      */
     _filterLogicalGroup(logic) {
@@ -211,7 +214,7 @@ class Filter {
      * @param {String} field - The field affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the field value.
-     * @returns {Filter.FilterCondition}
+     * @returns {FilterCondition}
      * @private
      */
     _filterCondition(field, op, value) {
@@ -245,8 +248,8 @@ class Filter {
 
     /**
      * Makes a copy of the filter group and returns the clone.
-     * @param {Filter.FilterLogicalGroup} orig - The group to clone.
-     * @returns {Filter.FilterLogicalGroup}
+     * @param {FilterLogicalGroup} orig - The group to clone.
+     * @returns {FilterLogicalGroup}
      * @private
      */
     _cloneFilterGroup(orig) {
@@ -283,7 +286,7 @@ class Filter {
 
     /**
      * Checks if the given model matches the given filter group criteria.
-     * @param {Filter.FilterLogicalGroup|Filter.FilterCondition} conditionOrGroup - The filter criteria to check.
+     * @param {FilterLogicalGroup|FilterCondition} conditionOrGroup - The filter criteria to check.
      * @param {Model} model - The model to evaluate. 
      * @returns {Boolean}
      * @private
@@ -373,7 +376,7 @@ class Filter {
 
     /**
      * Converts the filter to a readable string.
-     * @param {Filter.FilterLogicalGroup|Filter.FilterCondition} [fg] - Optional filter condition or filter group to convert to a string.
+     * @param {FilterLogicalGroup|FilterCondition} [fg] - Optional filter condition or filter group to convert to a string.
      * @returns {String}
      */
     toString(fg) {
@@ -381,14 +384,20 @@ class Filter {
         if (fg) {
             if (fg.logic) {
                 if (fg.filters) {
-                    s = '(';
+                    if (fg !== this.tree) {
+                        s = '(';
+                    } else {
+                        s = '';
+                    }
                     for (let x = 0; x < fg.filters.length; x++) {
                         s += this.toString(fg.filters[x]);
                         if (fg.filters.length > 1 && x < fg.filters.length - 1) {
                             s += ` ${fg.logic.toUpperCase()} `;
                         }
                     }
-                    s += ')';
+                    if (fg !== this.tree) {
+                        s += ')';
+                    }
                 }
             } else if (fg.field && fg.op) {
                 if (fg.op === Filter.OP.ISNULL
@@ -406,6 +415,8 @@ class Filter {
                                 return 'null';
                             } else if (typeof v === 'undefined') {
                                 return 'undefined';
+                            } else if (v instanceof Date) {
+                                return `"${v.toISOString()}"`;
                             } else {
                                 return v.toString();
                             }
@@ -416,6 +427,8 @@ class Filter {
                         strValue = 'null';
                     } else if (typeof fg.value === 'undefined') {
                         strValue = 'undefined';
+                    } else if (fg.value instanceof Date) {
+                        strValue = `"${fg.value.toISOString()}"`;
                     } else {
                         strValue = fg.value.toString();
                     }
@@ -429,183 +442,228 @@ class Filter {
     }
 
     /**
-     * Attempts to parse a string containing a filter declaration into a new `Filter` instance and returns it.
+     * Recursive function that parses each "group" it finds into a new `Filter` instance.
      * @throws SyntaxError if the string is unparsable.
-     * @param {String} input - The input string to parse into a new `Filter` instance.
+     * @param {String|Array.<ParserToken>} input - The input string to parse into a new `Filter` instance.
      * @returns {Filter} Returns a `Filter` instance when an input is given. If the input is `null` then `null` 
      * is returned.
      */
     static parse(input) {
-        if (input !== null) {
-            if (typeof input !== 'string') {
-                throw new SyntaxError('Invalid "input" argument, the value is not a string.');
+        if (input) {
+            let tokens;
+            if (typeof input === 'string') {
+                tokens = Filter._tokenize(input);
+                console.log(tokens);
+            } else if (Array.isArray(input)) {
+                tokens = input;
+            } else {
+                throw new SyntaxError('Invalid "input" argument. Input must be a string or array of tokens.');
             }
             let f = new Filter();
-            //parse this
-            //[test0] EQ 1 OR [test1] EQ 2
-            //'([test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR (([test3] ISNULL AND [test4] EQ 4) OR [test5] IN "1,2,3,4,5,6" OR [test5] IN {"abc",null,123,undefined,true}))'
-            //ignore [ and ]
-            //( indicates start of group
-            //) indicates end of last group
-            //AND and OR are the only logic supported
-            let isNewLogicalGroupRegEx = /^\s*\(/;
-            let isEndingLogicalGroupRegEx = /^\s*\)/;
-            let isLogicalOr = /^OR\s/i;
-            let isLogicalAnd = /^AND\s/i;
-            let tree = { logic: null, filters: [] };
-            let group = tree;
-            //strip outermost parenthesis, if any.
-            if (/^\(.*\)$/.test(input)) {
-                input = input.substr(1, input.length - 2);
-            }
-            //start walk
-            for (let i = 0; i < input.length; i++) {
-                if (isNewLogicalGroupRegEx.test(input[i])) {
-                    let newGroup = {
-                        logic: null,
-                        filters: []
-                    };
-                    Object.defineProperty(newGroup, 'parent', { value: group, enumerable: false });
-                    group.filters.push(newGroup);
-                    group = newGroup;
-                } else if (isEndingLogicalGroupRegEx.test(input[i])) {
-                    if (tree === group) {
-                        throw new SyntaxError(`Error parsing filter group, mismatched grouping: Found no starting "(" for ending ")" at position ${i}.`);
-                    } else {
-                        //final group check
-                        if (!group.logic) {
-                            group.logic = Filter.LOGIC.AND;
-                        }
-                        //pop to parent
-                        group = group.parent;
-                    }
-                } else if (input[i] === '[') {
-                    let parseResult = Filter._parseCondition(input, i);
-                    group.filters.push(parseResult.condition);
-                    i = parseResult.indexTo;
-                } else if (isLogicalOr.test(input.substr(i, 3))) {
-                    if (!group.logic) {
-                        group.logic = Filter.LOGIC.OR;
-                    } else if (group.logic !== Filter.LOGIC.OR) {
-                        throw new SyntaxError(`Error parsing filter at position ${i}, logical comparison has changed from "${group.logic}" to "${Filter.LOGIC.OR}" without starting a new group (parenthesis).`);
-                    }
-                    i += 2;
-                } else if (isLogicalAnd.test(input.substr(i, 4))) {
-                    if (!group.logic) {
-                        group.logic = Filter.LOGIC.AND;
-                    } else if (group.logic !== Filter.LOGIC.AND) {
-                        throw new SyntaxError(`Error parsing filter at position ${i}, logical comparison has changed from "${group.logic}" to "${Filter.LOGIC.AND}" without starting a new group (parenthesis).`);
-                    }
-                    i += 3;
+            //look-ahead for group-logic
+            let groupDepth = 0;
+            let groupLogic = Filter.LOGIC.AND;
+            for (let gei = 0; gei < tokens.length; gei++) {
+                if (tokens[gei].type === 'group-start') {
+                    groupDepth++;
+                } else if (groupDepth > 0 && tokens[gei].type === 'group-end') {
+                    groupDepth--;
+                } else if (groupDepth === 0 && tokens[gei].type === 'group-logic') {
+                    groupLogic = tokens[gei].value;
                 }
             }
-            if (tree !== group) {
-                throw new SyntaxError('Error parsing filter group, mismatched grouping: Found starting "(" but no corresponding ending ")".');
+            for (let ti = 0; ti < tokens.length; ti++) {
+                let t = tokens[ti];
+                if (t.type === 'group-start') {
+                    //find ending token index for the group, and determine logic
+                    let endingTokenIndex = -1;
+                    let groupDepth = 0;
+                    for (let gei = ti + 1; gei < tokens.length; gei++) {
+                        if (tokens[gei].type === 'group-start') {
+                            groupDepth++;
+                        } else if (groupDepth > 0 && tokens[gei].type === 'group-end') {
+                            groupDepth--;
+                        } else if (groupDepth === 0 && tokens[gei].type === 'group-end') {
+                            endingTokenIndex = gei;
+                        }
+                    }
+                    //create new group
+                    let tokensInGroup = tokens.slice(ti + 1, endingTokenIndex);
+                    if (tokensInGroup && tokensInGroup.length) {
+                        let fg = this.parse(tokensInGroup);
+                        f.add(groupLogic, fg);
+                    }
+                    //move to after the group to process next
+                    ti = endingTokenIndex;
+                } else if (t.type === 'condition-field') {
+                    //look-ahead and get the op and optional value.
+                    let tOp = tokens[ti + 1];
+                    let tValue;
+                    if (ti + 2 < tokens.length && tokens[ti + 2].type === 'condition-value') {
+                        tValue = tokens[ti + 2];
+                    }
+                    f.add(groupLogic, t.value, tOp.value, Filter._parseValueString(tValue?.value));
+                }
             }
-            if (!tree.logic) {
-                tree.logic = Filter.LOGIC.AND;
-            }
-            console.log(JSON.stringify(tree, null, 4));
             return f;
         }
         return null;
     }
 
     /**
-     * Extracts a filter condition object from the given string, up to any ending value determination.
-     * @param {String} input - the full input string being parsed.
-     * @param {Number} startIndex - the current index in the parser walk.
-     * @returns {FilterCondition}
+     * @typedef ParserToken
+     * @property {String} type
+     * @property {Number} startIndex
+     * @property {Number} endIndex
+     * @property {String} [value]
+     */
+
+    /**
+     * Scans the input string starting at the given index to determine the logic for a group.
+     * @param {String} input - The input string to parse into an array of tokens.
+     * @returns {Array.<ParserToken>}
      * @private
      */
-    static _parseCondition(input, startIndex) {
-        let c = {
-            field: '',
-            op: ''
-        };
-        let noValueOps = [Filter.OP.ISNULL, Filter.OP.ISNOTNULL, Filter.OP.ISEMPTY, Filter.OP.ISNOTEMPTY];
-        let prop = 'field';
-        let isQuoted = false;
-        let isSingleQuoted = false;
-        let isBraced = false;
-        let i = startIndex;
-        for (; i < input.length; i++) {
-            if (prop === 'field') {
-                if (input[i] === '[') {
-                    continue;
-                } else if (input[i] === ']') {
-                    prop = 'op';
-                } else if (i === input.length - 1) {
-                    throw new SyntaxError(`Error parsing filter condition starting at ${startIndex}, unterminated property name: Found no "]" for starting "[".`);
+    static _tokenize(input) {
+        let tokens = [];
+        let openToken = null;
+        let isLogicalOr = /^OR/i;
+        let isLogicalAnd = /^AND/i;
+        let sortedOpKeys = Filter.OP_KEYS.sort((a, b) => b.length - a.length); //ensure longest strings are checked first
+        for (let i = 0; i < input.length; i++) {
+            let newToken = null;
+            if (openToken && openToken.type === 'condition-value') { //parsing a value
+                if (!openToken.endIndex
+                    && (
+                        (openToken.style === 'double-quoted' && input[i - 1] !== '\\' && input[i] === '"')
+                        || (openToken.style === 'single-quoted' && input[i - 1] !== '\\' && input[i] === '\'')
+                        || (openToken.style === 'array' && input[i - 1] !== '\\' && input[i] === '}')
+                    )) {
+                    openToken.value += input[i]; //we include the quote (parsed out later)
+                    openToken.endIndex = i + 1;
+                    openToken = null;
+                } else if (!openToken.endIndex && openToken.style === 'naked' && NakedValueTokenTerminator.test(input[i])) {
+                    openToken.endIndex = i;
+                    openToken = null;
+                    i--; //need to walk back (-1) on this after closing as it may be a actionable char
+                } else if (!openToken.endIndex && openToken.style === 'naked' && input[i - 1] !== '\\' && input[i] === '"') {
+                    throw new SyntaxError(`Failed to tokenize filter string, a conditional value at position ${openToken.startIndex} found a closing double-quote, but the value was not opened with one.`);
+                } else if (!openToken.endIndex && openToken.style === 'naked' && input[i - 1] !== '\\' && input[i] === '\'') {
+                    throw new SyntaxError(`Failed to tokenize filter string, a conditional value at position ${openToken.startIndex} found a closing single-quote, but the value was not opened with one.`);
                 } else {
-                    c.field += input[i];
+                    openToken.value += input[i];
                 }
-            } else if (prop === 'op') {
-                if (!c.op && /\s/.test(input[i])) {
-                    continue;
-                } else if (c.op && /\s/.test(input[i])) {
-                    if (noValueOps.indexOf(c.op.toLowerCase()) > -1) {
-                        break;
-                    } else {
-                        prop = 'value';
+            } else if (openToken && openToken.type === 'condition-field') { //parsing a field name
+                if (!openToken.endIndex && input[i] === ']') {
+                    openToken.endIndex = i + 1;
+                    openToken = null;
+                } else {
+                    openToken.value = (openToken.value ?? '') + input[i];
+                }
+            } else if (input[i] === '(') { //new group detected
+                newToken = {
+                    type: 'group-start',
+                    startIndex: i,
+                    endIndex: i + 1
+                };
+            } else if (input[i] === ')') { //new group detected
+                newToken = {
+                    type: 'group-end',
+                    startIndex: i,
+                    endIndex: i + 1
+                };
+            } else if (input[i] === '[') {
+                newToken = {
+                    type: 'condition-field',
+                    startIndex: i
+                };
+                openToken = newToken; //token is open for more information
+            } else if (isLogicalOr.test(input.substr(i, 2))) {
+                newToken = {
+                    type: 'group-logic',
+                    startIndex: i,
+                    endIndex: i + 2,
+                    value: Filter.LOGIC.OR
+                };
+                i += 1;
+            } else if (isLogicalAnd.test(input.substr(i, 3))) {
+                newToken = {
+                    type: 'group-logic',
+                    startIndex: i,
+                    endIndex: i + 3,
+                    value: Filter.LOGIC.AND
+                };
+                i += 2;
+            } else {
+                if (tokens.length && tokens[tokens.length - 1].type === 'condition-field') { //check for matching operator only if preceding was a conditional-field
+                    for (let op of sortedOpKeys) {
+                        if (input.substr(i, op.length)?.localeCompare(op, undefined, { sensitivity: 'base' }) === 0) {
+                            newToken = {
+                                type: 'condition-op',
+                                startIndex: i,
+                                endIndex: i + op.length,
+                                value: op
+                            };
+                            i += op.length - 1;
+                            break;
+                        }
                     }
-                } else if (i === input.length - 1) {
-                    throw new SyntaxError(`Error parsing filter condition starting at ${startIndex}, could not determine operator.`);
-                } else {
-                    c.op += input[i];
                 }
-            } else { //value
-                let missing = (typeof c.value === 'undefined');
-                if (missing && /\s/.test(input[i])) {
-                    continue;
-                } else if (missing && /null/i.test(input.substr(i, 4))) {
-                    c.value = null;
-                    i += 4;
-                    break;
-                } else if (missing && /undefined/i.test(input.substr(i, 9))) {
-                    i += 9;
-                    break;
-                } else if (missing && input[i] === '"') {
-                    isQuoted = true;
-                    c.value = '';
-                } else if (missing && input[i] === '\'') {
-                    isSingleQuoted = true;
-                    c.value = '';
-                } else if (missing && input[i] === '{') {
-                    isBraced = true;
-                    c.value = [];
-                } else if (missing) {
-                    c.value = input[i];
-                } else if (!missing && isQuoted && input[i] === '"' && input[i - 1] !== '\\') { //end of string value
-                    isQuoted = false;
-                    break;
-                } else if (!missing && isSingleQuoted && input[i] === '\'' && input[i - 1] !== '\\') { //end of string value
-                    isSingleQuoted = false;
-                    break;
-                } else if (!missing && isBraced && input[i] === '}') { //end of array value
-                    isBraced = false;
-                    c.value = c.value.split(',').map(v => Filter._parseValueString(v));
-                    break;
-                } else if (!missing && isQuoted === false && isSingleQuoted === false && isBraced === false && /\s|\)/.test(input[i])) { //end of indeterminate value
-                    c.value = Filter._parseValueString(c.value);
-                    i--;
-                    break;
-                } else {
-                    c.value += input[i];
+                if (!newToken && /\s/.test(input[i]) === false) { //check for a possible value starting
+                    //values should only be declared if the last token was a condition-op, validate this immediately.
+                    if (tokens.length && tokens[tokens.length - 1].type !== 'condition-op') {
+                        throw new SyntaxError(`Failed to tokenize filter string, an invalid or unexpected value was found at position ${i}.`);
+                    }
+                    newToken = {
+                        type: 'condition-value',
+                        startIndex: i,
+                        value: input[i],
+                        style: 'naked'
+                    };
+                    if (input[i - 1] !== '\\') { //ignore escaped values
+                        if (input[i] === '"') {
+                            newToken.style = 'double-quoted';
+                        } else if (input[i] === '\'') {
+                            newToken.style = 'single-quoted';
+                        } else if (input[i] === '{') {
+                            newToken.style = 'array';
+                        }
+                    }
+                    openToken = newToken; //token is open for more information
+                }
+            }
+            //push new token to array
+            if (newToken) {
+                tokens.push(newToken);
+            }
+        }
+        //validate
+        //ensure no open token
+        if (openToken) {
+            if (openToken.type === 'condition-field') {
+                throw new SyntaxError(`Failed to tokenize filter string, a conditional field at position ${openToken.startIndex} was not closed properly, expected matching square brackets "[" and "]".`);
+            } else if (openToken.type === 'condition-value' && openToken.style === 'double-quoted') {
+                throw new SyntaxError(`Failed to tokenize filter string, a conditional value at position ${openToken.startIndex} was not closed properly, a closing double-quote was not found.`);
+            } else if (openToken.type === 'condition-value' && openToken.style === 'single-quoted') {
+                throw new SyntaxError(`Failed to tokenize filter string, a conditional value token at position ${openToken.startIndex} was not closed properly, a closing single-quote was not found.`);
+            }
+        }
+        //ensure all groups are terminated
+        let groupStartCount = tokens.reduce((p, c) => c.type === 'group-start' ? p + 1 : p + 0, 0);
+        let groupEndCount = tokens.reduce((p, c) => c.type === 'group-end' ? p + 1 : p + 0, 0);
+        if (groupStartCount !== groupEndCount) {
+            throw new SyntaxError('Failed to tokenize filter string, there are one or more mismatches between the opening and closing group parenthesis "(" and ")".');
+        }
+        //ensure all condition fields are followed by appropriate tokens
+        for (let ti = 0; ti < tokens.length; ti++) {
+            let t = tokens[ti];
+            if (t.type === 'condition-field') { //check followed by condition-op
+                if (ti === tokens.length - 1 || (ti < tokens.length - 1 && tokens[ti + 1].type !== 'condition-op')) {
+                    throw new SyntaxError(`Failed to tokenize filter string, a conditional field at position ${t.startIndex} was not followed by a conditional operator.`);
                 }
             }
         }
-        if (isQuoted) {
-            throw new SyntaxError(`Error parsing filter condition starting at ${startIndex}, unterminated double-quoted value.`);
-        } else if (isSingleQuoted) {
-            throw new SyntaxError(`Error parsing filter condition starting at ${startIndex}, unterminated single-quoted value.`);
-        } else if (isBraced) {
-            throw new SyntaxError(`Error parsing filter condition starting at ${startIndex}, unterminated array ({...}) value.`);
-        }
-        return {
-            indexTo: i,
-            condition: c
-        };
+        return tokens;
     }
 
     /**
@@ -618,7 +676,6 @@ class Filter {
      * @private
      */
     static _parseValueString(value) {
-        const ISO8601Date = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
         if (value) {
             if (/^-?\d*(\.\d+)?$/.test(value)) {
                 let tryValue = parseFloat(value);

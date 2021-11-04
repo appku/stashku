@@ -301,7 +301,7 @@ describe('#toString', () => {
             .or('test2', Filter.OP.EQUALS, 3)
             .or('test3', Filter.OP.EQUALS, null)
             .or('test4', Filter.OP.EQUALS);
-        expect(f.toString()).toBe('([test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR [test3] EQ null OR [test4] EQ undefined)');
+        expect(f.toString()).toBe('[test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR [test3] EQ null OR [test4] EQ undefined');
     });
     it('returns complex filter representation.', () => {
         let f = Filter
@@ -314,7 +314,7 @@ describe('#toString', () => {
                 .or('test5', Filter.OP.IN, '1,2,3,4,5,6')
                 .or('test5', Filter.OP.IN, ['abc', null, 123, undefined, true])
             );
-        expect(f.toString()).toBe('([test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR (([test3] ISNULL AND [test4] EQ 4) OR [test5] IN "1,2,3,4,5,6" OR [test5] IN {"abc",null,123,undefined,true}))');
+        expect(f.toString()).toBe('[test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR (([test3] ISNULL AND [test4] EQ 4) OR [test5] IN "1,2,3,4,5,6" OR [test5] IN {"abc",null,123,undefined,true})');
     });
 });
 
@@ -383,20 +383,163 @@ describe('#_filterCondition', () => {
 });
 
 describe('.parse', () => {
-    it.only('returns a new Filter instance created from a valid input string.', () => {
-        Filter.parse('[test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR (([test3] ISNULL AND [test4] EQ 4) OR [test5] IN "1,2,3,4,5,6" OR [test5] IN {"abc",null,123,undefined,true})');
-        Filter.parse('(((([test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3))))');
-        Filter.parse('(((())))');
-        Filter.parse('[test0] EQ 1 AND ([test1] EQ 2 OR [test2] EQ 3)');
+    it.only('matches toString filters.', () => {
+        let tests = [
+            // Filter
+            //     .or('test0', Filter.OP.EQUALS, 1)
+            //     .or('test1', Filter.OP.EQUALS, 2)
+            //     .or('test2', Filter.OP.EQUALS, 3)
+            //     .or('test3', Filter.OP.EQUALS, null)
+            //     .or('test4', Filter.OP.EQUALS),
+            Filter
+                .or('test0', Filter.OP.EQUALS, 1)
+                .or('test1', Filter.OP.EQUALS, 2)
+                .or('test2', Filter.OP.EQUALS, 3)
+                .or(Filter
+                    .and('test3', Filter.OP.ISNULL)
+                    .and('test4', Filter.OP.EQUALS, 4)
+                    .or('test5', Filter.OP.IN, '1,2,3,4,5,6')
+                    .or('test5', Filter.OP.IN, ['abc', null, 123, undefined, true])
+                )
+        ];
+        for (let f of tests) {
+            let strExpected = f.toString();
+            console.log(strExpected);
+            let parsed = Filter.parse(strExpected);
+            expect(parsed).toBeInstanceOf(Filter);
+            // console.log(JSON.stringify(f.tree, null, 4));
+            // console.log(JSON.stringify(parsed.tree, null, 4));
+            expect(parsed.toString()).toEqual(strExpected);
+        }
     });
-    it('throws a SyntaxError when the input string contains errors.', () => {
-        
+});
+//     let testFilters = [
+//         // Filter
+//         //     .or('test0', Filter.OP.EQUALS, 1)
+//         //     .or('test1', Filter.OP.EQUALS, 2)
+//         //     .or('test2', Filter.OP.EQUALS, 3)
+//         //     .or(Filter
+//         //         .and('test3', Filter.OP.ISNULL)
+//         //         .and('test4', Filter.OP.EQUALS, 4)
+//         //         .or('test5', Filter.OP.IN, '1,2,3,4,5,6')
+//         //         .or('test5', Filter.OP.IN, ['abc', null, 123, undefined, true])
+//         //     ),
+//         // Filter
+//         //     .or('test0', Filter.OP.EQUALS, 1)
+//         //     .or('test1', Filter.OP.ISEMPTY, 2)
+//         //     .or('test2', Filter.OP.EQUALS, 3),
+//         Filter
+//             .or('test0', Filter.OP.LESSTHAN, 1)
+//             .or('test1', Filter.OP.ISEMPTY, 2)
+//             .and('test2', Filter.OP.CONTAINS, 'hello')
+//             .or('test5', Filter.OP.IN, ['abc', 'test', true, false, new Date()])
+//     ];
+//     it.only('Retains parity with parsing toString output.', () => {
+//         for (let tf of testFilters) {
+//             let output = tf.toString();
+//             console.log(output);
+//             Filter.parse(output);
+//             //expect(Filter.parse(output).toString()).toMatch(output);
+//         }
+//     });
+//     it('throws a SyntaxError when the input string contains errors.', () => {
+
+//     });
+//     it('Returns null if unparsable.', () => {
+//         let tries = [null, undefined, '', 0, false];
+//         for (let t of tries) {
+//             let s = Filter.parse(t);
+//             expect(s).toBeNull();
+//         }
+//     });
+// });
+
+describe('._tokenize', () => {
+    it('throws a SyntaxError when a quoted value is not closed.', () => {
+        let tests = [
+            '([test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR [test3] CONTAINS \'hoof OR [test4] EQ undefined)',
+            '([test0] EQ 1 OR [test1] EQ 2 OR ([test2] EQ "lalal AND [test3] GTE 42) OR [test5] ISNULL)',
+            '([test0] EQ 1 AND [test1] EQ \'housing) OR ([test2] EQ 3 TRUE AND [test3] EQ null AND [test4] EQ undefined)',
+            '[test0] EQ 1 OR [test1] EQ "'
+        ];
+        for (let test of tests) {
+            expect(() => Filter._tokenize(test)).toThrow(SyntaxError);
+            expect(() => Filter._tokenize(test)).toThrow(/not closed properly.+quote/i);
+        }
     });
-    it('Returns null if unparsable.', () => {
-        let tries = [null, undefined, '', 0, false];
-        for (let t of tries) {
-            let s = Filter.parse(t);
-            expect(s).toBeNull();
+    it('throws a SyntaxError when a quoted value is not opened, but the end is found.', () => {
+        let tests = [
+            '([test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR [test3] CONTAINS hoof\' OR [test4] EQ undefined)',
+            '([test0] EQ 1 OR [test1] EQ 2 OR ([test2] EQ lalal" AND [test3] GTE 42) OR [test5] ISNULL)',
+            '([test0] EQ 1 AND [test1] EQ housing\') OR ([test2] EQ 3 TRUE AND [test3] EQ null AND [test4] EQ undefined)',
+            '[test0] EQ 1 OR [test1] EQ 3"',
+            '[test0] EQ 1 OR [test1] EQ 3\''
+        ];
+        for (let test of tests) {
+            expect(() => Filter._tokenize(test)).toThrow(SyntaxError);
+            expect(() => Filter._tokenize(test)).toThrow(/quote.+not opened/i);
+        }
+    });
+    it('throws a SyntaxError when a conditional field is not closed properly.', () => {
+        let tests = [
+            '([test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR [test3] CONTAINS hoof OR [test4 EQ undefined)',
+            '[test0] EQ 1 OR [test1 EQ 3'
+        ];
+        for (let test of tests) {
+            expect(() => Filter._tokenize(test)).toThrow(SyntaxError);
+            expect(() => Filter._tokenize(test)).toThrow(/field.+not closed properly/i);
+        }
+    });
+    it('throws a SyntaxError when an invalid value is found outside or out of order for the expected token.', () => {
+        let tests = [
+            '(GTE [test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR [test3] EQ null OR [test4] EQ undefined)',
+            '([test0] EQ 1 OR [test1] EQ 2 OR ([test2] EQ "lalal" AND [test3] GTE 42 ISEMPTY) OR [test5] ISNULL)',
+            '([test0] EQ 1 AND [test1] EQ 2) OR (ISNULL [test2] EQ 3 AND [test3] EQ null AND [test4] EQ undefined)',
+            '[test0] GTE EQ 1 OR [test1] EQ 2'
+        ];
+        for (let test of tests) {
+            expect(() => Filter._tokenize(test)).toThrow(SyntaxError);
+            expect(() => Filter._tokenize(test)).toThrow(/invalid or unexpected/i);
+        }
+    });
+    it('throws a SyntaxError when a group is not opened or closed properly.', () => {
+        let tests = [
+            '([test0] EQ 1 OR [test1] EQ 2 OR [test2] EQ 3 OR [test3] EQ null OR [test4] EQ undefined',
+            '[test0] EQ 1 OR [test1] EQ 2 OR ([test2] EQ "lalal" AND [test3] GTE 42 OR [test5] ISNULL',
+            '([test0] EQ 1 AND [test1] EQ 2) OR [test2] EQ 3 AND [test3] EQ null AND [test4] EQ undefined)',
+            '[test0] GTE 1 OR [test1] EQ 2)',
+            '(((()))',
+            '((())))'
+        ];
+        for (let test of tests) {
+            expect(() => Filter._tokenize(test)).toThrow(SyntaxError);
+            expect(() => Filter._tokenize(test)).toThrow(/mismatch.+group/i);
+        }
+    });
+    it('throws a SyntaxError when a conditional field is not followed by a conditional operator', () => {
+        let tests = [
+            '[apples] GTE 1 OR [bananas]',
+            '[apples] GTE 1 OR ([bananas] CONTAINS "Moose" AND [horse])'
+        ];
+        for (let test of tests) {
+            expect(() => Filter._tokenize(test)).toThrow(SyntaxError);
+            expect(() => Filter._tokenize(test)).toThrow(/field.+not followed by.+operator/i);
+        }
+    });
+    it('generates a valid array of tokens.', () => {
+        let test = '[apples] GTE 1 OR ([bananas] CONTAINS "Moose" AND [name] CONTAINS \'bob\') OR [char] NEQ "yoda"';
+        let tokens = Filter._tokenize(test);
+        expect(tokens).toBeInstanceOf(Array);
+        for (let t of tokens) {
+            expect(t.type).toMatch(/group-start|group-logic|group-end|condition-field|condition-op|condition-value/);
+            expect(t.startIndex).toBeGreaterThan(-1);
+            expect(t.endIndex).toBeGreaterThan(t.startIndex);
+            if (/group-logic|condition-field|condition-op|condition-value/.test(t.type)) {
+                expect(t.value).toBeDefined();
+            }
+            if (t.type === 'condition-value') {
+                expect(t.style).toMatch(/naked|double-quote|single-quote|array/);
+            }
         }
     });
 });
