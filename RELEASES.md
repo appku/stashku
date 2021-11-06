@@ -1,3 +1,7 @@
+# v-0.4.1: Filter & Sort Parsing
+- Add `toString` and static `parse` functions to `Sort` class.
+- Add `toString` and static `parse` functions to `Filter` class.
+
 # v-0.4.0: Models
 - Support for a new OPTIONS request, which should return a schema of the target resource. 
 - Full support for model usage in all request types:

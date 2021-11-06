@@ -12,7 +12,18 @@
  * @property {Array.<FilterCondition|FilterLogicalGroup>} filters - The filter items and groups under the logical operator.
  */
 
-const ISO8601Date = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
+/**
+ * A regular expression to check for a reasonable ISO8601 format date.
+ * YYYY-MM-DDThh:mm
+ * YYYY-MM-DDThh:mmTZD
+ * YYYY-MM-DDThh:mm:ss
+ * YYYY-MM-DDThh:mm:ssTZD
+ * YYYY-MM-DDThh:mm:ss.s
+ * YYYY-MM-DDThh:mm:ss.sTZD
+ * @see: https://www.w3.org/TR/NOTE-datetime
+ * @type {RegExp}
+ */
+const ISO8601Date = /^\d{4}-\d\d-\d\dT\d\d:\d\d(:\d\d(\.\d+)?)?(([+-]\d\d:\d\d)|Z)?$/i;
 const NakedValueTokenTerminator = /\s|\)|\(|\[|\]/;
 
 /**
@@ -404,11 +415,11 @@ class Filter {
                     || fg.op === Filter.OP.ISNOTNULL
                     || fg.op === Filter.OP.ISEMPTY
                     || fg.op === Filter.OP.ISNOTEMPTY) {
-                    s = `[${fg.field}] ${fg.op.toUpperCase()}`;
+                    s = `{${fg.field}} ${fg.op.toUpperCase()}`;
                 } else {
                     let strValue = null;
                     if (Array.isArray(fg.value)) {
-                        strValue = '{' + fg.value.map(v => {
+                        strValue = '[' + fg.value.map(v => {
                             if (typeof v === 'string') {
                                 return `"${v}"`;
                             } else if (v === null) {
@@ -420,7 +431,7 @@ class Filter {
                             } else {
                                 return v.toString();
                             }
-                        }).join(',') + '}';
+                        }).join(',') + ']';
                     } else if (typeof fg.value === 'string') {
                         strValue = `"${fg.value}"`;
                     } else if (fg.value === null) {
@@ -432,7 +443,7 @@ class Filter {
                     } else {
                         strValue = fg.value.toString();
                     }
-                    s = `[${fg.field}] ${fg.op.toUpperCase()} ${strValue}`;
+                    s = `{${fg.field}} ${fg.op.toUpperCase()} ${strValue}`;
                 }
             }
         } else {
@@ -453,7 +464,6 @@ class Filter {
             let tokens;
             if (typeof input === 'string') {
                 tokens = Filter._tokenize(input);
-                console.log(tokens);
             } else if (Array.isArray(input)) {
                 tokens = input;
             } else {
@@ -537,7 +547,7 @@ class Filter {
                     && (
                         (openToken.style === 'double-quoted' && input[i - 1] !== '\\' && input[i] === '"')
                         || (openToken.style === 'single-quoted' && input[i - 1] !== '\\' && input[i] === '\'')
-                        || (openToken.style === 'array' && input[i - 1] !== '\\' && input[i] === '}')
+                        || (openToken.style === 'array' && input[i - 1] !== '\\' && input[i] === ']')
                     )) {
                     openToken.value += input[i]; //we include the quote (parsed out later)
                     openToken.endIndex = i + 1;
@@ -554,7 +564,7 @@ class Filter {
                     openToken.value += input[i];
                 }
             } else if (openToken && openToken.type === 'condition-field') { //parsing a field name
-                if (!openToken.endIndex && input[i] === ']') {
+                if (!openToken.endIndex && input[i] === '}') {
                     openToken.endIndex = i + 1;
                     openToken = null;
                 } else {
@@ -572,7 +582,7 @@ class Filter {
                     startIndex: i,
                     endIndex: i + 1
                 };
-            } else if (input[i] === '[') {
+            } else if (input[i] === '{') {
                 newToken = {
                     type: 'condition-field',
                     startIndex: i
@@ -625,7 +635,7 @@ class Filter {
                             newToken.style = 'double-quoted';
                         } else if (input[i] === '\'') {
                             newToken.style = 'single-quoted';
-                        } else if (input[i] === '{') {
+                        } else if (input[i] === '[') {
                             newToken.style = 'array';
                         }
                     }
@@ -668,15 +678,15 @@ class Filter {
 
     /**
      * Parses a singlular supported string representation of a value into a typed value, either a Number, String, 
-     * Date (from ISO8601, full), or Boolean. This method will remove outermost double or single quotes if found on
-     * a String value.
+     * Date (from ISO8601, full), Boolean, or Array of those values. This method will remove outermost double or 
+     * single quotes if found on a String value.
      * @throws SyntaxError if there is an outermost starting or ending single or double quote without the opposite.
      * @param {String} value - the value to be parsed.
-     * @returns {Number|String|Date|Boolean}
+     * @returns {Number|String|Date|Boolean|Array}
      * @private
      */
     static _parseValueString(value) {
-        if (value) {
+        if (value && typeof value === 'string') {
             if (/^-?\d*(\.\d+)?$/.test(value)) {
                 let tryValue = parseFloat(value);
                 if (isNaN(tryValue) === false) {
@@ -694,12 +704,47 @@ class Filter {
                 return new Date(value);
             } else if (/^(""|'')$/.test(value)) { //empty string
                 return '';
-            } else if (/^".+[^\\]"$/.test(value) || /^'.+[^\\]'$/.test(value)) { //strip quotes
-                return value.substr(1, value.length - 2);
+            } else if (/^".+[^\\]"$/.test(value)) {
+                return value.substr(1, value.length - 2).replace(/\\"/g, '"');
+            }  else if (/^'.+[^\\]'$/.test(value)) {
+                return value.substr(1, value.length - 2).replace(/\\'/g, '\'');
             } else if (/^".+([^"]|\\")$/.test(value) || /^([^"]|\\").+[^\\]"$/.test(value)) {
                 throw new SyntaxError(`Error parsing filter value "${value}", unterminated double-quoted value.`);
             } else if (/^'.+([^']|\\')$/.test(value) || /^([^']|\\').+[^\\]'$/.test(value)) {
                 throw new SyntaxError(`Error parsing filter value "${value}", unterminated single-quoted value.`);
+            } else if (/^\[.*\]$/.test(value)) {
+                let extract = [];
+                let isDoubleQuoted = false;
+                let isSingleQuoted = false;
+                for (let i = 1; i < value.length - 1; i++) {
+                    let append = false;
+                    if (isDoubleQuoted === false && isSingleQuoted === false && value[i] === ',') {
+                        if (extract.length === 0) {
+                            extract.push(null); //blank first item, set a null
+                        }
+                        extract.push(null); //create a space for the new item
+                    } else if (value[i - 1] !== '\\' && value[i] === '"') {
+                        isDoubleQuoted = !isDoubleQuoted;
+                        append = true;
+                    } else if (value[i - 1] !== '\\' && value[i] === '\'') {
+                        isSingleQuoted = !isSingleQuoted;
+                        append = true;
+                    } else if (/\s/.test(value[i]) === false || extract[extract.length - 1]) {
+                        append = true;
+                    }
+                    if (append) {
+                        if (extract.length === 0) {
+                            extract.push(value[i]);
+                        } else {
+                            extract[extract.length - 1] = (extract[extract.length - 1] ?? '') + value[i];
+                        }
+                    }
+                }
+                //now parse each extracted array value
+                for (let i = 0; i < extract.length; i++) {
+                    extract[i] = Filter._parseValueString(extract[i]);
+                }
+                return extract;
             }
         }
         return value;
