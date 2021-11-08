@@ -181,6 +181,12 @@ describe('#add', () => {
         let expectedTree = Object.assign({}, f.tree);
         expect(f.add(Filter.LOGIC.AND, new Filter()).tree).toEqual(expectedTree);
     });
+    it('supports alternative logic (&&, ||) syntax.', () => {
+        let f = new Filter();
+        expect(f.add('&&', 'Hello', Filter.OP.EQUALS, 1).tree).toEqual(Filter.and('Hello', Filter.OP.EQUALS, 1).tree);
+        f = new Filter();
+        expect(f.add('||', 'Hello', Filter.OP.EQUALS, 1).tree).toEqual(Filter.or('Hello', Filter.OP.EQUALS, 1).tree);
+    });
 });
 
 describe('#test', () => {

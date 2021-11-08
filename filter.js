@@ -165,6 +165,13 @@ class Filter {
      * @returns {Filter} 
      */
     add(logic, field, op, value) {
+        //convert logic aliases
+        if (logic === '&&') {
+            logic = Filter.LOGIC.AND;
+        } else if (logic === '||') {
+            logic = Filter.LOGIC.OR;
+        }
+        //validate
         if (!logic) {
             throw new Error('The "logic" parameter argument is required.');
         } else if (Filter.LOGIC_KEYS.indexOf(logic) <= -1) {
