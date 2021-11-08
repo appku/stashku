@@ -354,3 +354,22 @@ describe('#meta', () => {
         expect(r.metadata.extra).toBe(123);
     });
 });
+
+describe('#toJSON', () => {
+    class ThemeModel { }
+    it('returns the metadata to utilize for JSON stringifying.', () => {
+        let r = new PutRequest()
+            .model(ThemeModel)
+            .to('Goose')
+            .headers({ hello: 'world' })
+            .objects({ Bob: 'Sue', Hi: 12345 }, { Hi: true })
+            .pk('ID');
+        let parsed = JSON.parse(JSON.stringify(r));
+        expect(parsed.model).toEqual(r.metadata.model.name);
+        expect(parsed.to).toEqual(r.metadata.to);
+        expect(parsed.count).toEqual(r.metadata.count);
+        expect(parsed.objects).toEqual([{ Bob: 'Sue', Hi: 12345 }, { Hi: true }]);
+        expect(parsed.pk).toEqual(['ID']);
+        expect(parsed.headers).toEqual({ hello: 'world' });
+    });
+});

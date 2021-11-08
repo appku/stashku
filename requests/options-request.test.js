@@ -189,3 +189,17 @@ describe('#headers', () => {
         expect(r.headers(null)).toBe(r);
     });
 });
+
+describe('#toJSON', () => {
+    class ThemeModel { }
+    it('returns the metadata to utilize for JSON stringifying.', () => {
+        let r = new OptionsRequest()
+            .model(ThemeModel)
+            .from('Goose')
+            .headers({ hello: 'world' });
+        let parsed = JSON.parse(JSON.stringify(r));
+        expect(parsed.model).toEqual(r.metadata.model.name);
+        expect(parsed.from).toEqual(r.metadata.from);
+        expect(parsed.headers).toEqual({ hello: 'world' });
+    });
+});

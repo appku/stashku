@@ -318,3 +318,21 @@ describe('#meta', () => {
         expect(r.metadata.extra).toBe(123);
     });
 });
+
+describe('#toJSON', () => {
+    class ThemeModel { }
+    it('returns the metadata to utilize for JSON stringifying.', () => {
+        let r = new PatchRequest()
+            .model(ThemeModel)
+            .to('Goose')
+            .headers({ hello: 'world' })
+            .template({ Bob: 'Sue', Hi: 12345 })
+            .count();
+        let parsed = JSON.parse(JSON.stringify(r));
+        expect(parsed.model).toEqual(r.metadata.model.name);
+        expect(parsed.to).toEqual(r.metadata.to);
+        expect(parsed.count).toEqual(r.metadata.count);
+        expect(parsed.template).toEqual({ Bob: 'Sue', Hi: 12345 });
+        expect(parsed.headers).toEqual({ hello: 'world' });
+    });
+});

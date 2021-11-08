@@ -1,5 +1,6 @@
 import Filter from '../filter.js';
 import ModelUtility from '../modeling/model-utility.js';
+import Objects from '../utilities/objects.js';
 
 /**
  * This class defines a StashKu OPTIONS request that instructs StashKu to gather the schema for models from a 
@@ -115,6 +116,19 @@ export default class OptionsRequest {
             throw new Error('The "dictionary" argument must be null, a Map, or an object.');
         }
         return this;
+    }
+
+    /**
+     * Returns the metadata object to be utilized for stringifying into JSON.
+     * @returns {*}
+     */
+    toJSON() {
+        let metaClone = Object.assign({}, this.metadata);
+        if (this.metadata.headers) {
+            metaClone.headers = Objects.fromEntries(this.metadata.headers);
+        }
+        metaClone.model = this.metadata?.model?.name;
+        return metaClone;
     }
 
 }

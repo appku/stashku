@@ -460,6 +460,14 @@ class Filter {
     }
 
     /**
+     * Returns the tree object to be utilized for stringifying into JSON.
+     * @returns {FilterLogicalGroup}
+     */
+    toJSON() {
+        return this.tree;
+    }
+
+    /**
      * Recursive function that parses each "group" it finds into a new `Filter` instance.
      * @throws SyntaxError if the string is unparsable.
      * @param {String|Array.<ParserToken>} input - The input string to parse into a new `Filter` instance.

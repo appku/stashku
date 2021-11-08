@@ -44,7 +44,7 @@ describe('#model', () => {
         }
         let r = new GetRequest().model(MyModel);
         expect(r.metadata.from).toBe('abc');
-        r = new GetRequest().model(class TestModel {});
+        r = new GetRequest().model(class TestModel { });
         expect(r.metadata.from).toBe('TestModels');
     });
     it('removes the metadata "model" property when null is passed.', () => {
@@ -54,8 +54,8 @@ describe('#model', () => {
     });
     it('adds to the metadata "properties" property.', () => {
         class MyModel {
-            static get hello() {return 'hello';}
-            static get abc() {return 'abc';}
+            static get hello() { return 'hello'; }
+            static get abc() { return 'abc'; }
         }
         let r = new GetRequest().model(MyModel);
         expect(r.metadata.properties).toEqual(['hello', 'abc']);
@@ -140,12 +140,12 @@ describe('#properties', () => {
         r.properties(null);
         expect(r.metadata.properties.length).toBe(0);
     });
-    it('adds to properties already defined in a model.', ()=> {
+    it('adds to properties already defined in a model.', () => {
         class TestModel {
-            static get hello() {return 'hello'; }
+            static get hello() { return 'hello'; }
         }
         expect(new GetRequest().model(TestModel).properties('ID', 'Moose').metadata.properties)
-            .toEqual(['hello', 'ID', 'Moose'])
+            .toEqual(['hello', 'ID', 'Moose']);
     });
 });
 
@@ -498,5 +498,34 @@ describe('#meta', () => {
         expect(r.metadata.from).toBe('somewhere');
         expect(r.metadata.abc).toBe('ok');
         expect(r.metadata.extra).toBe(123);
+    });
+});
+
+describe('#toJSON', () => {
+    class ThemeModel { }
+    it('returns the metadata to utilize for JSON stringifying.', () => {
+        let r = new GetRequest()
+            .model(ThemeModel)
+            .where(Filter
+                .or('test0', Filter.OP.EQUALS, 1)
+                .or('test1', Filter.OP.EQUALS, 2)
+                .or('test2', Filter.OP.EQUALS, 3)
+                .or('test3', Filter.OP.EQUALS, null)
+                .or('test4', Filter.OP.EQUALS))
+            .from('Goose')
+            .headers({ hello: 'world' })
+            .skip(10)
+            .take(123)
+            .sort(new Sort('FirstName', Sort.DIR.DESC));
+        let parsed = JSON.parse(JSON.stringify(r));
+        expect(parsed.model).toEqual(r.metadata.model.name);
+        expect(parsed.from).toEqual(r.metadata.from);
+        expect(parsed.skip).toEqual(r.metadata.skip);
+        expect(parsed.take).toEqual(r.metadata.take);
+        expect(parsed.count).toEqual(r.metadata.count);
+        expect(parsed.distinct).toEqual(r.metadata.distinct);
+        expect(parsed.sorts).toEqual([new Sort('FirstName', Sort.DIR.DESC)]);
+        expect(parsed.where).toEqual(JSON.parse(JSON.stringify(r.metadata.where)));
+        expect(parsed.headers).toEqual({ hello: 'world' });
     });
 });

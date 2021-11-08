@@ -1,5 +1,6 @@
 import PatchRequest from './patch-request.js';
 import ModelUtility from '../modeling/model-utility.js';
+import Objects from '../utilities/objects.js';
 
 /**
  * This class defines a StashKu PUT request that instructs StashKu to update existing objects in storage.
@@ -234,6 +235,19 @@ export default class PutRequest {
             this.metadata = Object.assign(this.metadata, metadata);
         }
         return this;
+    }
+
+    /**
+     * Returns the metadata object to be utilized for stringifying into JSON.
+     * @returns {*}
+     */
+    toJSON() {
+        let metaClone = Object.assign({}, this.metadata);
+        if (this.metadata.headers) {
+            metaClone.headers = Objects.fromEntries(this.metadata.headers);
+        }
+        metaClone.model = this.metadata?.model?.name;
+        return metaClone;
     }
 
 }

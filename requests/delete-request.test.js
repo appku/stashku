@@ -299,3 +299,27 @@ describe('#meta', () => {
         expect(r.metadata.extra).toBe(123);
     });
 });
+
+describe('#toJSON', () => {
+    class ThemeModel {}
+    it('returns the metadata to utilize for JSON stringifying.', () => {
+        let dr = new DeleteRequest()
+            .model(ThemeModel)
+            .where(Filter
+                .or('test0', Filter.OP.EQUALS, 1)
+                .or('test1', Filter.OP.EQUALS, 2)
+                .or('test2', Filter.OP.EQUALS, 3)
+                .or('test3', Filter.OP.EQUALS, null)
+                .or('test4', Filter.OP.EQUALS))
+            .from('Goose')
+            .headers({ hello: 'world' })
+            .count();
+        let parsed = JSON.parse(JSON.stringify(dr));
+        expect(parsed.model).toEqual(dr.metadata.model.name);
+        expect(parsed.all).toEqual(dr.metadata.all);
+        expect(parsed.from).toEqual(dr.metadata.from);
+        expect(parsed.count).toEqual(dr.metadata.count);
+        expect(parsed.where).toEqual(JSON.parse(JSON.stringify(dr.metadata.where)));
+        expect(parsed.headers).toEqual({ hello: 'world' });
+    });
+});

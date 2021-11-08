@@ -1,3 +1,12 @@
+# v-0.4.2: JSON Stringify Support
+- Add `toJSON` support to `Filter` class.
+- Add `toJSON` support to `DeleteRequest` class.
+- Add `toJSON` support to `GetRequest` class.
+- Add `toJSON` support to `PatchRequest` class.
+- Add `toJSON` support to `PostRequest` class.
+- Add `toJSON` support to `PutRequest` class.
+- Add `toJSON` support to `OptionsRequest` class.
+
 # v-0.4.1: Filter & Sort Parsing
 - Add `toString` and static `parse` functions to `Sort` class.
 - Add `toString` and static `parse` functions to `Filter` class.

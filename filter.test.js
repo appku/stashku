@@ -324,6 +324,32 @@ describe('#toString', () => {
     });
 });
 
+describe('#toJSON', () => {
+    it('returns the tree of the filter to utilize for JSON stringifying.', () => {
+        let tests = [
+            Filter
+                .or('test0', Filter.OP.EQUALS, 1)
+                .or('test1', Filter.OP.EQUALS, 2)
+                .or('test2', Filter.OP.EQUALS, 3)
+                .or('test3', Filter.OP.EQUALS, null)
+                .or('test4', Filter.OP.EQUALS),
+            Filter
+                .or('test0', Filter.OP.EQUALS, 1)
+                .or('test1', Filter.OP.EQUALS, 2)
+                .or('test2', Filter.OP.EQUALS, 3)
+                .or(Filter
+                    .and('test3', Filter.OP.ISNULL)
+                    .and('test4', Filter.OP.EQUALS, 4)
+                    .or('test5', Filter.OP.IN, '1,2,3,4,5,6')
+                    .or('test5', Filter.OP.IN, ['abc', null, 123, true])
+                )
+        ];
+        for (let t of tests) {
+            expect(JSON.parse(JSON.stringify(t))).toEqual(t.tree);
+        }
+    });
+});
+
 describe('builds complex logic tree', () => {
     it('allows sub-filters.', () => {
         let f = Filter

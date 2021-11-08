@@ -1,6 +1,7 @@
 import Filter from '../filter.js';
 import Sort from '../sort.js';
 import ModelUtility from '../modeling/model-utility.js';
+import Objects from '../utilities/objects.js';
 
 /**
  * This class defines a StashKu GET request that instructs StashKu to retrieve objects from storage.
@@ -333,6 +334,19 @@ export default class GetRequest {
             this.metadata = Object.assign(this.metadata, metadata);
         }
         return this;
+    }
+
+    /**
+     * Returns the metadata object to be utilized for stringifying into JSON.
+     * @returns {*}
+     */
+    toJSON() {
+        let metaClone = Object.assign({}, this.metadata);
+        if (this.metadata.headers) {
+            metaClone.headers = Objects.fromEntries(this.metadata.headers);
+        }
+        metaClone.model = this.metadata?.model?.name;
+        return metaClone;
     }
 
 }

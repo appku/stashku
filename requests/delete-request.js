@@ -1,5 +1,6 @@
 import Filter from '../filter.js';
 import ModelUtility from '../modeling/model-utility.js';
+import Objects from '../utilities/objects.js';
 
 /**
  * This class defines a StashKu DELETE request that instructs StashKu to delete objects matching the specified criteria.
@@ -19,6 +20,8 @@ export default class DeleteRequest {
             from: null,
             /** @type {Boolean} */
             count: false,
+            /** @type {*} */
+            model: null,
             /** @type {Map.<String, *>} */
             headers: null
         };
@@ -210,6 +213,19 @@ export default class DeleteRequest {
             this.metadata = Object.assign(this.metadata, metadata);
         }
         return this;
+    }
+
+    /**
+     * Returns the metadata object to be utilized for stringifying into JSON.
+     * @returns {*}
+     */
+    toJSON() {
+        let metaClone = Object.assign({}, this.metadata);
+        if (this.metadata.headers) {
+            metaClone.headers = Objects.fromEntries(this.metadata.headers);
+        }
+        metaClone.model = this.metadata?.model?.name;
+        return metaClone;
     }
 
 }
