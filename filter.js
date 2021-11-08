@@ -537,8 +537,9 @@ class Filter {
     static _tokenize(input) {
         let tokens = [];
         let openToken = null;
-        let isLogicalOr = /^OR/i;
+        let isLogicalOr = /^OR|\|\|/i;
         let isLogicalAnd = /^AND/i;
+        let isLogicalAndAlt = /^&&/i;
         let sortedOpKeys = Filter.OP_KEYS.sort((a, b) => b.length - a.length); //ensure longest strings are checked first
         for (let i = 0; i < input.length; i++) {
             let newToken = null;
@@ -604,6 +605,14 @@ class Filter {
                     value: Filter.LOGIC.AND
                 };
                 i += 2;
+            } else if (isLogicalAndAlt.test(input.substr(i, 2))) {
+                newToken = {
+                    type: 'group-logic',
+                    startIndex: i,
+                    endIndex: i + 2,
+                    value: Filter.LOGIC.AND
+                };
+                i += 1;
             } else {
                 if (tokens.length && tokens[tokens.length - 1].type === 'condition-field') { //check for matching operator only if preceding was a conditional-field
                     for (let op of sortedOpKeys) {
@@ -706,7 +715,7 @@ class Filter {
                 return '';
             } else if (/^".+[^\\]"$/.test(value)) {
                 return value.substr(1, value.length - 2).replace(/\\"/g, '"');
-            }  else if (/^'.+[^\\]'$/.test(value)) {
+            } else if (/^'.+[^\\]'$/.test(value)) {
                 return value.substr(1, value.length - 2).replace(/\\'/g, '\'');
             } else if (/^".+([^"]|\\")$/.test(value) || /^([^"]|\\").+[^\\]"$/.test(value)) {
                 throw new SyntaxError(`Error parsing filter value "${value}", unterminated double-quoted value.`);

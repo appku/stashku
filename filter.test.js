@@ -487,6 +487,26 @@ describe('._tokenize', () => {
             expect(() => Filter._tokenize(test)).toThrow(/field.+not followed by.+operator/i);
         }
     });
+    it('supports both AND, OR and &&, || symbols for logic.', () => {
+        let tests = [
+            '{apples} GTE 1 OR ({bananas} CONTAINS "Moose" AND {name} CONTAINS \'bob\' AND {horse} EQ 2)',
+            '{apples} GTE 1 || ({bananas} CONTAINS "Moose" && {name} CONTAINS \'bob\' && {horse} EQ 2)'
+        ];
+        for (let t of tests) {
+            let tokens = Filter._tokenize(t);
+            expect(tokens).toBeInstanceOf(Array);
+            expect(tokens.reduce((pv, cv) =>
+                cv.type === 'group-logic'
+                    && cv.value === Filter.LOGIC.OR
+                    ? pv + 1 : pv + 0, 0
+            )).toBe(1);
+            expect(tokens.reduce((pv, cv) =>
+                cv.type === 'group-logic'
+                    && cv.value === Filter.LOGIC.AND
+                    ? pv + 1 : pv + 0, 0
+            )).toBe(2);
+        }
+    });
     it('generates a valid array of tokens.', () => {
         let test = '{apples} GTE 1 OR ({bananas} CONTAINS "Moose" AND {name} CONTAINS \'bob\') OR {char} NEQ "yoda"';
         let tokens = Filter._tokenize(test);

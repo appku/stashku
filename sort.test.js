@@ -15,12 +15,12 @@ describe('#constructor', () => {
 
 describe('#toString', () => {
     it('returns a property and direction when set.', () => {
-        expect(new Sort('test', Sort.DIR.ASC).toString()).toBe('test asc');
+        expect(new Sort('test', Sort.DIR.ASC).toString()).toBe('{test} ASC');
     });
     it('returns a property when set but direction is missing.', () => {
         let s = new Sort('test');
         s.dir = null;
-        expect(s.toString()).toBe('test');
+        expect(s.toString()).toBe('{test}');
     });
     it('returns a blank string when the property is missing.', () => {
         expect(new Sort('', Sort.DIR.ASC).toString()).toBe('');
@@ -46,12 +46,11 @@ describe('.desc', () => {
 describe('.parse', () => {
     it('returns a new Sort instance created from just a property name.', () => {
         let tries = [
-            { input: 'test', expected: { property: 'test', dir: Sort.DIR.ASC } },
-            { input: 'test desc', expected: { property: 'test', dir: Sort.DIR.DESC } },
-            { input: 'test DESC', expected: { property: 'test', dir: Sort.DIR.DESC } },
-            { input: 'test Descending', expected: { property: 'test', dir: Sort.DIR.DESC } },
-            { input: 'test asc', expected: { property: 'test', dir: Sort.DIR.ASC } },
-            { input: 'test ASC', expected: { property: 'test', dir: Sort.DIR.ASC } }
+            { input: '{test}', expected: { property: 'test', dir: Sort.DIR.ASC } },
+            { input: '{test} desc', expected: { property: 'test', dir: Sort.DIR.DESC } },
+            { input: '{test} DESC', expected: { property: 'test', dir: Sort.DIR.DESC } },
+            { input: '{test} asc', expected: { property: 'test', dir: Sort.DIR.ASC } },
+            { input: '{test} ASC', expected: { property: 'test', dir: Sort.DIR.ASC } }
         ];
         for (let t of tries) {
             let s = Sort.parse(t.input);
@@ -60,18 +59,37 @@ describe('.parse', () => {
             expect(s.dir).toBe(t.expected.dir);
         }
     });
-    it('Treats words that start or end with asc and desc as part of the property.', () => {
+    it('returns an array of sorts if the string is comma-seperated', () => {
         let tries = [
-            { input: 'test Ascension', expected: { property: 'test Ascension', dir: Sort.DIR.ASC } },
-            { input: 'test Description', expected: { property: 'test Description', dir: Sort.DIR.ASC } },
-            { input: 'test Tasc', expected: { property: 'test Tasc', dir: Sort.DIR.ASC } },
-            { input: 'test addesc', expected: { property: 'test addesc', dir: Sort.DIR.ASC } }
+            {
+                input: '{test}, {moose}, {rest}',
+                expected: [
+                    { property: 'test', dir: Sort.DIR.ASC },
+                    { property: 'moose', dir: Sort.DIR.ASC },
+                    { property: 'rest', dir: Sort.DIR.ASC }
+                ]
+            },
+            {
+                input: '{test} desc, {moose} asc, {rest} desc',
+                expected: [
+                    { property: 'test', dir: Sort.DIR.DESC },
+                    { property: 'moose', dir: Sort.DIR.ASC },
+                    { property: 'rest', dir: Sort.DIR.DESC }
+                ]
+            },
+            {
+                input: '{test} desc, {moose}',
+                expected: [
+                    { property: 'test', dir: Sort.DIR.DESC },
+                    { property: 'moose', dir: Sort.DIR.ASC }
+                ]
+            }
         ];
         for (let t of tries) {
             let s = Sort.parse(t.input);
-            expect(s).toBeInstanceOf(Sort);
-            expect(s.property).toBe(t.expected.property);
-            expect(s.dir).toBe(t.expected.dir);
+            expect(s).toBeInstanceOf(Array);
+            expect(s).toEqual(t.expected);
+            expect(s.length).toBeGreaterThan(1);
         }
     });
     it('Returns null if unparsable.', () => {
@@ -80,5 +98,45 @@ describe('.parse', () => {
             let s = Sort.parse(t);
             expect(s).toBeNull();
         }
+    });
+});
+
+describe('._tokenize', () => {
+    it('retrieves properties, order, and separator tokens.', () => {
+        let tests = [
+            {
+                input: '{Bob}',
+                expected: [
+                    { type: 'property', value: 'Bob' }
+                ]
+            },
+            {
+                input: '{\\{Bobby Tables\\}}',
+                expected: [
+                    { type: 'property', value: '{Bobby Tables}' }
+                ]
+            },
+            {
+                input: '{Bob},  {Susan} desc, {Micael} asc',
+                expected: [
+                    { type: 'property', value: 'Bob' },
+                    { type: 'separator' },
+                    { type: 'property', value: 'Susan' },
+                    { type: 'order', value: Sort.DIR.DESC },
+                    { type: 'separator' },
+                    { type: 'property', value: 'Micael' },
+                    { type: 'order', value: Sort.DIR.ASC },
+                ]
+            },
+        ];
+        for (let t of tests) {
+            let s = Sort._tokenize(t.input);
+            expect(s).toBeInstanceOf(Array);
+            expect(s).toEqual(t.expected);
+        }
+    });
+    it('throws SyntaxError on invalid or unescaped character in the string.', () => {
+        expect(() => Sort._tokenize('{Marshmellow} mellon')).toThrow(SyntaxError);
+        expect(() => Sort._tokenize('{Marshmellow} ||')).toThrow(SyntaxError);
     });
 });
