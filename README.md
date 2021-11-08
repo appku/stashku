@@ -28,8 +28,13 @@ StashKu can be configured using environmental variables.
 |-|-|-|-|-|
 | limit | STASHKU_MEMORY_LIMIT | `Number` | `0` | Specifies the maximum number of records allowed to be stored in the memory engine. Attempts to write more than this number will throw an exception. Set to a value of `0` or less to not enforce a limit. |
 
-## Code Documentation
+# Code Documentation
 You can generate a static JSDoc site under the `docs/` path using the command `npm run docs`.
+
+# Installing
+```sh
+npm i --registry=https://registry.npmjs.org
+```
 
 # Testing
 This project uses `jest` to perform unit tests.
