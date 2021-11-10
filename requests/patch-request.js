@@ -155,10 +155,7 @@ export default class PatchRequest {
      * @returns {PatchRequest}
      */
     to(name) {
-        if (name === null) {
-            this.metadata.to = null;
-            return this;
-        } else if (typeof name !== 'string') {
+        if (name !== null && typeof name !== 'string') {
             throw new Error('Invalid "name" argument. The value must be a string or null.');
         }
         this.metadata.to = name;
@@ -186,7 +183,7 @@ export default class PatchRequest {
      * @throws Error when the dictionary argument uses a non-string key.
      * @throws Error when the dictionary argument is not an object, null, or a Map.
      * @param {Object | Map.<String, *>} dictionary - A map or object defining the headers and values.
-     * @returns {DeleteRequest}
+     * @returns {PatchRequest}
      */
     headers(dictionary) {
         if (!this.metadata.headers) {
@@ -224,6 +221,8 @@ export default class PatchRequest {
      * @param {*} metadata - An object with properties and values to set as request metadata for engine-specific functionality.
      * @returns {PatchRequest}
      * @deprecated Use new `headers` function for engine-specific options per-request.
+     * 
+     * *This function will be removed in a future release.*
      */
     meta(metadata) {
         if (metadata === null) {
@@ -254,6 +253,7 @@ export default class PatchRequest {
             metaClone.headers = Objects.fromEntries(this.metadata.headers);
         }
         metaClone.model = this.metadata?.model?.name;
+        metaClone.method = this.method;
         return metaClone;
     }
 

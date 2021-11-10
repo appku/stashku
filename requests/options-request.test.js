@@ -201,5 +201,6 @@ describe('#toJSON', () => {
         expect(parsed.model).toEqual(r.metadata.model.name);
         expect(parsed.from).toEqual(r.metadata.from);
         expect(parsed.headers).toEqual({ hello: 'world' });
+        expect(parsed.method).toBe('options');
     });
 });

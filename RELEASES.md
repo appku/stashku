@@ -1,3 +1,10 @@
+# v-0.4.3: JSON Stringify Support
+- New `fromObject` support to `Filter` class.
+- New `requestFromFile` and `requestFromObject` static StashKu functions to generate request instances from untyped objects (or JSON files).
+- Depreciate use of term "field" and use "property" instead to align with requests, models, and other areas of StashKu.
+  - The `GetRequest` `sort` function prefers `property` over a `field` property on a sort object passed.
+  - (*Breaking*) The `Filter` now uses `property` instead of `field`. The constructor will convert `field` properties to `property`.
+
 # v-0.4.2: JSON Stringify Support
 - Add `toJSON` support to `Filter` class.
 - Add `toJSON` support to `DeleteRequest` class.

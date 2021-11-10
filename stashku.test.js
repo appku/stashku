@@ -6,6 +6,8 @@ import PatchRequest from './requests/patch-request.js';
 import DeleteRequest from './requests/delete-request.js';
 import OptionsRequest from './requests/options-request.js';
 import Response from './response.js';
+import Filter from './filter.js';
+import Sort from './sort.js';
 import jest from 'jest-mock';
 import fs from 'fs/promises';
 
@@ -404,5 +406,116 @@ describe('#options', () => {
         for (let m of res.data) {
             expect(m).toBeInstanceOf(Theme);
         }
+    });
+});
+
+describe('.requestFromFile', () => {
+    let testFilter = Filter
+        .or('lastName', Filter.OP.EQUALS, 'Thing')
+        .or('lastName', Filter.OP.EQUALS, 'Other')
+        .and('firstName', Filter.OP.EQUALS, 'Bob')
+        .and('age', Filter.OP.GREATERTHAN, 23);
+    it('loads an DELETE request from file.', async () => {
+        let r = await StashKu.requestFromFile('./test/requests/delete.json');
+        expect(r).toBeInstanceOf(DeleteRequest);
+        expect(r.metadata.from).toBe('test');
+        expect(r.metadata.all).toBe(true);
+        expect(r.metadata.count).toBe(true);
+        expect(r.metadata.where).toBeInstanceOf(Filter);
+        expect(r.metadata.where.tree).toEqual(testFilter.tree);
+        expect(r.metadata.headers.get('hello')).toBe('world');
+        expect(r.metadata.headers.get('good')).toBe(true);
+        expect(r.metadata.headers.get('evil')).toBe(false);
+    });
+    it('loads a GET request from file.', async () => {
+        let r = await StashKu.requestFromFile('./test/requests/get.json');
+        expect(r).toBeInstanceOf(GetRequest);
+        expect(r.metadata.from).toBe('test');
+        expect(r.metadata.properties).toEqual(['firstName', 'lastName']);
+        expect(r.metadata.distinct).toBe(true);
+        expect(r.metadata.count).toBe(true);
+        expect(r.metadata.take).toBe(1);
+        expect(r.metadata.skip).toBe(2);
+        expect(r.metadata.sorts.length).toBe(2);
+        expect(r.metadata.sorts[0]).toBeInstanceOf(Sort);
+        expect(r.metadata.sorts[0].property).toBe('firstName');
+        expect(r.metadata.sorts[0].dir).toBe('desc');
+        expect(r.metadata.sorts[1]).toBeInstanceOf(Sort);
+        expect(r.metadata.sorts[1].property).toBe('lastName');
+        expect(r.metadata.sorts[1].dir).toBe('asc');
+        expect(r.metadata.where).toBeInstanceOf(Filter);
+        expect(r.metadata.where.tree).toEqual(testFilter.tree);
+        expect(r.metadata.headers.get('hello')).toBe('world');
+        expect(r.metadata.headers.get('good')).toBe(true);
+        expect(r.metadata.headers.get('evil')).toBe(false);
+    });
+    it('loads an OPTIONS request from file.', async () => {
+        let r = await StashKu.requestFromFile('./test/requests/options.json');
+        expect(r).toBeInstanceOf(OptionsRequest);
+        expect(r.metadata.from).toBe('test');
+        expect(r.metadata.headers.get('hello')).toBe('world');
+        expect(r.metadata.headers.get('good')).toBe(true);
+        expect(r.metadata.headers.get('evil')).toBe(false);
+    });
+    it('loads an PATCH request from file.', async () => {
+        let r = await StashKu.requestFromFile('./test/requests/patch.json');
+        expect(r).toBeInstanceOf(PatchRequest);
+        expect(r.metadata.to).toBe('test');
+        expect(r.metadata.template).toEqual({
+            firstName: 'Bob',
+            age: 22
+        });
+        expect(r.metadata.all).toBe(true);
+        expect(r.metadata.count).toBe(true);
+        expect(r.metadata.where).toBeInstanceOf(Filter);
+        expect(r.metadata.where.tree).toEqual(testFilter.tree);
+        expect(r.metadata.headers.get('hello')).toBe('world');
+        expect(r.metadata.headers.get('good')).toBe(true);
+        expect(r.metadata.headers.get('evil')).toBe(false);
+    });
+    it('loads an POST request from file.', async () => {
+        let r = await StashKu.requestFromFile('./test/requests/post.json');
+        expect(r).toBeInstanceOf(PostRequest);
+        expect(r.metadata.to).toBe('test');
+        expect(r.metadata.objects).toEqual([
+            {
+                firstName: 'Bob',
+                lastName: 'Goose',
+                age: 33
+            },
+            {
+                firstName: 'Susan',
+                lastName: 'Moose',
+                age: 17
+            }
+        ]);
+        expect(r.metadata.count).toBe(true);
+        expect(r.metadata.headers.get('hello')).toBe('world');
+        expect(r.metadata.headers.get('good')).toBe(true);
+        expect(r.metadata.headers.get('evil')).toBe(false);
+    });
+    it('loads an PUT request from file.', async () => {
+        let r = await StashKu.requestFromFile('./test/requests/put.json');
+        expect(r).toBeInstanceOf(PutRequest);
+        expect(r.metadata.to).toBe('test');
+        expect(r.metadata.pk).toEqual(['ID']);
+        expect(r.metadata.objects).toEqual([
+            {
+                ID: 1,
+                firstName: 'Bob',
+                lastName: 'Goose',
+                age: 33
+            },
+            {
+                ID: 44,
+                firstName: 'Susan',
+                lastName: 'Moose',
+                age: 17
+            }
+        ]);
+        expect(r.metadata.count).toBe(true);
+        expect(r.metadata.headers.get('hello')).toBe('world');
+        expect(r.metadata.headers.get('good')).toBe(true);
+        expect(r.metadata.headers.get('evil')).toBe(false);
     });
 });

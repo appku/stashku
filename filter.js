@@ -1,9 +1,9 @@
 
 /**
  * @typedef FilterCondition
- * @property {String} field - The field name from the schema affected by the filter.
+ * @property {String} property - The property name from the schema affected by the filter.
  * @property {String} op - The filter operator.
- * @property {*} [value] - The value used by the operator on the field value.
+ * @property {*} [value] - The value used by the operator on the property value.
  */
 
 /**
@@ -27,7 +27,7 @@ const ISO8601Date = /^\d{4}-\d\d-\d\dT\d\d:\d\d(:\d\d(\.\d+)?)?(([+-]\d\d:\d\d)|
 const NakedValueTokenTerminator = /\s|\)|\(|\[|\]/;
 
 /**
- * Represents a tree of conditions that can be used to filter objects and data based on "fields", "operations", and
+ * Represents a tree of conditions that can be used to filter objects and data based on "properties", "operations", and
  * "values" in logical and/or groupings.
  */
 class Filter {
@@ -49,8 +49,8 @@ class Filter {
         this._current = null;
 
         /**
-         * When enabled (default) the Filter will support dot-notation field names, allowing nested object value
-         * evaluation. If disabled, dot-notation field names will be treated as the explicit field name.
+         * When enabled (default) the Filter will support dot-notation property names, allowing nested object value
+         * evaluation. If disabled, dot-notation property names will be treated as the explicit property name.
          * @type {Boolean}
          */
         this.dot = true;
@@ -65,17 +65,27 @@ class Filter {
          */
         this.OP = Filter.OP;
 
-        //init
+        //init and validate tree
         if (tree) {
             let cleanup = (fg) => {
                 if (fg.logic && fg.filters && Array.isArray(fg.filters)) {
                     for (let f of fg.filters) {
                         cleanup(f);
                     }
-                } else if (fg.field && fg.operator) {
-                    //convert property "operator" to "op"
-                    fg.op = fg.operator;
-                    delete fg.operator;
+                } else if (fg.field || fg.operator) {
+                    if (fg.field) {
+                        //convert property "field" to "property"
+                        fg.property = fg.field;
+                        delete fg.field;
+                    }
+                    if (fg.operator) {
+                        //convert property "operator" to "op"
+                        fg.op = fg.operator;
+                        delete fg.operator;
+                    }
+                } 
+                if (typeof fg.property === 'undefined' && typeof fg.op === 'undefined' && typeof fg.logic === 'undefined' && typeof fg.filters === 'undefined') {
+                    throw new Error('Invalid filter tree. Found unexpected object that does not appear to be a condition or filter-group (missing expected properties).');
                 }
                 return fg;
             };
@@ -83,30 +93,32 @@ class Filter {
                 this.tree = tree.tree;
             } else if (tree.logic) { //tree-like object
                 this.tree = cleanup(tree);
+            } else {
+                throw new Error('Invalid filter tree. Found unexpected object that does not appear to be a condition or filter-group (missing expected properties).');
             }
         }
     }
 
     /**
      * Create a new `Filter` instance and opening with a logical "and" operator.
-     * @param {String|Filter|FilterLogicalGroup} field - The field affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
-     * @param {*} [value] - The value used by the operator on the field value.
+     * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter}
      */
-    static and(field, op, value) {
-        return new Filter().and(field, op, value);
+    static and(property, op, value) {
+        return new Filter().and(property, op, value);
     }
 
     /**
      * Create a new `Filter` instance and opening with a logical "or" operator.
-     * @param {String|Filter|FilterLogicalGroup} field - The field affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
-     * @param {*} [value] - The value used by the operator on the field value.
+     * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter}
      */
-    static or(field, op, value) {
-        return new Filter().or(field, op, value);
+    static or(property, op, value) {
+        return new Filter().or(property, op, value);
     }
 
     /**
@@ -121,7 +133,7 @@ class Filter {
                 return Filter.isEmpty(filter.tree);
             } else {
                 for (let f of filter.filters) {
-                    if (f.field) {
+                    if (f.property) {
                         return false;
                     } else if (f.logic) {
                         if (Filter.isEmpty(f) === false) {
@@ -136,35 +148,35 @@ class Filter {
 
     /**
      * Adds a new condition using a logical "or" operator.
-     * @param {String|Filter|FilterLogicalGroup} field - The field affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
-     * @param {*} [value] - The value used by the operator on the field value.
+     * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter}
      */
-    and(field, op, value) {
-        return this.add(Filter.LOGIC.AND, field, op, value);
+    and(property, op, value) {
+        return this.add(Filter.LOGIC.AND, property, op, value);
     }
 
     /**
      * Adds a new condition using a logical "or" operator.
-     * @param {String|Filter|FilterLogicalGroup} field - The field affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
-     * @param {*} [value] - The value used by the operator on the field value.
+     * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter}
      */
-    or(field, op, value) {
-        return this.add(Filter.LOGIC.OR, field, op, value);
+    or(property, op, value) {
+        return this.add(Filter.LOGIC.OR, property, op, value);
     }
 
     /**
      * Adds a new condition or filter group to the tree using the given logical operator.
      * @param {String} logic - The logical operator.
-     * @param {String|Filter|FilterLogicalGroup} field - The field affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
-     * @param {*} [value] - The value used by the operator on the field value.
+     * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter} 
      */
-    add(logic, field, op, value) {
+    add(logic, property, op, value) {
         //convert logic aliases
         if (logic === '&&') {
             logic = Filter.LOGIC.AND;
@@ -176,8 +188,8 @@ class Filter {
             throw new Error('The "logic" parameter argument is required.');
         } else if (Filter.LOGIC_KEYS.indexOf(logic) <= -1) {
             throw new Error(`The "logic" parameter argument "${logic}" is invalid or unsupported.`);
-        } else if (!field) {
-            throw new Error('The "field" parameter argument is required.');
+        } else if (!property) {
+            throw new Error('The "property" parameter argument is required.');
         }
         //ensure there is a tree object.
         if (!this.tree) {
@@ -185,26 +197,26 @@ class Filter {
             this._current = this.tree;
         }
         //add another filter logical group
-        if (field instanceof Filter) {
-            if (field.tree) {
-                field = field.tree;
+        if (property instanceof Filter) {
+            if (property.tree) {
+                property = property.tree;
             } else {
                 return this; //empty filter
             }
         }
-        if (field.logic && field.filters) {
-            this._current.filters.push(field);
+        if (property.logic && property.filters) {
+            this._current.filters.push(property);
             return this;
         }
         //add a condition
         if (this._current.logic === logic) {
-            this._current.filters.push(this._filterCondition(field, op, value));
+            this._current.filters.push(this._filterCondition(property, op, value));
         } else {
             //wrap the current logical group with the new operator, then add the new condition
             let lg = this._filterLogicalGroup(this._current.logic);
             lg.filters = this._current.filters;
             this._current.logic = logic;
-            this._current.filters = [lg, this._filterCondition(field, op, value)];
+            this._current.filters = [lg, this._filterCondition(property, op, value)];
         }
         return this;
     }
@@ -229,22 +241,22 @@ class Filter {
 
     /**
      * Creates a new condition object.
-     * @param {String} field - The field affected by the filter.
+     * @param {String} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
-     * @param {*} [value] - The value used by the operator on the field value.
+     * @param {*} [value] - The value used by the operator on the property value.
      * @returns {FilterCondition}
      * @private
      */
-    _filterCondition(field, op, value) {
-        if (!field) {
-            throw new Error('The "field" parameter argument is required.');
+    _filterCondition(property, op, value) {
+        if (!property) {
+            throw new Error('The "property" parameter argument is required.');
         } else if (!op) {
             throw new Error('The "op" parameter argument is required.');
         } else if (Filter.OP_KEYS.indexOf(op) <= -1) {
             throw new Error(`The "op" parameter argument "${op}" is invalid or unsupported.`);
         }
         return {
-            field: field,
+            property: property,
             op: op,
             value: value
         };
@@ -273,7 +285,7 @@ class Filter {
     _cloneFilterGroup(orig) {
         let g = this._filterLogicalGroup(orig.logic);
         for (let f of orig.filters) {
-            if (f.field) {
+            if (f.property) {
                 g.filters.push(Object.assign({}, f));
             } else if (f.logic) {
                 g.filters.push(this._cloneFilterGroup(f));
@@ -323,13 +335,13 @@ class Filter {
                 }
             }
             return !!result;
-        } else if (conditionOrGroup.field && conditionOrGroup.op) {
+        } else if (conditionOrGroup.property && conditionOrGroup.op) {
             let condition = conditionOrGroup;
             let modelValue = null;
-            if (this.dot && condition.field.indexOf('.') >= 0) {
-                modelValue = condition.field.split('.').reduce((o, i) => o[i], model);
+            if (this.dot && condition.property.indexOf('.') >= 0) {
+                modelValue = condition.property.split('.').reduce((o, i) => o[i], model);
             } else {
-                modelValue = model[condition.field];
+                modelValue = model[condition.property];
             }
             switch (condition.op) {
                 case Filter.OP.NOTEQUALS:
@@ -417,12 +429,12 @@ class Filter {
                         s += ')';
                     }
                 }
-            } else if (fg.field && fg.op) {
+            } else if (fg.property && fg.op) {
                 if (fg.op === Filter.OP.ISNULL
                     || fg.op === Filter.OP.ISNOTNULL
                     || fg.op === Filter.OP.ISEMPTY
                     || fg.op === Filter.OP.ISNOTEMPTY) {
-                    s = `{${fg.field}} ${fg.op.toUpperCase()}`;
+                    s = `{${fg.property}} ${fg.op.toUpperCase()}`;
                 } else {
                     let strValue = null;
                     if (Array.isArray(fg.value)) {
@@ -450,7 +462,7 @@ class Filter {
                     } else {
                         strValue = fg.value.toString();
                     }
-                    s = `{${fg.field}} ${fg.op.toUpperCase()} ${strValue}`;
+                    s = `{${fg.property}} ${fg.op.toUpperCase()} ${strValue}`;
                 }
             }
         } else {
@@ -465,6 +477,15 @@ class Filter {
      */
     toJSON() {
         return this.tree;
+    }
+
+    /**
+     * Creates a new `Filter` instance using the object containing a filter tree.
+     * @param {FilterLogicalGroup} obj - The filter tree object.
+     * @returns {Filter}
+     */
+    static fromObject(obj) {
+        return new Filter(obj);
     }
 
     /**
@@ -520,7 +541,7 @@ class Filter {
                     }
                     //move to after the group to process next
                     ti = endingTokenIndex;
-                } else if (t.type === 'condition-field') {
+                } else if (t.type === 'condition-property') {
                     //look-ahead and get the op and optional value.
                     let tOp = tokens[ti + 1];
                     let tValue;
@@ -579,7 +600,7 @@ class Filter {
                 } else {
                     openToken.value += input[i];
                 }
-            } else if (openToken && openToken.type === 'condition-field') { //parsing a field name
+            } else if (openToken && openToken.type === 'condition-property') { //parsing a property name
                 if (!openToken.endIndex && input[i] === '}') {
                     openToken.endIndex = i + 1;
                     openToken = null;
@@ -600,7 +621,7 @@ class Filter {
                 };
             } else if (input[i] === '{') {
                 newToken = {
-                    type: 'condition-field',
+                    type: 'condition-property',
                     startIndex: i
                 };
                 openToken = newToken; //token is open for more information
@@ -629,7 +650,7 @@ class Filter {
                 };
                 i += 1;
             } else {
-                if (tokens.length && tokens[tokens.length - 1].type === 'condition-field') { //check for matching operator only if preceding was a conditional-field
+                if (tokens.length && tokens[tokens.length - 1].type === 'condition-property') { //check for matching operator only if preceding was a conditional-property
                     for (let op of sortedOpKeys) {
                         if (input.substr(i, op.length)?.localeCompare(op, undefined, { sensitivity: 'base' }) === 0) {
                             newToken = {
@@ -674,8 +695,8 @@ class Filter {
         //validate
         //ensure no open token
         if (openToken) {
-            if (openToken.type === 'condition-field') {
-                throw new SyntaxError(`Failed to tokenize filter string, a conditional field at position ${openToken.startIndex} was not closed properly, expected matching square brackets "[" and "]".`);
+            if (openToken.type === 'condition-property') {
+                throw new SyntaxError(`Failed to tokenize filter string, a conditional property at position ${openToken.startIndex} was not closed properly, expected matching square brackets "[" and "]".`);
             } else if (openToken.type === 'condition-value' && openToken.style === 'double-quoted') {
                 throw new SyntaxError(`Failed to tokenize filter string, a conditional value at position ${openToken.startIndex} was not closed properly, a closing double-quote was not found.`);
             } else if (openToken.type === 'condition-value' && openToken.style === 'single-quoted') {
@@ -688,12 +709,12 @@ class Filter {
         if (groupStartCount !== groupEndCount) {
             throw new SyntaxError('Failed to tokenize filter string, there are one or more mismatches between the opening and closing group parenthesis "(" and ")".');
         }
-        //ensure all condition fields are followed by appropriate tokens
+        //ensure all condition properties are followed by appropriate tokens
         for (let ti = 0; ti < tokens.length; ti++) {
             let t = tokens[ti];
-            if (t.type === 'condition-field') { //check followed by condition-op
+            if (t.type === 'condition-property') { //check followed by condition-op
                 if (ti === tokens.length - 1 || (ti < tokens.length - 1 && tokens[ti + 1].type !== 'condition-op')) {
-                    throw new SyntaxError(`Failed to tokenize filter string, a conditional field at position ${t.startIndex} was not followed by a conditional operator.`);
+                    throw new SyntaxError(`Failed to tokenize filter string, a conditional property at position ${t.startIndex} was not followed by a conditional operator.`);
                 }
             }
         }

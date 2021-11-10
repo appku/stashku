@@ -9,11 +9,43 @@ describe('#constructor', () => {
         let tgt = new Filter(src);
         expect(tgt.tree.logic).toBe(Filter.LOGIC.OR);
         expect(tgt.tree.filters.length).toBe(1);
-        expect(tgt.tree.filters[0].field).toBe('First');
+        expect(tgt.tree.filters[0].property).toBe('First');
         expect(tgt.tree.filters[0].op).toBe(Filter.OP.EQUALS);
         expect(tgt.tree.filters[0].value).toBe('ABC');
     });
-    it('copies a tree-like object, renaming any "operator" properties.', () => {
+    it('copies a tree-like object.', () => {
+        let src = {
+            logic: 'or',
+            filters: [
+                { property: 'First', op: 'eq', value: 'ABC' },
+                { property: 'Age', op: 'gt', value: 123 },
+                {
+                    logic: 'or',
+                    filters: [
+                        { property: 'Last', op: 'startswith', value: 'A' },
+                        { property: 'Last', op: 'startswith', value: 'Z' }
+                    ]
+                }
+            ]
+        };
+        let tgt = new Filter(src);
+        expect(tgt.tree.logic).toBe(Filter.LOGIC.OR);
+        expect(tgt.tree.filters.length).toBe(3);
+        expect(tgt.tree.filters[0].property).toBe('First');
+        expect(tgt.tree.filters[0].op).toBe(Filter.OP.EQUALS);
+        expect(tgt.tree.filters[0].value).toBe('ABC');
+        expect(tgt.tree.filters[1].property).toBe('Age');
+        expect(tgt.tree.filters[1].op).toBe(Filter.OP.GREATERTHAN);
+        expect(tgt.tree.filters[1].value).toBe(123);
+        expect(tgt.tree.filters[2].logic).toBe(Filter.LOGIC.OR);
+        expect(tgt.tree.filters[2].filters[0].property).toBe('Last');
+        expect(tgt.tree.filters[2].filters[0].op).toBe(Filter.OP.STARTSWITH);
+        expect(tgt.tree.filters[2].filters[0].value).toBe('A');
+        expect(tgt.tree.filters[2].filters[1].property).toBe('Last');
+        expect(tgt.tree.filters[2].filters[1].op).toBe(Filter.OP.STARTSWITH);
+        expect(tgt.tree.filters[2].filters[1].value).toBe('Z');
+    });
+    it('copies a kendo-compatible filter object, renaming any "operator" and "field" properties.', () => {
         let src = {
             logic: 'or',
             filters: [
@@ -31,26 +63,26 @@ describe('#constructor', () => {
         let tgt = new Filter(src);
         expect(tgt.tree.logic).toBe(Filter.LOGIC.OR);
         expect(tgt.tree.filters.length).toBe(3);
-        expect(tgt.tree.filters[0].field).toBe('First');
+        expect(tgt.tree.filters[0].property).toBe('First');
         expect(tgt.tree.filters[0].op).toBe(Filter.OP.EQUALS);
         expect(tgt.tree.filters[0].value).toBe('ABC');
-        expect(tgt.tree.filters[1].field).toBe('Age');
+        expect(tgt.tree.filters[1].property).toBe('Age');
         expect(tgt.tree.filters[1].op).toBe(Filter.OP.GREATERTHAN);
         expect(tgt.tree.filters[1].value).toBe(123);
         expect(tgt.tree.filters[2].logic).toBe(Filter.LOGIC.OR);
-        expect(tgt.tree.filters[2].filters[0].field).toBe('Last');
+        expect(tgt.tree.filters[2].filters[0].property).toBe('Last');
         expect(tgt.tree.filters[2].filters[0].op).toBe(Filter.OP.STARTSWITH);
         expect(tgt.tree.filters[2].filters[0].value).toBe('A');
-        expect(tgt.tree.filters[2].filters[1].field).toBe('Last');
+        expect(tgt.tree.filters[2].filters[1].property).toBe('Last');
         expect(tgt.tree.filters[2].filters[1].op).toBe(Filter.OP.STARTSWITH);
         expect(tgt.tree.filters[2].filters[1].value).toBe('Z');
     });
 });
 
 describe('.and', () => {
-    it('throws when the "field" parameter argument is missing', () => {
-        expect(() => { Filter.and(); }).toThrow('field');
-        expect(() => { Filter.and(null); }).toThrow('field');
+    it('throws when the "property" parameter argument is missing', () => {
+        expect(() => { Filter.and(); }).toThrow('property');
+        expect(() => { Filter.and(null); }).toThrow('property');
     });
     it('throws when the "operator" parameter argument is missing', () => {
         expect(() => { Filter.and('test'); }).toThrow('op');
@@ -61,7 +93,7 @@ describe('.and', () => {
         expect(f.tree).toBeTruthy();
         expect(f.tree.logic).toBe(Filter.LOGIC.AND);
         expect(f.tree.filters.length).toBe(1);
-        expect(f.tree.filters[0].field).toBe('test');
+        expect(f.tree.filters[0].property).toBe('test');
         expect(f.tree.filters[0].op).toBe(Filter.OP.EQUALS);
         expect(f.tree.filters[0].value).toBe(1);
     });
@@ -74,16 +106,16 @@ describe('.and', () => {
         expect(f.tree.logic).toBe(Filter.LOGIC.AND);
         expect(f.tree.filters.length).toBe(3);
         for (let x = 0; x < 3; x++) {
-            expect(f.tree.filters[x].field).toBe('test' + x);
+            expect(f.tree.filters[x].property).toBe('test' + x);
             expect(f.tree.filters[x].value).toBe(x + 1);
         }
     });
 });
 
 describe('.or', () => {
-    it('throws when the "field" parameter argument is missing', () => {
-        expect(() => { Filter.or(); }).toThrow('field');
-        expect(() => { Filter.or(null); }).toThrow('field');
+    it('throws when the "property" parameter argument is missing', () => {
+        expect(() => { Filter.or(); }).toThrow('property');
+        expect(() => { Filter.or(null); }).toThrow('property');
     });
     it('throws when the "operator" parameter argument is missing', () => {
         expect(() => { Filter.or('test'); }).toThrow('op');
@@ -94,7 +126,7 @@ describe('.or', () => {
         expect(f.tree).toBeTruthy();
         expect(f.tree.logic).toBe(Filter.LOGIC.OR);
         expect(f.tree.filters.length).toBe(1);
-        expect(f.tree.filters[0].field).toBe('test');
+        expect(f.tree.filters[0].property).toBe('test');
         expect(f.tree.filters[0].op).toBe(Filter.OP.EQUALS);
         expect(f.tree.filters[0].value).toBe(1);
     });
@@ -107,7 +139,7 @@ describe('.or', () => {
         expect(f.tree.logic).toBe(Filter.LOGIC.OR);
         expect(f.tree.filters.length).toBe(3);
         for (let x = 0; x < 3; x++) {
-            expect(f.tree.filters[x].field).toBe('test' + x);
+            expect(f.tree.filters[x].property).toBe('test' + x);
             expect(f.tree.filters[x].value).toBe(x + 1);
         }
     });
@@ -132,7 +164,7 @@ describe('.isEmpty', () => {
         //test nested condition.
         f = new Filter({
             filters: [{
-                filters: [{ field: 'abc', op: Filter.OP.EQUALS, value: 123 }],
+                filters: [{ property: 'abc', op: Filter.OP.EQUALS, value: 123 }],
                 logic: Filter.LOGIC.AND
             }],
             logic: Filter.LOGIC.AND
@@ -170,8 +202,8 @@ describe('#add', () => {
     it('throws when the "logic" argument is invalid.', () => {
         expect(() => new Filter().add('banana')).toThrow(/logic.+invalid/gi);
     });
-    it('throws when the "field" argument is missing.', () => {
-        expect(() => new Filter().add(Filter.LOGIC.AND, null)).toThrow(/field.+required/gi);
+    it('throws when the "property" argument is missing.', () => {
+        expect(() => new Filter().add(Filter.LOGIC.AND, null)).toThrow(/property.+required/gi);
     });
     it('does not modify the filter tree when an empty filter is passed.', () => {
         let f = Filter
@@ -196,52 +228,52 @@ describe('#test', () => {
     };
     it('correctly returns expected boolean result for simple condition.', () => {
         let tests = [
-            { field: 'abc', op: Filter.OP.EQUALS, value: 123, expects: true },
-            { field: 'abc', op: Filter.OP.EQUALS, value: '123', expects: false },
-            { field: 'abc', op: Filter.OP.EQUALS, value: null, expects: false },
-            { field: 'abc', op: Filter.OP.NOTEQUALS, value: 456, expects: true },
-            { field: 'abc', op: Filter.OP.NOTEQUALS, value: '456', expects: true },
-            { field: 'abc', op: Filter.OP.NOTEQUALS, value: null, expects: true },
-            { field: 'abc', op: Filter.OP.ISNULL, expects: false },
-            { field: 'abc', op: Filter.OP.ISNOTNULL, expects: true },
-            { field: 'abc', op: Filter.OP.LESSTHAN, value: 999, expects: true },
-            { field: 'abc', op: Filter.OP.LESSTHAN, value: 123, expects: false },
-            { field: 'abc', op: Filter.OP.LESSTHAN, value: 1, expects: false },
-            { field: 'abc', op: Filter.OP.LESSTHANOREQUAL, value: 999, expects: true },
-            { field: 'abc', op: Filter.OP.LESSTHANOREQUAL, value: 123, expects: true },
-            { field: 'abc', op: Filter.OP.LESSTHANOREQUAL, value: 1, expects: false },
-            { field: 'abc', op: Filter.OP.GREATERTHAN, value: 111, expects: true },
-            { field: 'abc', op: Filter.OP.GREATERTHAN, value: 123, expects: false },
-            { field: 'abc', op: Filter.OP.GREATERTHAN, value: 999, expects: false },
-            { field: 'abc', op: Filter.OP.GREATERTHANOREQUAL, value: 111, expects: true },
-            { field: 'abc', op: Filter.OP.GREATERTHANOREQUAL, value: 123, expects: true },
-            { field: 'abc', op: Filter.OP.GREATERTHANOREQUAL, value: 999, expects: false },
-            { field: 'hello', op: Filter.OP.STARTSWITH, value: 'wor', expects: true },
-            { field: 'hello', op: Filter.OP.STARTSWITH, value: 'WOR', expects: false },
-            { field: 'hello', op: Filter.OP.STARTSWITH, value: 'or', expects: false },
-            { field: 'hello', op: Filter.OP.ENDSWITH, value: 'ld', expects: true },
-            { field: 'hello', op: Filter.OP.ENDSWITH, value: 'LD', expects: false },
-            { field: 'hello', op: Filter.OP.ENDSWITH, value: 'llld', expects: false },
-            { field: 'hello', op: Filter.OP.CONTAINS, value: 'orl', expects: true },
-            { field: 'hello', op: Filter.OP.CONTAINS, value: 'OrL', expects: false },
-            { field: 'hello', op: Filter.OP.CONTAINS, value: 'owls', expects: false },
-            { field: 'hello', op: Filter.OP.DOESNOTCONTAIN, value: 'banana', expects: true },
-            { field: 'hello', op: Filter.OP.DOESNOTCONTAIN, value: 'oRL', expects: true },
-            { field: 'hello', op: Filter.OP.DOESNOTCONTAIN, value: 'orl', expects: false },
-            { field: 'hello', op: Filter.OP.ISEMPTY, expects: false },
-            { field: 'hello', op: Filter.OP.ISNOTEMPTY, expects: true },
-            { field: 'hello', op: Filter.OP.IN, value: ['ok', 'ehll', 'world'], expects: true },
-            { field: 'hello', op: Filter.OP.IN, value: ['ok', 'ehll', 'WORLD'], expects: false },
-            { field: 'hello', op: Filter.OP.IN, value: ['ok', 'ehll', 'moose'], expects: false },
-            { field: 'hello', op: Filter.OP.IN, value: [], expects: false },
-            { field: 'hello', op: Filter.OP.IN, value: null, expects: false },
-            { field: 'hello', op: Filter.OP.NOTIN, value: ['hello', 'moose'], expects: true },
-            { field: 'hello', op: Filter.OP.NOTIN, value: ['hello', 'world', 'moose'], expects: false },
-            { field: 'hello', op: Filter.OP.NOTIN, value: [], expects: true },
-            { field: 'hello', op: Filter.OP.NOTIN, value: null, expects: true }
+            { property: 'abc', op: Filter.OP.EQUALS, value: 123, expects: true },
+            { property: 'abc', op: Filter.OP.EQUALS, value: '123', expects: false },
+            { property: 'abc', op: Filter.OP.EQUALS, value: null, expects: false },
+            { property: 'abc', op: Filter.OP.NOTEQUALS, value: 456, expects: true },
+            { property: 'abc', op: Filter.OP.NOTEQUALS, value: '456', expects: true },
+            { property: 'abc', op: Filter.OP.NOTEQUALS, value: null, expects: true },
+            { property: 'abc', op: Filter.OP.ISNULL, expects: false },
+            { property: 'abc', op: Filter.OP.ISNOTNULL, expects: true },
+            { property: 'abc', op: Filter.OP.LESSTHAN, value: 999, expects: true },
+            { property: 'abc', op: Filter.OP.LESSTHAN, value: 123, expects: false },
+            { property: 'abc', op: Filter.OP.LESSTHAN, value: 1, expects: false },
+            { property: 'abc', op: Filter.OP.LESSTHANOREQUAL, value: 999, expects: true },
+            { property: 'abc', op: Filter.OP.LESSTHANOREQUAL, value: 123, expects: true },
+            { property: 'abc', op: Filter.OP.LESSTHANOREQUAL, value: 1, expects: false },
+            { property: 'abc', op: Filter.OP.GREATERTHAN, value: 111, expects: true },
+            { property: 'abc', op: Filter.OP.GREATERTHAN, value: 123, expects: false },
+            { property: 'abc', op: Filter.OP.GREATERTHAN, value: 999, expects: false },
+            { property: 'abc', op: Filter.OP.GREATERTHANOREQUAL, value: 111, expects: true },
+            { property: 'abc', op: Filter.OP.GREATERTHANOREQUAL, value: 123, expects: true },
+            { property: 'abc', op: Filter.OP.GREATERTHANOREQUAL, value: 999, expects: false },
+            { property: 'hello', op: Filter.OP.STARTSWITH, value: 'wor', expects: true },
+            { property: 'hello', op: Filter.OP.STARTSWITH, value: 'WOR', expects: false },
+            { property: 'hello', op: Filter.OP.STARTSWITH, value: 'or', expects: false },
+            { property: 'hello', op: Filter.OP.ENDSWITH, value: 'ld', expects: true },
+            { property: 'hello', op: Filter.OP.ENDSWITH, value: 'LD', expects: false },
+            { property: 'hello', op: Filter.OP.ENDSWITH, value: 'llld', expects: false },
+            { property: 'hello', op: Filter.OP.CONTAINS, value: 'orl', expects: true },
+            { property: 'hello', op: Filter.OP.CONTAINS, value: 'OrL', expects: false },
+            { property: 'hello', op: Filter.OP.CONTAINS, value: 'owls', expects: false },
+            { property: 'hello', op: Filter.OP.DOESNOTCONTAIN, value: 'banana', expects: true },
+            { property: 'hello', op: Filter.OP.DOESNOTCONTAIN, value: 'oRL', expects: true },
+            { property: 'hello', op: Filter.OP.DOESNOTCONTAIN, value: 'orl', expects: false },
+            { property: 'hello', op: Filter.OP.ISEMPTY, expects: false },
+            { property: 'hello', op: Filter.OP.ISNOTEMPTY, expects: true },
+            { property: 'hello', op: Filter.OP.IN, value: ['ok', 'ehll', 'world'], expects: true },
+            { property: 'hello', op: Filter.OP.IN, value: ['ok', 'ehll', 'WORLD'], expects: false },
+            { property: 'hello', op: Filter.OP.IN, value: ['ok', 'ehll', 'moose'], expects: false },
+            { property: 'hello', op: Filter.OP.IN, value: [], expects: false },
+            { property: 'hello', op: Filter.OP.IN, value: null, expects: false },
+            { property: 'hello', op: Filter.OP.NOTIN, value: ['hello', 'moose'], expects: true },
+            { property: 'hello', op: Filter.OP.NOTIN, value: ['hello', 'world', 'moose'], expects: false },
+            { property: 'hello', op: Filter.OP.NOTIN, value: [], expects: true },
+            { property: 'hello', op: Filter.OP.NOTIN, value: null, expects: true }
         ];
         for (let x = 0; x < tests.length; x++) {
-            let f = Filter.and(tests[x].field, tests[x].op, tests[x].value);
+            let f = Filter.and(tests[x].property, tests[x].op, tests[x].value);
             expect(f.test(model)).toBe(tests[x].expects);
         }
     });
@@ -350,6 +382,41 @@ describe('#toJSON', () => {
     });
 });
 
+describe('.fromObject', () => {
+    it('throws an error when the tree has a non-condition and non-filter-group object within the tree.', () => {
+        let tests = [
+            { bananas: true },
+            {
+                logic: Filter.LOGIC.AND, filters: [
+                    { bananas: true }
+                ]
+            },
+            {
+                logic: Filter.LOGIC.AND, filters: [
+                    { property: 'test', op: Filter.OP.ISNULL },
+                    { bananas: true },
+                    { property: 'test', op: Filter.OP.EQUALS, value: 1 }
+                ]
+            },
+            {
+                logic: Filter.LOGIC.AND, filters: [
+                    { property: 'test', op: Filter.OP.ISNULL },
+                    new Date()
+                ]
+            },
+            {
+                logic: Filter.LOGIC.AND, filters: [
+                    { property: 'test', op: Filter.OP.ISNULL },
+                    { logic: Filter.LOGIC.AND, filters: [{ bananas: true }] },
+                ]
+            }
+        ];
+        for (let t of tests) {
+            expect(() => Filter.fromObject(t)).toThrow(/object/i);
+        }
+    });
+});
+
 describe('builds complex logic tree', () => {
     it('allows sub-filters.', () => {
         let f = Filter
@@ -380,7 +447,7 @@ describe('builds complex logic tree', () => {
         expect(f.tree.filters.length).toBe(2);
         expect(f.tree.filters[0].logic).toBe(Filter.LOGIC.OR);
         for (let x = 0; x < 3; x++) {
-            expect(f.tree.filters[0].filters[x].field).toBe('test' + x);
+            expect(f.tree.filters[0].filters[x].property).toBe('test' + x);
             expect(f.tree.filters[0].filters[x].value).toBe(x + 1);
         }
     });
@@ -400,8 +467,8 @@ describe('#_filterLogicalGroup', () => {
 });
 
 describe('#_filterCondition', () => {
-    it('throws when the "field" argument is missing.', () => {
-        expect(() => new Filter()._filterCondition(null)).toThrow(/field.+required/gi);
+    it('throws when the "property" argument is missing.', () => {
+        expect(() => new Filter()._filterCondition(null)).toThrow(/property.+required/gi);
     });
     it('throws when the "op" argument is missing.', () => {
         expect(() => new Filter()._filterCondition('abc', null)).toThrow(/op.+required/gi);
@@ -409,8 +476,8 @@ describe('#_filterCondition', () => {
     it('throws when the "op" argument is invalid.', () => {
         expect(() => new Filter()._filterCondition('abc', 'banana')).toThrow(/op.+invalid/gi);
     });
-    it('returns a new filter condition with the field, op, and value set.', () => {
-        expect(new Filter()._filterCondition('abc', Filter.OP.ISNULL)).toEqual({ field: 'abc', op: Filter.OP.ISNULL });
+    it('returns a new filter condition with the property, op, and value set.', () => {
+        expect(new Filter()._filterCondition('abc', Filter.OP.ISNULL)).toEqual({ property: 'abc', op: Filter.OP.ISNULL });
     });
 });
 
@@ -473,14 +540,14 @@ describe('._tokenize', () => {
             expect(() => Filter._tokenize(test)).toThrow(/quote.+not opened/i);
         }
     });
-    it('throws a SyntaxError when a conditional field is not closed properly.', () => {
+    it('throws a SyntaxError when a conditional property is not closed properly.', () => {
         let tests = [
             '({test0} EQ 1 OR {test1} EQ 2 OR {test2} EQ 3 OR {test3} CONTAINS hoof OR {test4 EQ undefined)',
             '{test0} EQ 1 OR {test1 EQ 3'
         ];
         for (let test of tests) {
             expect(() => Filter._tokenize(test)).toThrow(SyntaxError);
-            expect(() => Filter._tokenize(test)).toThrow(/field.+not closed properly/i);
+            expect(() => Filter._tokenize(test)).toThrow(/property.+not closed properly/i);
         }
     });
     it('throws a SyntaxError when an invalid value is found outside or out of order for the expected token.', () => {
@@ -509,14 +576,14 @@ describe('._tokenize', () => {
             expect(() => Filter._tokenize(test)).toThrow(/mismatch.+group/i);
         }
     });
-    it('throws a SyntaxError when a conditional field is not followed by a conditional operator', () => {
+    it('throws a SyntaxError when a conditional property is not followed by a conditional operator', () => {
         let tests = [
             '{apples} GTE 1 OR {bananas}',
             '{apples} GTE 1 OR ({bananas} CONTAINS "Moose" AND {horse})'
         ];
         for (let test of tests) {
             expect(() => Filter._tokenize(test)).toThrow(SyntaxError);
-            expect(() => Filter._tokenize(test)).toThrow(/field.+not followed by.+operator/i);
+            expect(() => Filter._tokenize(test)).toThrow(/property.+not followed by.+operator/i);
         }
     });
     it('supports both AND, OR and &&, || symbols for logic.', () => {
@@ -544,10 +611,10 @@ describe('._tokenize', () => {
         let tokens = Filter._tokenize(test);
         expect(tokens).toBeInstanceOf(Array);
         for (let t of tokens) {
-            expect(t.type).toMatch(/group-start|group-logic|group-end|condition-field|condition-op|condition-value/);
+            expect(t.type).toMatch(/group-start|group-logic|group-end|condition-property|condition-op|condition-value/);
             expect(t.startIndex).toBeGreaterThan(-1);
             expect(t.endIndex).toBeGreaterThan(t.startIndex);
-            if (/group-logic|condition-field|condition-op|condition-value/.test(t.type)) {
+            if (/group-logic|condition-property|condition-op|condition-value/.test(t.type)) {
                 expect(t.value).toBeDefined();
             }
             if (t.type === 'condition-value') {

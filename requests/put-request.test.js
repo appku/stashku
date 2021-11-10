@@ -371,5 +371,6 @@ describe('#toJSON', () => {
         expect(parsed.objects).toEqual([{ Bob: 'Sue', Hi: 12345 }, { Hi: true }]);
         expect(parsed.pk).toEqual(['ID']);
         expect(parsed.headers).toEqual({ hello: 'world' });
+        expect(parsed.method).toBe('put');
     });
 });

@@ -1,0 +1,57 @@
+{
+    "method": "get",
+    "from": "test",
+    "take": 1,
+    "skip": 2,
+    "properties": [
+        "firstName",
+        "lastName"
+    ],
+    "sorts": [
+        {
+            "property": "firstName",
+            "dir": "desc"
+        },
+        {
+            "property": "lastName",
+            "dir": "asc"
+        }
+    ],
+    "distinct": true,
+    "count": true,
+    "where": {
+        "logic": "and",
+        "filters": [
+            {
+                "logic": "or",
+                "filters": [
+                    {
+                        "property": "lastName",
+                        "op": "eq",
+                        "value": "Thing"
+                    },
+                    {
+                        "property": "lastName",
+                        "op": "eq",
+                        "value": "Other"
+                    }
+                ]
+            },
+            {
+                "property": "firstName",
+                "op": "eq",
+                "value": "Bob"
+            },
+            {
+                "property": "age",
+                "op": "gt",
+                "value": 23
+            }
+        ]
+    },
+    "headers": {
+        "hello": "world",
+        "good": true,
+        "evil": false
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "method": "put",
+    "to": "test",
+    "count": true,
+    "pk": ["ID"],
+    "objects": [
+        {
+            "ID": 1,
+            "firstName": "Bob",
+            "lastName": "Goose",
+            "age": 33
+        },
+        {
+            "ID": 44,
+            "firstName": "Susan",
+            "lastName": "Moose",
+            "age": 17
+        }
+    ],
+    "headers": {
+        "hello": "world",
+        "good": true,
+        "evil": false
+    }
+}

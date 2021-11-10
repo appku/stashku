@@ -126,10 +126,7 @@ export default class DeleteRequest {
      * @returns {DeleteRequest}
      */
     from(name) {
-        if (name === null) {
-            this.metadata.from = null;
-            return this;
-        } else if (typeof name !== 'string') {
+        if (name !== null && typeof name !== 'string') {
             throw new Error('Invalid "name" argument. The value must be a string or null.');
         }
         this.metadata.from = name;
@@ -195,6 +192,8 @@ export default class DeleteRequest {
      * @param {*} metadata - An object with properties and values to set as request metadata for engine-specific functionality.
      * @returns {DeleteRequest}
      * @deprecated Use new `headers` function for engine-specific options per-request.
+     * 
+     * *This function will be removed in a future release.*
      */
     meta(metadata) {
         if (metadata === null) {
@@ -225,6 +224,7 @@ export default class DeleteRequest {
             metaClone.headers = Objects.fromEntries(this.metadata.headers);
         }
         metaClone.model = this.metadata?.model?.name;
+        metaClone.method = this.method;
         return metaClone;
     }
 

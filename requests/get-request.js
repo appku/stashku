@@ -9,7 +9,7 @@ import Objects from '../utilities/objects.js';
 export default class GetRequest {
     /**
      * Creates a new `PostRequest` instance. A GET request instructs StashKu to retrieve objects from storage.
-     * @param  {...String} [properties] - Spread of property names (aka: columns) to get from data storage.
+     * @param  {...String} [properties] - Spread of field names (aka: columns) to get from data storage.
      */
     constructor(...properties) {
         this.metadata = {
@@ -172,12 +172,16 @@ export default class GetRequest {
             for (let s of sorts) {
                 let stype = typeof s;
                 if (s !== null && stype !== 'undefined') {
-                    if (stype === 'string') {
-                        s = Sort.asc(s);
-                    } else if (s.field) {
-                        s = new Sort(s.field, s.dir);
-                    } else if ((s instanceof Sort) === false) {
-                        throw new Error('The "sorts" argument contains an invalid value. Values must be a string, Sort, null, or undefined.');
+                    if ((s instanceof Sort) === false) {
+                        if (stype === 'string') {
+                            s = Sort.asc(s);
+                        } else if (s.property) {
+                            s = new Sort(s.property, s.dir);
+                        } else if (s.field) {
+                            s = new Sort(s.field, s.dir);
+                        } else {
+                            throw new Error('The "sorts" argument contains an invalid value. Values must be a string, Sort, null, or undefined.');
+                        }
                     }
                     if (s.property) {
                         let existingIndex = this.metadata.sorts.findIndex(v => v.property.toLowerCase() === s.property.toLowerCase());
@@ -202,10 +206,7 @@ export default class GetRequest {
      * @returns {GetRequest}
      */
     from(name) {
-        if (name === null) {
-            this.metadata.from = null;
-            return this;
-        } else if (typeof name !== 'string') {
+        if (name !== null && typeof name !== 'string') {
             throw new Error('Invalid "name" argument. The value must be a string or null.');
         }
         this.metadata.from = name;
@@ -278,7 +279,7 @@ export default class GetRequest {
      * @throws Error when the dictionary argument uses a non-string key.
      * @throws Error when the dictionary argument is not an object, null, or a Map.
      * @param {Object | Map.<String, *>} dictionary - A map or object defining the headers and values.
-     * @returns {DeleteRequest}
+     * @returns {GetRequest}
      */
     headers(dictionary) {
         if (!this.metadata.headers) {
@@ -316,6 +317,8 @@ export default class GetRequest {
      * @param {*} metadata - An object with properties and values to set as request metadata for engine-specific functionality.
      * @returns {GetRequest}
      * @deprecated Use new `headers` function for engine-specific options per-request.
+     * 
+     * *This function will be removed in a future release.*
      */
     meta(metadata) {
         if (metadata === null) {
@@ -346,6 +349,7 @@ export default class GetRequest {
             metaClone.headers = Objects.fromEntries(this.metadata.headers);
         }
         metaClone.model = this.metadata?.model?.name;
+        metaClone.method = this.method;
         return metaClone;
     }
 

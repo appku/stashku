@@ -14,7 +14,7 @@ import Logger from './logger.js';
 import ModelConfiguration from './modeling/model-configuration.js';
 import Randomization from './utilities/randomization.js';
 import ModelUtility from './modeling/model-utility.js';
-import fs from 'fs';
+import fs, { promises as fsAsync } from 'fs';
 import path from 'path';
 
 const SUPPORTED_METHODS = ['all', '*', 'get', 'post', 'put', 'patch', 'delete', 'options'];
@@ -565,6 +565,94 @@ class StashKu {
      */
     async options(request) {
         return await this._handle(request ?? new OptionsRequest(), OptionsRequest);
+    }
+
+    /**
+     * @callback ModelNameResolveCallback
+     * @param {String} name - The model name defined.
+     * @returns {*} Returns a model type constructor/class associated with the model name.
+     */
+
+    /**
+     * Reads a request defintion from file and returns an instance of that request.
+     * @param {fs.PathOrFileDescriptor} jsonFile - The file path to the JSON formatted file defining a single StashKu request.
+     * @param {{encoding: String, flag: String} | String | fs.BufferEncodingOption} [fsOptions] - File encoding options.
+     * @param {ModelNameResolveCallback} [modelNameResolver] - Callback function that resolves a model name into a model type (constructor/class).
+     * @returns {DeleteRequest | GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest}
+     */
+    static async requestFromFile(jsonFile, fsOptions, modelNameResolver) {
+        let f = await fsAsync.readFile(jsonFile, fsOptions);
+        let obj = JSON.parse(f);
+        return StashKu.requestFromObject(obj, modelNameResolver);
+    }
+
+    /**
+     * Converts an untyped object representing a StashKu request into an instance of the appropriate request. This
+     * can be used in conjunction with `JSON.stringify(...)` and subsequently a `JSON.parse(...)` of a request.
+     * 
+     * If the object is `null` or `undefined`, a `null` value is returned.
+     * @throws Error if the object is missing a method property.
+     * @throws Error if the method property value is invalid.
+     * @param {*} reqObj - The untyped request object.
+     * @param {ModelNameResolveCallback} [modelNameResolver] - Callback function that resolves a model name into a model type (constructor/class).
+     * @returns {DeleteRequest | GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest} 
+     */
+    static requestFromObject(reqObj, modelNameResolver) {
+        if (reqObj) {
+            if (!reqObj.method || /^delete|get|patch|post|put|options$/i.test(reqObj.method) === false) {
+                throw new Error('The method property value of the object is missing or invalid. Expected a valid request method.');
+            }
+            let mt = null;
+            if (modelNameResolver && reqObj.model) {
+                mt = modelNameResolver(reqObj.model);
+            }
+            switch (reqObj.method.toLowerCase()) {
+                case 'delete': return new DeleteRequest()
+                    .model(mt)
+                    .headers(reqObj.headers)
+                    .from(reqObj.from ?? null)
+                    .all(reqObj.all ?? false)
+                    .count(reqObj.count ?? false)
+                    .where(Filter.fromObject(reqObj.where));
+                case 'get': return new GetRequest()
+                    .model(mt)
+                    .headers(reqObj.headers)
+                    .from(reqObj.from ?? null)
+                    .properties(...reqObj.properties)
+                    .distinct(reqObj.distinct ?? false)
+                    .count(reqObj.count ?? false)
+                    .skip(reqObj.skip ?? null)
+                    .take(reqObj.take ?? null)
+                    .sort(...reqObj.sorts)
+                    .where(Filter.fromObject(reqObj.where));
+                case 'options': return new OptionsRequest()
+                    .model(mt)
+                    .from(reqObj.from ?? null)
+                    .headers(reqObj.headers);
+                case 'patch': return new PatchRequest()
+                    .model(mt)
+                    .headers(reqObj.headers)
+                    .to(reqObj.to ?? null)
+                    .template(reqObj.template ?? null)
+                    .all(reqObj.all ?? false)
+                    .count(reqObj.count ?? false)
+                    .where(Filter.fromObject(reqObj.where));
+                case 'post': return new PostRequest()
+                    .model(mt)
+                    .headers(reqObj.headers)
+                    .to(reqObj.to ?? null)
+                    .count(reqObj.count ?? false)
+                    .objects(reqObj.objects ?? null);
+                case 'put': return new PutRequest()
+                    .model(mt)
+                    .headers(reqObj.headers)
+                    .to(reqObj.to ?? null)
+                    .count(reqObj.count ?? false)
+                    .pk(...reqObj.pk)
+                    .objects(reqObj.objects ?? null);
+            }
+        }
+        return null;
     }
 
 }

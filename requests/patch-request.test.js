@@ -123,7 +123,7 @@ describe('#where', () => {
         expect(r.metadata.where).toBeInstanceOf(Filter);
         expect(r.metadata.where.tree.logic).toBe(Filter.LOGIC.AND);
         expect(r.metadata.where.tree.filters.length).toBe(1);
-        expect(r.metadata.where.tree.filters[0].field).toBe('a');
+        expect(r.metadata.where.tree.filters[0].property).toBe('a');
         expect(r.metadata.where.tree.filters[0].op).toBe(Filter.OP.CONTAINS);
         expect(r.metadata.where.tree.filters[0].value).toBe('z');
     });
@@ -334,5 +334,6 @@ describe('#toJSON', () => {
         expect(parsed.count).toEqual(r.metadata.count);
         expect(parsed.template).toEqual({ Bob: 'Sue', Hi: 12345 });
         expect(parsed.headers).toEqual({ hello: 'world' });
+        expect(parsed.method).toBe('patch');
     });
 });

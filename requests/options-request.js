@@ -58,10 +58,7 @@ export default class OptionsRequest {
      * @returns {OptionsRequest}
      */
     from(name) {
-        if (name === null) {
-            this.metadata.from = null;
-            return this;
-        } else if (typeof name !== 'string') {
+        if (name !== null && typeof name !== 'string') {
             throw new Error('Invalid "name" argument. The value must be a string or null.');
         }
         this.metadata.from = name;
@@ -128,6 +125,7 @@ export default class OptionsRequest {
             metaClone.headers = Objects.fromEntries(this.metadata.headers);
         }
         metaClone.model = this.metadata?.model?.name;
+        metaClone.method = this.method;
         return metaClone;
     }
 

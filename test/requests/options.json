@@ -1,0 +1,9 @@
+{
+    "method": "options",
+    "from": "test",
+    "headers": {
+        "hello": "world",
+        "good": true,
+        "evil": false
+    }
+}

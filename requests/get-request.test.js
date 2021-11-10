@@ -171,7 +171,7 @@ describe('#where', () => {
         expect(r.metadata.where).toBeInstanceOf(Filter);
         expect(r.metadata.where.tree.logic).toBe(Filter.LOGIC.AND);
         expect(r.metadata.where.tree.filters.length).toBe(1);
-        expect(r.metadata.where.tree.filters[0].field).toBe('a');
+        expect(r.metadata.where.tree.filters[0].property).toBe('a');
         expect(r.metadata.where.tree.filters[0].op).toBe(Filter.OP.CONTAINS);
         expect(r.metadata.where.tree.filters[0].value).toBe('z');
     });
@@ -233,7 +233,6 @@ describe('#sort', () => {
         expect(r.sort(null)).toBe(r);
         expect(r.sort('test', 'abc', Sort.asc('yolo'))).toBe(r);
     });
-
     it('accepts a kendo-like array of sorts.', () => {
         let r = new GetRequest();
         expect(r.sort([{ field: 'ID', dir: 'asc' }])).toBe(r);
@@ -527,5 +526,6 @@ describe('#toJSON', () => {
         expect(parsed.sorts).toEqual([new Sort('FirstName', Sort.DIR.DESC)]);
         expect(parsed.where).toEqual(JSON.parse(JSON.stringify(r.metadata.where)));
         expect(parsed.headers).toEqual({ hello: 'world' });
+        expect(parsed.method).toBe('get');
     });
 });

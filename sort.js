@@ -135,7 +135,7 @@ export default class Sort {
                     value: ''
                 };
             } else if (/\s/.test(input[i]) === false) {
-                throw new SyntaxError(`Failed to tokenize sort string, unknown value at position ${i} was found (are you surrounding property names with braces "{...}"?).`)
+                throw new SyntaxError(`Failed to tokenize sort string, unknown value at position ${i} was found (are you surrounding property names with braces "{...}"?).`);
             }
         }
         //validate

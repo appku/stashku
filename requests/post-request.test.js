@@ -304,5 +304,6 @@ describe('#toJSON', () => {
         expect(parsed.count).toEqual(r.metadata.count);
         expect(parsed.objects).toEqual([{ Bob: 'Sue', Hi: 12345 }, { Hi: true }]);
         expect(parsed.headers).toEqual({ hello: 'world' });
+        expect(parsed.method).toBe('post');
     });
 });

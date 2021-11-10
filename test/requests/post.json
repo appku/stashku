@@ -1,0 +1,22 @@
+{
+    "method": "post",
+    "to": "test",
+    "count": true,
+    "objects": [
+        {
+            "firstName": "Bob",
+            "lastName": "Goose",
+            "age": 33
+        },
+        {
+            "firstName": "Susan",
+            "lastName": "Moose",
+            "age": 17
+        }
+    ],
+    "headers": {
+        "hello": "world",
+        "good": true,
+        "evil": false
+    }
+}
