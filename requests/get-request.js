@@ -215,7 +215,8 @@ export default class GetRequest {
 
     /**
      * Indicates the request wishes to skip over the specified number of objects in storage.
-     * @param {Number} count - The number of models to skip over.
+     * @param {Number|String} count - The number of models to skip over. Optionally, if the string `"all"` is provided,
+     * then the `skip` and `take` values will be cleared.
      * @returns {GetRequest}
      */
     skip(count) {
@@ -223,6 +224,9 @@ export default class GetRequest {
             return this;
         } else if (count === null) {
             count = 0;
+        } else if (count === 'all') {
+            count = 0;
+            this.metadata.take = 0;
         } else if (isNaN(count) || count < 0) {
             throw new Error('The "count" argument is invalid. The value must be a number.');
         }
@@ -240,7 +244,8 @@ export default class GetRequest {
 
     /**
      * Hints that the request wishes to retrieve only the specified number of objects from storage.
-     * @param {Number} count - The number of models to take.
+     * @param {Number|String} count - The number of models to take. Optionally, if the string `"all"` is provided, then
+     * the `skip` and `take` values will be cleared.
      * @returns {GetRequest}
      */
     take(count) {
@@ -248,6 +253,9 @@ export default class GetRequest {
             return this;
         } else if (count === null) {
             count = 0;
+        } else if (count === 'all') {
+            count = 0;
+            this.metadata.skip = 0;
         } else if (isNaN(count) || count < 0) {
             throw new Error('The "count" argument is invalid. The value must be a number.');
         }

@@ -299,6 +299,12 @@ describe('#skip', () => {
         q.skip(null);
         expect(q.metadata.skip).toBe(0);
     });
+    it('sets skip and take to 0 if "all" is passed.', () => {
+        let q = new GetRequest().skip(111).take(123);
+        q.skip('all');
+        expect(q.metadata.skip).toBe(0);
+        expect(q.metadata.take).toBe(0);
+    });
     it('throws on non-number.', () => {
         let q = new GetRequest();
         expect(() => { q.skip('failthis'); }).toThrow(/number/i);
@@ -329,6 +335,12 @@ describe('#take', () => {
     it('sets 0 on null.', () => {
         let q = new GetRequest().take(111);
         q.take(null);
+        expect(q.metadata.take).toBe(0);
+    });
+    it('sets skip and take to 0 if "all" is passed.', () => {
+        let q = new GetRequest().skip(111).take(123);
+        q.take('all');
+        expect(q.metadata.skip).toBe(0);
         expect(q.metadata.take).toBe(0);
     });
     it('throws on non-number.', () => {
