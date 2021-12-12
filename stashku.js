@@ -670,5 +670,6 @@ export {
     RESTError,
     Filter,
     Sort,
-    ModelConfiguration
+    ModelConfiguration,
+    ModelUtility
 };
