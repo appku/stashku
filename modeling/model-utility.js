@@ -14,6 +14,7 @@ import Strings from '../utilities/strings.js';
  * @property {*} [default]
  * @property {Boolean} [pk=false]
  * @property {Boolean} [nullable=true]
+ * @property {Boolean} [nullomit=false]
  */
 
 /**
@@ -55,6 +56,25 @@ export default class ModelUtility {
             }
         }
         return true;
+    }
+
+    /**
+     * Attempts to format a generically formatted property name to a JavaScript camelCase property name format.
+     * @param {String} dirtyPropName - The property name value to be formatted.
+     * @returns {String}
+     */
+    static formatPropName(dirtyPropName) {
+        return Strings.camelify(dirtyPropName);
+    }
+
+    /**
+     * Attempts to format a generic resource name into a model class name in PascalCase format.
+     * The resource name is always suffixed with the word "Model".
+     * @param {String} dirtyResourceName - The resource name value to be formatted.
+     * @returns {String}
+     */
+    static formatModelName(dirtyResourceName) {
+        return Strings.camelify(pluralize.singular(dirtyResourceName), true) + 'Model';
     }
 
     /**
@@ -233,7 +253,7 @@ export default class ModelUtility {
             constructor() { mtConstructor.call(this); }
         };
         if (!className) {
-            className = Strings.camelify(pluralize.singular(resource), true) + 'Model';
+            className = ModelUtility.formatModelName(resource);
         }
         Object.defineProperty(mt, 'name', { value: className });
         //add static properties

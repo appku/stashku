@@ -128,19 +128,27 @@ const Strings = {
             //normalize diacritics and remove un-processable characters and split into words.
             let words = input
                 .normalize('NFKD')
-                .replace(/[^\w\s.\-_\\/,:;<>|`~!@#$%^&*()[\]]/g, '')
+                .replace(/[^\w\s.\-_\\/,:;<>|`~!@#$%^&*()\[\]]/g, '')
                 .split(/[^A-Za-z0-9]/g);
+            let count = 0;
             input = words.reduce((pv, cv, i) => {
-                if (words.length === 1 && cv.toUpperCase() === cv) { //if a single word name and uppercase, always just return lowercase.
-                    return cv.toLowerCase();
-                } else if (cv.toUpperCase() != cv) { //word is not all uppercase
-                    let camel = (i > 0 ? cv[0].toUpperCase() : cv[0].toLowerCase());
-                    camel += cv.substr(1);
-                    return pv + camel;
+                if (cv.length) {
+                    let uppered = cv.toUpperCase();
+                    if (words.length === 1 && uppered === cv) { //if a single word name and uppercase, always just return lowercase.
+                        count++;
+                        return cv.toLowerCase();
+                    } else if (uppered !== cv) { //word is not all uppercase
+                        let camel = (count > 0 ? cv[0].toUpperCase() : cv[0].toLowerCase());
+                        camel += cv.substr(1);
+                        count++;
+                        return pv + camel;
+                    } else if (uppered === cv) {
+                        count++;
+                    }
                 }
                 return pv + cv;
             }, '');
-            if (pascal && input.length) {
+            if (pascal) {
                 return input[0].toUpperCase() + input.substr(1);
             }
         }

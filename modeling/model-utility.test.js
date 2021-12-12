@@ -68,6 +68,24 @@ describe('.isModelType', () => {
     });
 });
 
+describe('.formatPropName', () => {
+    it('returns a formatted camelCase name when given dirty values.', () => {
+        expect(ModelUtility.formatPropName('test-prop')).toBe('testProp');
+        expect(ModelUtility.formatPropName('The Quick brown fox-jumped.')).toBe('theQuickBrownFoxJumped');
+        expect(ModelUtility.formatPropName('[john].[jumped[')).toBe('johnJumped');
+        expect(ModelUtility.formatPropName('[acro.NYM].[OK[')).toBe('acroNYMOK');
+    });
+});
+
+describe('.formatModelName', () => {
+    it('returns a formatted pascalCase name when given dirty values.', () => {
+        expect(ModelUtility.formatModelName('test-yoda')).toBe('TestYodaModel');
+        expect(ModelUtility.formatModelName('The Quick brown fox-jumped.')).toBe('TheQuickBrownFoxJumpedModel');
+        expect(ModelUtility.formatModelName('[john].[jumped[')).toBe('JohnJumpedModel');
+        expect(ModelUtility.formatModelName('[acro.NYM].[OK[')).toBe('AcroNYMOKModel');
+    });
+});
+
 describe('.map', () => {
     it('returns an empty map when the "modelType" argument is not a valid model type.', () => {
         for (let i = 4; i < invalidModelTypeValues.length; i++) {

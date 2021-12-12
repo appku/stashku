@@ -84,6 +84,8 @@ test('.camelify creates valid camel-case strings.', () => {
     expect(Strings.camelify('a,bunch.of.value^together')).toBe('aBunchOfValueTogether');
     expect(Strings.camelify('Comma,sEParated,values')).toBe('commaSEParatedValues');
     expect(Strings.camelify('dot.notation.knows.BEST...right')).toBe('dotNotationKnowsBESTRight');
+    expect(Strings.camelify('[john].[jumped[')).toBe('johnJumped');
+    expect(Strings.camelify('[acro.NYM].[OK[')).toBe('acroNYMOK');
     expect(Strings.camelify(null)).toBe(null);
     expect(Strings.camelify('')).toBe('');
 });
