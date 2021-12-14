@@ -12,8 +12,11 @@ import Strings from '../utilities/strings.js';
  * @typedef ModelProperty
  * @property {String} target
  * @property {*} [default]
+ * @property {Number} [precision]
+ * @property {Number} [radix]
+ * @property {Number} [charLength]
  * @property {Boolean} [pk=false]
- * @property {Boolean} [nullable=true]
+ * @property {Boolean} [required=false]
  * @property {Boolean} [nullomit=false]
  */
 

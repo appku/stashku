@@ -44,7 +44,7 @@ export default class Response {
         /**
          * The number of objects (records) returned from storage as a result of the request.    
          * 
-         * This number *will be* populated on GET requests utilizing the `.total()` flag, even though no objects are returned in `data`.
+         * This number *will be* populated on GET requests utilizing the `.count()` flag, even though no objects are returned in `data`.
          * @type {Number}
          */
         this.returned = parseInt(returned) || 0;

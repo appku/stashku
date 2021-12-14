@@ -310,7 +310,7 @@ describe('.generateModelType', () => {
         a: {},
         b: { pk: false },
         c: null,
-        d: { target: 'z', default: 4949, nullable: true },
+        d: { target: 'z', default: 4949, required: false },
         e: { pk: true }
     }));
     it('returns a class type with the proper configuration.', () => {
@@ -323,7 +323,7 @@ describe('.generateModelType', () => {
             expect(dynamicModel.a).toEqual({});
             expect(dynamicModel.b).toEqual({ pk: false });
             expect(dynamicModel.c).toEqual({});
-            expect(dynamicModel.d).toEqual({ target: 'z', default: 4949, nullable: true });
+            expect(dynamicModel.d).toEqual({ target: 'z', default: 4949, required: false });
             expect(dynamicModel.e).toEqual({ pk: true });
         }
     });

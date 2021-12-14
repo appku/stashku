@@ -337,19 +337,19 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
                     properties.set(k, { 
                         target: k,
                         type: m[k]?.constructor?.name || null,
-                        nullable: isNullOrUndefined
+                        required: !isNullOrUndefined
                     });
                 } else {
                     let v = properties.get(k);
-                    if (v.nullable === false && isNullOrUndefined) {
-                        v.nullable = true;
+                    if (v.required && isNullOrUndefined) {
+                        v.required = false;
                     }
                 }
             }
         }
         //set defaults on non-null types
         for (let [k, v] of properties) {
-            if (v.nullable === false) {
+            if (v.required) {
                 switch (v.type) {
                     case 'Number': v.default = 0; break;
                     case 'String': v.default = ''; break;
