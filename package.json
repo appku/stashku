@@ -1,6 +1,6 @@
 {
     "name": "@appku/stashku",
-    "version": "0.4.6",
+    "version": "0.4.7",
     "description": "Stashku is a flat-data, format agnostic, platform for performing RESTful operations on data storage mediums such as databases, and files, and even APIs.",
     "repository": {
         "type": "git",
