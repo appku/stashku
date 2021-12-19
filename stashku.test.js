@@ -219,9 +219,15 @@ describe('#configure', () => {
                 }
             }
         });
-        await stash.engine;
+        await stash.configure();
         expect(stash.engine.config.test).toBe(123);
         expect(stash.engine.config.nested.hello).toBe('world');
+    });
+    it('throws when an invalid engine is specified, and called with an await.', async () => {
+        let stash = new StashKu({
+            engine: 'blargh'
+        });
+        await expect(stash.configure()).rejects.toThrow(/cannot find module/i);
     });
 });
 

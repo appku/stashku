@@ -113,7 +113,7 @@ class StashKu {
         } else {
             this.log = new Logger(this.middlerun.bind(this));
             //apply standard configuration
-            this.configure(config);
+            this.configure(config ?? null);
         }
     }
 
@@ -167,15 +167,25 @@ class StashKu {
     /**
      * Configures this StashKu instance with the specified configuration. If a `null` value is passed, the
      * configuration is cleared and reset to the default.
+     * 
+     * When the `config` parameter is undefined (not specified), this function can be awaited. This will await the 
+     * import and load of the configured StashKu engine. If the engine is already loaded, the function will return.
      * @throws Error if the configured storage engine name (`config.engine`) is not registered with StashKu.
      * @param {StashKuConfiguration} [config] - The configuration settings which override defaults.
      * @returns {StashKu}
      */
     configure(config) {
+        if (typeof config === 'undefined') {
+            if (this.engine && this.engine.then) {
+                return this.engine.then((v) => this);
+            } else {
+                return this;
+            }
+        }
         this.log.debug('Configuring StashKu...');
         //assign defaults
         this.config = Object.assign({
-            engine: 'memory',
+            engine: process.env.STASHKU_ENGINE ?? 'memory',
             middleware: []
         }, config);
         this.log.debug('Configuration=', this.config);
