@@ -12,7 +12,7 @@ import RESTError from './rest-error.js';
 import MemoryStorageEngine from './memory-storage-engine.js';
 import Logger from './logger.js';
 import ModelConfiguration from './modeling/model-configuration.js';
-import Randomization from './utilities/randomization.js';
+import {Randomization} from '@appku/secure';
 import ModelUtility from './modeling/model-utility.js';
 import fs, { promises as fsAsync } from 'fs';
 import path from 'path';
