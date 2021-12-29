@@ -251,4 +251,4 @@ export default class PutRequest {
 
 }
 
-const STANDARD_METADATA = ['pk', 'objects', 'to', 'count', 'model'];
+const STANDARD_METADATA = ['pk', 'objects', 'to', 'count', 'model', 'headers'];

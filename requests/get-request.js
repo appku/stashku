@@ -363,4 +363,4 @@ export default class GetRequest {
 
 }
 
-const STANDARD_METADATA = ['properties', 'where', 'sorts', 'from', 'skip', 'take'];
+const STANDARD_METADATA = ['properties', 'where', 'sorts', 'from', 'skip', 'take', 'distinct', 'count', 'model', 'headers'];

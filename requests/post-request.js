@@ -213,4 +213,4 @@ export default class PostRequest {
 
 }
 
-const STANDARD_METADATA = ['objects', 'to'];
+const STANDARD_METADATA = ['objects', 'to', 'count', 'model', 'headers'];

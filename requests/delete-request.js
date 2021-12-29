@@ -230,4 +230,4 @@ export default class DeleteRequest {
 
 }
 
-const STANDARD_METADATA = ['all', 'where', 'from'];
+const STANDARD_METADATA = ['all', 'where', 'from', 'count', 'headers'];

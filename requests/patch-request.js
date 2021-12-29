@@ -259,4 +259,4 @@ export default class PatchRequest {
 
 }
 
-const STANDARD_METADATA = ['template', 'where', 'to'];
+const STANDARD_METADATA = ['all', 'template', 'where', 'to', 'count', 'headers'];
