@@ -23,7 +23,7 @@ import Strings from '../utilities/strings.js';
 /**
  * A utility class for working with StashKu-compatible model objects.
  */
-export default class ModelUtility {
+class ModelUtility {
 
     /**
      * Returns `true` if the model type object provided appears to be a class or constructor function, otherwise a
@@ -286,7 +286,7 @@ export default class ModelUtility {
      * @template T
      * @param {T} modelType - The model "class" or constructor function.
      * @param  {...any} objects - The raw objects to be transmuted into a model.
-     * @yields {<Constructor.<T>}
+     * @yields {Constructor.<T>}
      * @generator
      */
     static * model(modelType, ...objects) {
@@ -317,7 +317,7 @@ export default class ModelUtility {
      * @template T
      * @param {T} modelType - The model "class" or constructor function.
      * @param  {...Constructor.<T>} models - The modeled objects to be transformed back into a storage object.
-     * @yields {<Constructor.<T>}
+     * @yields {Constructor.<T>}
      * @generator
      */
     static * unmodel(modelType, ...models) {
@@ -341,3 +341,5 @@ export default class ModelUtility {
     }
 
 }
+
+export default ModelUtility;

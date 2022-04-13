@@ -57,11 +57,13 @@ class Filter {
 
         /**
          * @type {Filter.LOGIC}
+         * @ignore
          */
         this.LOGIC = Filter.LOGIC;
 
         /**
          * @type {Filter.OP}
+         * @ignore
          */
         this.OP = Filter.OP;
 

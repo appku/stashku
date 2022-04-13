@@ -7,7 +7,7 @@ const validErrorCodes = Object.keys(STATUS_CODES)
 /**
  * A RESTful error that can be used for actions processing requests and responses.
  */
-export default class RESTError extends Error {
+class RESTError extends Error {
     /**
      * Creates a new RESTful error with a HTTP-compliant status code.
      * @param {Number} [code] - A standard HTTP-compliant status code.
@@ -29,3 +29,5 @@ export default class RESTError extends Error {
         Error.captureStackTrace(this, RESTError);
     }
 }
+
+export default RESTError;

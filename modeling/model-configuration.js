@@ -53,7 +53,7 @@ import Response from '../response.js';
 /**
  * Defines configuration rules for how a model should be processed by StashKu in a request & response.
  */
-export default class ModelConfiguration {
+class ModelConfiguration {
     /**
      * Creates a new `ModelConfiguration` instance that defines rules for how a model should be processed by StashKu
      * in a request & response.
@@ -82,3 +82,5 @@ export default class ModelConfiguration {
 
     }
 }
+
+export default ModelConfiguration;

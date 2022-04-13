@@ -1,5 +1,5 @@
 
-export default class Sort {
+class Sort {
     constructor(property, dir) {
 
         /**
@@ -148,3 +148,5 @@ Sort.DIR = {
     ASC: 'asc',
     DESC: 'desc'
 };
+
+export default Sort;

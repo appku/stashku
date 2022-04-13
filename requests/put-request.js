@@ -4,7 +4,7 @@ import Objects from '../utilities/objects.js';
 /**
  * This class defines a StashKu PUT request that instructs StashKu to update existing objects in storage.
  */
-export default class PutRequest {
+class PutRequest {
     /**
      * Creates a new `PutRequest` instance. A PUT request instructs StashKu to update existing objects in storage.
      * @param {Array.<String>} [pk] - The property name(s) that are used to uniquely identify each object.
@@ -252,3 +252,5 @@ export default class PutRequest {
 }
 
 const STANDARD_METADATA = ['pk', 'objects', 'to', 'count', 'model', 'headers'];
+
+export default PutRequest;

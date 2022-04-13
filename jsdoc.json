@@ -13,24 +13,27 @@
         "exclude": [
             "./node_modules",
             "./old",
-            "./assets"
+            "./assets",
+            "./test"
         ],
         "includePattern": ".+\\.js(doc|x)?$",
-        "excludePattern": "(^|\\/|\\\\)_"
+        "excludePattern": "(^|\\/|\\\\)(_|.+\\.test\\.+)"
     },
     "typescript": {
         "moduleRoot": "./"
     },
     "opts": {
         "destination": "./docs/",
-        "recurse": true
+        "recurse": true,
+        "template": "./node_modules/tidy-jsdoc",
+        "encoding": "utf8"
     },
     "templates": {
         "cleverLinks": false,
         "monospaceLinks": false
     },
     "metadata": {
-        "title": "Flight Control: Runway",
-        "logo": "logo.png"
+        "title": "AppKu: StashKu",
+        "logo": "https://avatars.githubusercontent.com/u/76977527?s=400"
     }
 }

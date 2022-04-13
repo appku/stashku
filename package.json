@@ -21,11 +21,11 @@
     "main": "stashku.js",
     "scripts": {
         "prepare": "husky install",
-        "start-docs": "node cli.js ./docs",
         "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --verbose --coverage",
         "test-ci": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --verbose -ci",
         "lint": "./node_modules/.bin/eslint ./",
-        "docs": "./node_modules/jsdoc/jsdoc.js -c jsdoc.json --readme README.md"
+        "docs": "./node_modules/jsdoc/jsdoc.js -c jsdoc.json --readme README.md",
+        "serve-docs": "npx serve ./docs"
     },
     "jest": {
         "testEnvironment": "node",
@@ -53,6 +53,9 @@
         "jest": "^27.3.1",
         "jsdoc": "^3.6.7",
         "jsdoc-plugin-intersection": "^1.0.4",
+        "jsdoc-plugin-typescript": "^2.0.7",
+        "jsdoc-plugin-typescript-new": "^1.0.0",
+        "serve": "^13.0.2",
         "tidy-jsdoc": "^1.4.0"
     }
 }

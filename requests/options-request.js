@@ -6,7 +6,7 @@ import Objects from '../utilities/objects.js';
  * This class defines a StashKu OPTIONS request that instructs StashKu to gather the schema for models from a 
  * particular resource.
  */
-export default class OptionsRequest {
+class OptionsRequest {
     /**
      * Creates a new `OptionsRequest` instance. A OPTIONS request that instructs StashKu to gather the schema for
      * models from a particular resource.
@@ -130,3 +130,5 @@ export default class OptionsRequest {
     }
 
 }
+
+export default OptionsRequest;

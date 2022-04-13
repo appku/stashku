@@ -6,7 +6,7 @@ import Objects from '../utilities/objects.js';
 /**
  * This class defines a StashKu GET request that instructs StashKu to retrieve objects from storage.
  */
-export default class GetRequest {
+class GetRequest {
     /**
      * Creates a new `PostRequest` instance. A GET request instructs StashKu to retrieve objects from storage.
      * @param  {...String} [properties] - Spread of field names (aka: columns) to get from data storage.
@@ -364,3 +364,5 @@ export default class GetRequest {
 }
 
 const STANDARD_METADATA = ['properties', 'where', 'sorts', 'from', 'skip', 'take', 'distinct', 'count', 'model', 'headers'];
+
+export default GetRequest;

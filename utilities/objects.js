@@ -11,7 +11,6 @@
  * @property {Array.<String>} [ignore] - Any property names found in this array are omitted from the output.
  */
 
-/** @exports Objects */
 const Objects = {
 
     /**
@@ -169,4 +168,5 @@ const Objects = {
 
 };
 
+/** @exports Objects */
 export default Objects;

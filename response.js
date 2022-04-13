@@ -2,7 +2,7 @@
  * A standard response from a StashKu storage engine that completes a request.
  * @template M
  */
-export default class Response {
+class Response {
 
     /**
      * Creates a standard response of the data returned by a StashKu storage engine.
@@ -63,3 +63,5 @@ export default class Response {
     }
 
 }
+
+export default Response;

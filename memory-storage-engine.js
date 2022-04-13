@@ -34,7 +34,7 @@ import OptionsRequest from './requests/options-request.js';
  * This StashKu engine is built-in and provides an in-memory data store with support for all StashKu RESTful actions
  * and operations. 
  */
-export default class MemoryStorageEngine extends BaseStorageEngine {
+class MemoryStorageEngine extends BaseStorageEngine {
     /**
      * Creates a new `MemoryStorageEngine` instance.
      */
@@ -369,3 +369,5 @@ export default class MemoryStorageEngine extends BaseStorageEngine {
     }
 
 }
+
+export default MemoryStorageEngine;

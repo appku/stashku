@@ -5,7 +5,7 @@ import Objects from '../utilities/objects.js';
 /**
  * This class defines a StashKu DELETE request that instructs StashKu to delete objects matching the specified criteria.
  */
-export default class DeleteRequest {
+class DeleteRequest {
     /**
      * Creates a new `DeleteRequest` instance. A DELETE request instructs StashKu to delete objects from storage that
      * match the specified criteria.
@@ -231,3 +231,5 @@ export default class DeleteRequest {
 }
 
 const STANDARD_METADATA = ['all', 'where', 'from', 'count', 'headers'];
+
+export default DeleteRequest;

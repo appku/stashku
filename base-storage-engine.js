@@ -22,7 +22,7 @@ import Objects from './utilities/objects.js';
  * a 501 "Not supported" error.
  * @abstract
  */
-export default class BaseStorageEngine {
+class BaseStorageEngine {
     /**
      * Instantiates a new `BaseStorageEngine`.
      * @param {String} name - The name of this storage engine. 
@@ -274,3 +274,5 @@ export default class BaseStorageEngine {
     }
 
 }
+
+export default BaseStorageEngine;

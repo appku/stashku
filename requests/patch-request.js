@@ -6,7 +6,7 @@ import Objects from '../utilities/objects.js';
  * This class defines a StashKu PATCH request that instructs StashKu to update objects from storage with the specified
  * properties and values.
  */
-export default class PatchRequest {
+class PatchRequest {
     /**
      * Creates a new `PatchRequest` instance. A PATCH request instructs StashKu to update objects from storage with 
      * the specified properties and values.
@@ -260,3 +260,5 @@ export default class PatchRequest {
 }
 
 const STANDARD_METADATA = ['all', 'template', 'where', 'to', 'count', 'headers'];
+
+export default PatchRequest;

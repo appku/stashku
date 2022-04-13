@@ -9,7 +9,7 @@
 /**
  * A logging interface class that exposes friendly log methods that pass information to a configured callback.
  */
-export default class Logger {
+class Logger {
     /**
      * Creates a new `Logger` instance.
      * @param {LoggerCallback} callback - The logging callback asynchronously called when a log method call is made.
@@ -61,3 +61,5 @@ export default class Logger {
     }
 
 }
+
+export default Logger;

@@ -4,7 +4,7 @@ import Objects from '../utilities/objects.js';
 /**
  * This class defines a StashKu POST request that instructs StashKu to create a new object in storage.
  */
-export default class PostRequest {
+class PostRequest {
     /**
      * Creates a new `PostRequest` instance. A POST request instructs StashKu to create a new object in storage.
      * @param  {...String} [objects] - Spread of objects to create in data storage.
@@ -214,3 +214,5 @@ export default class PostRequest {
 }
 
 const STANDARD_METADATA = ['objects', 'to', 'count', 'model', 'headers'];
+
+export default PostRequest;
