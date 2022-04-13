@@ -25,7 +25,7 @@
     "opts": {
         "destination": "./docs/",
         "recurse": true,
-        "template": "./node_modules/tidy-jsdoc",
+        "template": "./node_modules/@appku/jsdoc-template",
         "encoding": "utf8"
     },
     "templates": {
