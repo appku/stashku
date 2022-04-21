@@ -12,7 +12,6 @@ import RESTError from './rest-error.js';
 import MemoryStorageEngine from './memory-storage-engine.js';
 import Logger from './logger.js';
 import ModelConfiguration from './modeling/model-configuration.js';
-import {Randomization} from '@appku/secure';
 import ModelUtility from './modeling/model-utility.js';
 import fs, { promises as fsAsync } from 'fs';
 import path from 'path';
@@ -95,6 +94,21 @@ class StashKu {
         this.middleware = [];
 
         /**
+         * Counter of all requests handled by this instance (or parent instance in the case of a proxy) of stashku.
+         */
+        this.stats = {
+            requests: {
+                total: 0,
+                get: 0,
+                put: 0,
+                post: 0,
+                patch: 0,
+                delete: 0,
+                options: 0
+            }
+        };
+
+        /**
          * @type {Logger}
          */
         this.log = null;
@@ -108,6 +122,7 @@ class StashKu {
             this.log = config.proxy.parent.log;
             this.engine = config.proxy.parent.engine;
             this.middleware = config.proxy.parent.middleware;
+            this.stats = config.proxy.parent.stats;
             //shallow-clone configuration, set proxy
             this.config = Object.assign({}, config.proxy.parent.config, { proxy: config.proxy });
         } else {
@@ -303,7 +318,9 @@ class StashKu {
         }
         //pre-process request
         let response = null;
-        let reqID = Randomization.uuidv4();
+        this.stats.requests[request.method]++;
+        this.stats.requests.total++;
+        let reqID = this.stats.requests.total.toString().padStart(16, '0');
         this.log.debug(`[${reqID}] Processing "${request.method}" request.`);
         try {
             await this.engine; //resolve if a promise.

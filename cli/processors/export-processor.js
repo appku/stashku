@@ -3,6 +3,7 @@ import BaseProcessor from './base-processor.js';
 import dot from 'dot';
 import StashKu, { OptionsRequest, ModelUtility } from '../../stashku.js';
 import fairu from '@appku/fairu';
+import strings from '../../utilities/strings.js';
 import path from 'path';
 
 const __dirname = (
@@ -51,23 +52,63 @@ export default class ExportProcessor extends BaseProcessor {
                 console.debug(`Exporting model type "${mt.name}".`);
                 let blueprint = {
                     name: mt.name,
+                    slug: strings.slugify(mt.name, '-', true, true),
+                    config: mt.$stashku,
                     timestamp: new Date(),
                     resource: this.options.resource,
                     mapping: ModelUtility.map(mt),
                     makeJSDefinition: this.makeJSDefinition,
                     makePropertyJSDoc: this.makePropertyJSDoc,
-                    makeJSDefault: this.makeJSDefault
+                    makeJSDefault: this.makeJSDefault,
+                    makeJSModelConfiguration: this.makeJSModelConfiguration
                 };
                 let baseModelContent = dots['base-model'](blueprint);
-                // let extModelContent = dots.model(this);
+                let extModelContent = dots.model(blueprint);
                 console.log(baseModelContent);
-                // console.log(extModelContent);
+                console.log(extModelContent);
             }
         }
     }
 
+    /**
+     * @typedef {import('../../modeling/model-utility.js').ModelProperty} PropertyDefinition
+     */
+
+    /**
+     * Creates a string representation of the property definition object.
+     * @param {PropertyDefinition} definition - The property definition object.
+     * @param {Number} indentSpaces - The number of spaces to indent.
+     * @param {Boolean} indentFirstLine - Enable or disable indenting the first line of the returned string.
+     * @returns {String}
+     */
     makeJSDefinition(definition, indentSpaces, indentFirstLine = false) {
-        //TODO
+        let indent = ' '.repeat(indentSpaces);
+        let output = (indentFirstLine ? indent : '') + '{\n';
+        if (definition.target) {
+            output += `${indent}    target: "${definition.target}"\n`;
+        }
+        if (definition.default) {
+            output += `${indent}    default: ${this.makeJSDefault(definition)}\n`;
+        }
+        if (definition.precision) {
+            output += `${indent}    precision: ${definition.precision}\n`;
+        }
+        if (definition.radix) {
+            output += `${indent}    radix: ${definition.radix}\n`;
+        }
+        if (definition.charLength) {
+            output += `${indent}    charLength: ${definition.charLength}\n`;
+        }
+        if (definition.pk) {
+            output += `${indent}    pk: ${definition.pk}\n`;
+        }
+        if (definition.required) {
+            output += `${indent}    required: ${definition.required}\n`;
+        }
+        if (definition.nullomit) {
+            output += `${indent}    nullomit: ${definition.nullomit}\n`;
+        }
+        return output + indent + '}';
     }
 
     makePropertyJSDoc(property, definition, indentSpaces, indentFirstLine = false) {
@@ -100,19 +141,26 @@ export default class ExportProcessor extends BaseProcessor {
     /**
      * Returns the computed JavaScript value string for a property definition's default value.
      * @param {*} definition - The StashKu property definition.
+     * @param {String} className - The name of the model class.
+     * @param {String} propertyName - The name of the property we are creating a default value for.
      * @returns {String}
      */
-    makeJSDefault(definition) {
-        console.log(definition);
+    makeJSDefault(definition, className, propertyName) {
         if (typeof definition.default !== 'undefined') {
             //handle special JS values
             if (definition.default === null) {
                 return 'null';
-            } else if (isFinite(definition.default) === false) {
+            } else if (definition.default === Infinity) {
                 return 'Infinity';
-            } else if (isNaN(definition.default)) {
+            // eslint-disable-next-line use-isnan
+            } else if (definition.default === NaN) {
                 return 'NaN';
-            }
+            } else if (typeof definition.default === 'function') {
+                if (className && propertyName) {
+                    return `${className}.${propertyName}.default()`;
+                }
+                return definition.default.toString();
+            } 
             //output JS representation by type.
             if (definition.type === 'Boolean' || definition.type === 'Number') {
                 return definition.default.toString();
@@ -136,6 +184,12 @@ export default class ExportProcessor extends BaseProcessor {
                 case 'Buffer': return 'Buffer.alloc(0)';
             }
         }
+    }
+
+    makeJSModelConfiguration(config, indentSpaces, indentFirstLine = false) {
+        let indent = ' '.repeat(indentSpaces);
+        let output = (indentFirstLine ? indent : '') + '{\n';
+        return output + indent + '}';
     }
 
     /**

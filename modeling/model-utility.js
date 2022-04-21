@@ -17,7 +17,6 @@ import Strings from '../utilities/strings.js';
  * @property {Number} [charLength]
  * @property {Boolean} [pk=false]
  * @property {Boolean} [required=false]
- * @property {Boolean} [nullomit=false]
  */
 
 /**

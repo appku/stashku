@@ -11,7 +11,7 @@ class Base{{= it.name}} {
     constructor() {
         {{ for(let [prop, def] of it.mapping) { }}
         {{=it.makePropertyJSDoc(prop, def, 8)}}
-        this.{{= prop}} = {{=it.makeJSDefault(def)}};
+        this.{{= prop}} = {{=it.makeJSDefault(def, 'Base' + it.name, prop)}};
         {{ } }}
     }
     {{ for(let [prop, def] of it.mapping) { }}
@@ -19,12 +19,12 @@ class Base{{= it.name}} {
      * StashKu property definition for {{=prop}}.
      */
     static get {{=prop}}() {
-        return {{=it.makeJSDefinition(def)}};
+        return {{=it.makeJSDefinition(def, 8)}};
     }
     {{ } }}
 
     static get $stashku() {
-        return {};
+        return {{=it.makeJSModelConfiguration(it.config, 8)}};
     }
     
 }

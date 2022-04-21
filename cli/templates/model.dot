@@ -1,9 +1,9 @@
-import Base{{= it.metadata.name}} from './base/base-{{= it.metadata.slug}}.js';
+import Base{{= it.name}} from './base/base-{{= it.slug}}.js';
 
 /**
- * The class for `{{= it.metadata.name}}` instances within the "{{= it.metadata.namespace}}" namespace.
+ * The class for `{{= it.name}}` instances.
  */
-export default class {{= it.metadata.name}} extends Base{{= it.metadata.name}} {
+class {{= it.name}} extends Base{{= it.name}} {
     constructor() {
         super();
     }
@@ -12,3 +12,5 @@ export default class {{= it.metadata.name}} extends Base{{= it.metadata.name}} {
     // You can add customizations to this class and they will not be overwritten by subsequent extracts.
 
 }
+
+export default {{= it.name}};
