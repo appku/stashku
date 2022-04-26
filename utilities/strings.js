@@ -128,7 +128,7 @@ const Strings = {
             //normalize diacritics and remove un-processable characters and split into words.
             let words = input
                 .normalize('NFKD')
-                .replace(/[^\w\s.\-_\\/,:;<>|`~!@#$%^&*()\[\]]/g, '')
+                .replace(/[^\w\s.\-_\\/,:;<>|`~!@#$%^&*()[]]/g, '')
                 .split(/[^A-Za-z0-9]/g);
             let count = 0;
             input = words.reduce((pv, cv, i) => {

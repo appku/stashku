@@ -8,7 +8,6 @@ import OptionsRequest from './requests/options-request.js';
 import Response from './response.js';
 import Sort from './sort.js';
 import Filter from './filter.js';
-import ModelConfiguration from './modeling/model-configuration.js';
 import fs from 'fs/promises';
 
 const samples = {
@@ -610,6 +609,5 @@ describe('#options', () => {
         expect(res.data[0].Name.default).toBe('');
         expect(res.data[0].HexCode.target).toBe('HexCode');
         expect(res.data[0].HexCode.default).toBe('');
-        expect(res.data[0].$stashku).toBeInstanceOf(ModelConfiguration);
     });
 });

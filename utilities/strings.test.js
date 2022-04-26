@@ -80,7 +80,7 @@ test('.camelify creates valid camel-case strings.', () => {
     expect(Strings.camelify('AddressEntityTypesX3')).toBe('addressEntityTypesX3');
     expect(Strings.camelify('AddressEntityTypesX3', true)).toBe('AddressEntityTypesX3');
     expect(Strings.camelify('vServerStorage')).toBe('vServerStorage');
-    expect(Strings.camelify('Crazy-letters:áäâyeeèéóöôùú')).toBe('crazyLettersAaayeeeeooouu');
+    expect(Strings.camelify('Crazy-letters:áäâyeeèéóöôùú')).toBe('crazyLettersAAAYeeeEOOOUU');
     expect(Strings.camelify('a,bunch.of.value^together')).toBe('aBunchOfValueTogether');
     expect(Strings.camelify('Comma,sEParated,values')).toBe('commaSEParatedValues');
     expect(Strings.camelify('dot.notation.knows.BEST...right')).toBe('dotNotationKnowsBESTRight');

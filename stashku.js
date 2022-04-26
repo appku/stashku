@@ -11,7 +11,6 @@ import Response from './response.js';
 import RESTError from './rest-error.js';
 import MemoryStorageEngine from './memory-storage-engine.js';
 import Logger from './logger.js';
-import ModelConfiguration from './modeling/model-configuration.js';
 import ModelUtility from './modeling/model-utility.js';
 import fs, { promises as fsAsync } from 'fs';
 import path from 'path';
@@ -25,7 +24,7 @@ const SUPPORTED_STATES = ['log', 'request', 'response', 'done'];
  * @param {BaseStorageEngine} engine - The storage engine instance that is processing the request.
  * @param {String} method - The name of the request method being carried out, typically "get", "post", "put", "patch",
  * "delete", "options".
- * @param {GetRequest|PostRequest|PutRequest|PatchRequest|DeleteRequest} request - The request object being specified.
+ * @param {GetRequest|PostRequest|PutRequest|PatchRequest|DeleteRequest|OptionsRequest} request - The request object being specified.
  * @param {Response} response - The response object (`null` if not prepared yet).
  * @param {String} state 
  * The name of the state of where in the RESTful process the callback is being made, either:
@@ -245,7 +244,7 @@ class StashKu {
      *  - "response": Indicates the callback was made before the engine's response has been considered.
      *  - "done": Indicates the callback was made after the engine has completed the response and the action is about to
      * complete (StashKu hands off the storage engine response to the caller).
-     * @param {GetRequest|PostRequest|PutRequest|PatchRequest|DeleteRequest} request - The request object being specified.
+     * @param {GetRequest|PostRequest|PutRequest|PatchRequest|DeleteRequest|OptionsRequest} request - The request object being specified.
      * @param {Response} response - The response object (`null` if not prepared yet).
      */
     async middlerun(state, request, response) {
@@ -291,13 +290,13 @@ class StashKu {
      * @throws Error if the "request" argument is not a callback function or request-like instance.
      * @throws Error if the engine module fails to load.
      * @throws Error if the engine is `null`.
-     * @param {GetRequest|PostRequest|PutRequest|PatchRequest|DeleteRequest} request - The request to ensure.
+     * @param {GetRequest|PostRequest|PutRequest|PatchRequest|DeleteRequest|OptionsRequest} request - The request to ensure.
      * @param {*} requestType - The expected request instance type.
-     * @returns {Response} Returns the data objects from storage matching request criteria.
+     * @returns {Promise.<Response>} Returns the data objects from storage matching request criteria.
      * @private
      */
     async _handle(request, requestType) {
-        //validate request
+        //validate arguments
         if (!requestType) {
             throw new Error('A "requestType" parameter argument is required.');
         }
@@ -327,18 +326,21 @@ class StashKu {
         } catch (err) {
             throw new RESTError(500, `The StashKu storage engine "${this.config.engine}" could not be loaded. ${err.toString()}`);
         }
-        if (request.metadata.model) {
-            //run model override request callback
-            ModelUtility.override(request.metadata.model, request, null);
+        if (request.validate) {
+            this.log.debug(`[${reqID}] Running "${request.method}" request validation.`);
+            await request.validate(reqID);
         }
+        this.log.debug(`[${reqID}] Running "${request.method}" request middleware.`);
         await this.middlerun('request', request, response);
         if (this.engine[request.method]) {
             try {
                 //make the request and get the response
                 this.log.debug(`[${reqID}] Sending "${request.method}" request to engine "${this.engine.name}".`);
                 response = await this.engine[request.method](request);
+                this.log.debug(`[${reqID}] Received response for "${request.method}" request from engine "${this.engine.name}".`);
                 if (request.metadata.model) {
                     //convert data
+                    this.log.debug(`[${reqID}] Modelling response data.`);
                     if (response.data && response.data.length) {
                         let counter = 0;
                         for (let m of ModelUtility.model(request.metadata.model, ...response.data)) {
@@ -346,9 +348,8 @@ class StashKu {
                             counter++;
                         }
                     }
-                    //run model override response callback
-                    ModelUtility.override(request.metadata.model, request, response);
                 }
+                this.log.debug(`[${reqID}] Running middleware for response.`);
                 await this.middlerun('response', request, response);
             } catch (err) {
                 if ((err instanceof RESTError) === false) {
@@ -697,6 +698,5 @@ export {
     RESTError,
     Filter,
     Sort,
-    ModelConfiguration,
     ModelUtility
 };

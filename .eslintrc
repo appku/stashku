@@ -39,7 +39,9 @@
                 "vars": "all",
                 "args": "none",
                 "ignoreRestSiblings": false,
-                "caughtErrors": "none"
+                "caughtErrors": "none",
+                "argsIgnorePattern": "^_",
+                "varsIgnorePattern": "_"
             }
         ],
         "no-console": [

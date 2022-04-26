@@ -1,6 +1,5 @@
 import ModelUtility from './model-utility.js';
 import jest from 'jest-mock';
-import ModelConfiguration from './model-configuration.js';
 
 const invalidModelTypeValues = [
     new Date(),
@@ -245,66 +244,21 @@ describe('.pk', () => {
     });
 });
 
-describe('.override', () => {
-    it('calls the request override callback when only the "request" is passed.', () => {
-        let reqCb = jest.fn();
-        let resCb = jest.fn();
-        let myReq = {};
-        class TestModel {
-            static get $stashku() {
-                return { override: { request: reqCb, response: resCb } };
-            }
-        }
-        ModelUtility.override(TestModel, myReq);
-        ModelUtility.override(TestModel, myReq, null);
-        expect(reqCb).toHaveBeenCalledTimes(2);
-        expect(reqCb).toBeCalledWith(myReq);
-        expect(resCb).not.toHaveBeenCalled();
-    });
-    it('calls the response override callback when the "request" and "response" is passed.', () => {
-        let reqCb = jest.fn();
-        let resCb = jest.fn();
-        let myReq = {};
-        let myRes = {};
-        class TestModel {
-            static get $stashku() {
-                return { override: { request: reqCb, response: resCb } };
-            }
-        }
-        ModelUtility.override(TestModel, myReq, myRes);
-        expect(resCb).toHaveBeenCalledTimes(1);
-        expect(resCb).toBeCalledWith(myReq, myRes);
-        expect(reqCb).not.toHaveBeenCalled();
-    });
-    it('returns when an invalid model type is specified.', () => {
-        expect(() => ModelUtility.override()).not.toThrow();
-        expect(() => ModelUtility.override({})).not.toThrow();
-        expect(() => ModelUtility.override(true)).not.toThrow();
-        expect(() => ModelUtility.override(123)).not.toThrow();
-    });
-});
-
 describe('.generateModelType', () => {
     it('throws an error if the "typeName" argument is missing.', () => {
-        expect(() => { ModelUtility.generateModelType('', new Map(), new ModelConfiguration()); }).toThrow(/resource.+required/);
-        expect(() => { ModelUtility.generateModelType(null, new Map(), new ModelConfiguration()); }).toThrow(/resource.+required/);
-        expect(() => { ModelUtility.generateModelType(undefined, new Map(), new ModelConfiguration()); }).toThrow(/resource.+required/);
+        expect(() => { ModelUtility.generateModelType('', new Map(), {}); }).toThrow(/resource.+required/);
+        expect(() => { ModelUtility.generateModelType(null, new Map(),{}); }).toThrow(/resource.+required/);
+        expect(() => { ModelUtility.generateModelType(undefined, new Map(), {}); }).toThrow(/resource.+required/);
     });
     it('throws an error if the "properties" argument is missing.', () => {
-        expect(() => { ModelUtility.generateModelType('Test', null, new ModelConfiguration()); }).toThrow(/properties.+required/);
-        expect(() => { ModelUtility.generateModelType('Test', undefined, new ModelConfiguration()); }).toThrow(/properties.+required/);
+        expect(() => { ModelUtility.generateModelType('Test', null, {}); }).toThrow(/properties.+required/);
+        expect(() => { ModelUtility.generateModelType('Test', undefined, {}); }).toThrow(/properties.+required/);
     });
     it('throws an error if the "properties" argument is not a Map instance.', () => {
-        expect(() => { ModelUtility.generateModelType('Test', new Date(), new ModelConfiguration()); }).toThrow(/properties.+Map/);
-        expect(() => { ModelUtility.generateModelType('Test', [[], []], new ModelConfiguration()); }).toThrow(/properties.+Map/);
-        expect(() => { ModelUtility.generateModelType('Test', 'hello', new ModelConfiguration()); }).toThrow(/properties.+Map/);
-        expect(() => { ModelUtility.generateModelType('Test', true, new ModelConfiguration()); }).toThrow(/properties.+Map/);
-    });
-    it('throws an error if the "configuration" argument is not a ModelConfiguration instance.', () => {
-        expect(() => { ModelUtility.generateModelType('Test', new Map(), new Date()); }).toThrow(/configuration.+ModelConfiguration/);
-        expect(() => { ModelUtility.generateModelType('Test', new Map(), 'hello'); }).toThrow(/configuration.+ModelConfiguration/);
-        expect(() => { ModelUtility.generateModelType('Test', new Map(), true); }).toThrow(/configuration.+ModelConfiguration/);
-        expect(() => { ModelUtility.generateModelType('Test', new Map(), []); }).toThrow(/configuration.+ModelConfiguration/);
+        expect(() => { ModelUtility.generateModelType('Test', new Date(), {}); }).toThrow(/properties.+Map/);
+        expect(() => { ModelUtility.generateModelType('Test', [[], []], {}); }).toThrow(/properties.+Map/);
+        expect(() => { ModelUtility.generateModelType('Test', 'hello', {}); }).toThrow(/properties.+Map/);
+        expect(() => { ModelUtility.generateModelType('Test', true, {}); }).toThrow(/properties.+Map/);
     });
     let properties = new Map(Object.entries({
         a: {},
@@ -314,7 +268,7 @@ describe('.generateModelType', () => {
         e: { pk: true }
     }));
     it('returns a class type with the proper configuration.', () => {
-        let configs = [null, new ModelConfiguration('testa-bits')];
+        let configs = [null, {resource: 'testa-bits'}];
         for (let mc of configs) {
             let dynamicModel = ModelUtility.generateModelType('testa-bits', properties, mc);
             expect(dynamicModel).toBeTruthy();
@@ -328,7 +282,7 @@ describe('.generateModelType', () => {
         }
     });
     it('returns a class type that constructs with defined properties.', () => {
-        let mc = new ModelConfiguration('testa-bits');
+        let mc = {resource: 'testa-bits'};
         let TestaBitModel = ModelUtility.generateModelType('testa-bits', properties, mc);
         let model = new TestaBitModel();
         expect(model).toBeInstanceOf(TestaBitModel);
@@ -372,9 +326,9 @@ describe('.model', () => {
             static get lastName() { return { target: 'Last_Name' }; }
         }
         let iterator = ModelUtility.model(TestModel, {}, { First_Name: 'abc', Last_Name: 123 }, { First_Name: 'def' });
-        expect(iterator.next().value).toEqual({});
+        expect(iterator.next().value).toEqual({ firstName: null, lastName: null });
         expect(iterator.next().value).toEqual({ firstName: 'abc', lastName: 123 });
-        expect(iterator.next().value).toEqual({ firstName: 'def' });
+        expect(iterator.next().value).toEqual({ firstName: 'def', lastName: null });
     });
     it('runs a transform on the model.', () => {
         class TestModel {
@@ -383,10 +337,10 @@ describe('.model', () => {
                 this.lastName = null;
             }
             static get firstName() { return 'First_Name'; }
-            static get lastName() { return { target: 'Last_Name', transform: (v) => v ? v : 'default' }; }
+            static get lastName() { return { target: 'Last_Name', transform: (k, v) => v ? v : 'default' }; }
         }
         let iterator = ModelUtility.model(TestModel, {}, { First_Name: 'abc', Last_Name: 123 }, { First_Name: 'def' });
-        expect(iterator.next().value).toEqual({ lastName: 'default' });
+        expect(iterator.next().value).toEqual({ firstName: null, lastName: 'default' });
         expect(iterator.next().value).toEqual({ firstName: 'abc', lastName: 123 });
         expect(iterator.next().value).toEqual({ firstName: 'def', lastName: 'default' });
     });
@@ -440,7 +394,7 @@ describe('.unmodel', () => {
                 this.lastName = null;
             }
             static get firstName() { return 'First_Name'; }
-            static get lastName() { return { target: 'Last_Name', transform: (v) => v ? v : 'default' }; }
+            static get lastName() { return { target: 'Last_Name', transform: (k, v) => v ? v : 'default' }; }
         }
         let m = new TestModel();
         m.firstName = 'abc';

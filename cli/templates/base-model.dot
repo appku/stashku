@@ -1,3 +1,4 @@
+///<reference path="modeling.d.js" />
 /**
  * The class for `{{= it.name}}` instances within the "{{= it.resource}}" resource.
  * Exported: {{= it.timestamp.toISOString()}}
@@ -10,21 +11,26 @@
 class Base{{= it.name}} {
     constructor() {
         {{ for(let [prop, def] of it.mapping) { }}
-        {{=it.makePropertyJSDoc(prop, def, 8)}}
+        {{=it.makePropertyJSDoc(prop, def, 2)}}
         this.{{= prop}} = {{=it.makeJSDefault(def, 'Base' + it.name, prop)}};
         {{ } }}
     }
     {{ for(let [prop, def] of it.mapping) { }}
     /**
      * StashKu property definition for {{=prop}}.
+     * @type {Modeling.PropertyDefinition}
      */
     static get {{=prop}}() {
-        return {{=it.makeJSDefinition(def, 8)}};
+        return {{=it.makeJSDefinition(def, 2)}};
     }
     {{ } }}
 
+    /**
+     * The StashKu resource configuration for this model.
+     * @type {Modeling.ModelConfiguration}
+     */
     static get $stashku() {
-        return {{=it.makeJSModelConfiguration(it.config, 8)}};
+        return {{=it.makeJSModelConfiguration(it.config, 2)}};
     }
     
 }

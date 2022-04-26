@@ -10,7 +10,6 @@ import thenby from 'thenby';
 import RESTError from './rest-error.js';
 import deepEqual from 'deep-is';
 import ModelUtility from './modeling/model-utility.js';
-import ModelConfiguration from './modeling/model-configuration.js';
 import OptionsRequest from './requests/options-request.js';
 
 /**
@@ -333,38 +332,40 @@ class MemoryStorageEngine extends BaseStorageEngine {
             let keys = Object.keys(m);
             for (let k of keys) {
                 let isNullOrUndefined = (m[k] === null || typeof m[k] === 'undefined');
+                let def = null;
                 if (properties.has(k) === false) {
-                    properties.set(k, { 
+                    def = {
                         target: k,
                         type: m[k]?.constructor?.name || null,
-                        required: !isNullOrUndefined
-                    });
+                        validate: ModelUtility.validators.required
+                    };
+                    properties.set(k, def);
                 } else {
-                    let v = properties.get(k);
-                    if (v.required && isNullOrUndefined) {
-                        v.required = false;
-                    }
+                    def = properties.get(k);
+                }
+                if (isNullOrUndefined) {
+                    delete def.validate;
                 }
             }
         }
         //set defaults on non-null types
-        for (let [k, v] of properties) {
-            if (v.required) {
-                switch (v.type) {
-                    case 'Number': v.default = 0; break;
-                    case 'String': v.default = ''; break;
-                    case 'Boolean': v.default = false; break;
-                    case 'Array': v.default = []; break;
-                    case 'Date': v.default = new Date(); break;
-                    case 'Map': v.default = new Map(); break;
-                    case 'Set': v.default = new Set(); break;
-                    case 'Buffer': v.default = Buffer.alloc(0); break;
-                    case 'ArrayBuffer': v.default = new ArrayBuffer(0); break;
+        for (let [_, def] of properties) {
+            if (def.validate) {
+                switch (def.type) {
+                    case 'Number': def.default = 0; break;
+                    case 'String': def.default = ''; break;
+                    case 'Boolean': def.default = false; break;
+                    case 'Array': def.default = []; break;
+                    case 'Date': def.default = new Date(); break;
+                    case 'Map': def.default = new Map(); break;
+                    case 'Set': def.default = new Set(); break;
+                    case 'Buffer': def.default = Buffer.alloc(0); break;
+                    case 'ArrayBuffer': def.default = new ArrayBuffer(0); break;
                 }
             }
         }
         //generate model type and return
-        let mt = ModelUtility.generateModelType(meta.from, properties, new ModelConfiguration(from));
+        let mt = ModelUtility.generateModelType(meta.from, properties, { resource: from });
         return new Response([mt], 1, 0, 1);
     }
 
