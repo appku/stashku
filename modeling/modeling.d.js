@@ -4,7 +4,7 @@
  */
 
 /**
- * @typedef Modeling.AnyModel
+ * @typedef Modeling.AnyModelType
  * @property {Modeling.Configuration} [$stashku]
  */
 

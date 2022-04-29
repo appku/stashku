@@ -250,6 +250,11 @@ describe('.generateModelType', () => {
             expect(dynamicModel.c).toEqual({});
             expect(dynamicModel.d).toEqual({ target: 'z', default: 4949, required: false });
             expect(dynamicModel.e).toEqual({ pk: true });
+            expect(dynamicModel.$stashku.resource).toBe('testa-bits');
+            expect(dynamicModel.$stashku.name).toBe('TestaBit');
+            expect(dynamicModel.$stashku.slug).toBe('testa-bit');
+            expect(dynamicModel.$stashku.plural.name).toBe('TestaBits');
+            expect(dynamicModel.$stashku.plural.slug).toBe('testa-bits');
         }
     });
     it('returns a class type that constructs with defined properties.', () => {
@@ -270,6 +275,19 @@ describe('.generateModelType', () => {
         expect(TestaBitModel.$stashku.slug).toBe('contact-record');
         expect(TestaBitModel.$stashku.plural.name).toBe('ContactRecords');
         expect(TestaBitModel.$stashku.plural.slug).toBe('contact-records');
+    });
+    it('returns a class type with and auto-fills missing $stashku configuration names.', () => {
+        let TestaBitModel = ModelUtility.generateModelType('horse_Records', properties, {
+            name: 'Banana',
+            plural: {
+                slug: 'dancing-frogs'
+            }
+        });
+        expect(TestaBitModel.$stashku.resource).toBe('horse_Records');
+        expect(TestaBitModel.$stashku.name).toBe('Banana');
+        expect(TestaBitModel.$stashku.slug).toBe('horse-record');
+        expect(TestaBitModel.$stashku.plural.name).toBe('HorseRecords');
+        expect(TestaBitModel.$stashku.plural.slug).toBe('dancing-frogs');
     });
 });
 

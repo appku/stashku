@@ -5,7 +5,7 @@ import dot from 'dot';
 import StashKu from '../../stashku.js';
 import OptionsRequest from '../../requests/options-request.js';
 import ModelUtility from '../../modeling/model-utility.js';
-import fairu from '@appku/fairu';
+import fairu, { Util as FairuUtil } from '@appku/fairu';
 import strings from '../../utilities/strings.js';
 import path from 'path';
 
@@ -23,7 +23,7 @@ const dots = dot.process({ path: path.resolve(__dirname + '/../templates') });
  * Runs a standard RESTful StashKu OPTIONS request using command line options to create a model type definition
  * that can be exported to a directory with a base-class and extending class file (if not already present).
  */
-export default class ExportProcessor extends BaseProcessor {
+class ExportProcessor extends BaseProcessor {
     // eslint-disable-next-line valid-jsdoc
     /**
      * Runs a standard RESTful StashKu OPTIONS request using command line options to create a model type definition
@@ -47,12 +47,22 @@ export default class ExportProcessor extends BaseProcessor {
             this.stash = new StashKu({ engine: 'memory' });
             this.stash.engine.data.set('themes', fairu.including('./test/cli/data-themes.json').parse().readSync()[0].data);
         }
-        console.debug(`Running OPTIONS request on "${this.stash.engine.name}" engine from the "${this.options.resource}" resource.`);
+        if (!this.options.cli.quiet && this.options.cli.verbose) {
+            console.debug(`Running OPTIONS request on "${this.stash.engine.name}" engine for the "${this.options.resource}" resource.`);
+        }
         let res = await this.stash.options(o => o.from(this.options.resource));
-        console.debug(`Total returned: ${res.returned}`);
+        if (!this.options.cli.quiet) {
+            let outputObj = Object.assign({}, res, { data: [] });
+            for (let i = 0; i < res.returned; i++) {
+                outputObj.data.push(ModelUtility.schema(res.data[i]));
+            }
+            console.log(FairuUtil.stringify(this.options.cli.format, outputObj));
+        }
         if (res.returned > 0) {
             for (let mt of res.data) {
-                console.debug(`Exporting model type "${mt.name}".`);
+                if (!this.options.cli.quiet && this.options.cli.verbose) {
+                    console.debug(`Exporting model type "${mt.name}".`);
+                }
                 let blueprint = {
                     name: mt.name,
                     slug: strings.slugify(mt.name, '-', true, true),
@@ -68,8 +78,10 @@ export default class ExportProcessor extends BaseProcessor {
                 };
                 let baseModelContent = dots['base-model'](blueprint);
                 let extModelContent = dots.model(blueprint);
-                console.log(baseModelContent);
-                console.log(extModelContent);
+                // if (this.options.dryRun) {
+                //     console.log(baseModelContent);
+                //     console.log(extModelContent);
+                // }
             }
         }
     }
@@ -212,6 +224,22 @@ export default class ExportProcessor extends BaseProcessor {
         if (config && config.resource) {
             let output = (indentFirstLine ? indentRoot : '') + '{';
             output += `\n${indentRoot}${indent}resource: '${config.resource}'`;
+            if (config.name) {
+                output += `\n${indentRoot}${indent}name: '${config.name}'`;
+            }
+            if (config.slug) {
+                output += `\n${indentRoot}${indent}slug: '${config.slug}'`;
+            }
+            if (config.plural) {
+                output += `\n${indentRoot}${indent}plural: {`;
+                if (config.plural.name) {
+                    output += `\n${indentRoot}${indent}${indent}name: '${config.plural.name}'`;
+                }
+                if (config.plural.slug) {
+                    output += `\n${indentRoot}${indent}${indent}name: '${config.plural.slug}'`;
+                }
+                output += `\n${indentRoot}${indent}}`;
+            }
             return output + '\n' + indentRoot + '}';
         }
         return '{}';
@@ -293,3 +321,5 @@ export default class ExportProcessor extends BaseProcessor {
     //     return filePaths;
     // }
 }
+
+export default ExportProcessor;

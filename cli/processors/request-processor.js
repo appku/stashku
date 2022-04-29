@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
 import BaseProcessor from './base-processor.js';
 import StashKu, { GetRequest, Filter, Sort } from '../../stashku.js';
-import fairu, {Util as FairuUtil} from '@appku/fairu';
+import fairu, { Util as FairuUtil } from '@appku/fairu';
 
 /**
  * Runs a standard RESTful StashKu GET request using command line options to define the request metadata. Callers can
  * optionally save output to file.
  */
-export default class RequestProcessor extends BaseProcessor {
+class RequestProcessor extends BaseProcessor {
     // eslint-disable-next-line valid-jsdoc
     /**
      * Runs a standard RESTful StashKu request using command line options to define the request metadata. Callers can
@@ -70,11 +70,14 @@ export default class RequestProcessor extends BaseProcessor {
                 await fairu.including(this.options.save).stringify().write(gr);
             }
             //run the request
-            //log.debug('Running GET request.', JSON.stringify(gr.metadata, null, 4)); //TODO add after Filter toJSON support.
+            if (!this.options.cli.quiet && this.options.cli.verbose) {
+                console.debug(`Running GET request on "${this.stash.engine.name}" engine for the "${this.options.resource}" resource.`);
+                console.debug(JSON.stringify(gr.metadata, null, 4));
+            }
             let res = await this.stash.get(gr);
             //output response to console
-            if (!this.options.quiet) {
-                console.log(FairuUtil.stringify(this.options.format, res));
+            if (!this.options.cli.quiet) {
+                console.log(FairuUtil.stringify(this.options.cli.format, res));
             }
             //save output to file
             if (this.options.output) {
@@ -85,3 +88,5 @@ export default class RequestProcessor extends BaseProcessor {
         }
     }
 }
+
+export default RequestProcessor;

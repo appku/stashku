@@ -10,7 +10,7 @@ class ModelUtility {
     /**
      * Returns `true` if the model type object provided appears to be a class or constructor function, otherwise a
      * `false` value is returned.
-     * @param {Modeling.AnyModel} modelType - The model "class" or constructor function to be checked.
+     * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function to be checked.
      * @returns {Boolean}
      */
     static isValidType(modelType) {
@@ -19,7 +19,7 @@ class ModelUtility {
 
     /**
      * Validates that the given objects only contain properties found in the specified model type.
-     * @param {Modeling.AnyModel} modelType - The model "class" or constructor function to be checked.
+     * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function to be checked.
      * @param {...Object} objects - The objects to evaluate.
      * @returns {Boolean} Returns `true` when all specified object's have only properties defined in the model type. If
      * any objects have properties not defined in the model type, a `false` value is returned.
@@ -65,7 +65,7 @@ class ModelUtility {
      * Returns a property name mapping between stored objects and model objects. StashKu model types must have static
      * properties named after the instance properties to be mapped. The value of those properties should be the name 
      * used in the stored object, or a definition of the mapping including the name and any additional metadata.
-     * @param {Modeling.AnyModel} modelType - The model "class" or constructor function.
+     * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
      * @returns {Map.<String, Modeling.PropertyDefinition>}
      * 
      * @example
@@ -112,13 +112,35 @@ class ModelUtility {
     }
 
     /**
+     * Takes a model type and generates a module with the same static properties used to define the model - all
+     * property definitions and the stashku configuration.
+     * @throws 500 `RESTError` if the "modelType" argument is missing or not a supported StashKu model type object.
+     * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
+     * @returns {*}
+     */
+    static schema(modelType) {
+        if (ModelUtility.isValidType(modelType) === false) {
+            throw new RESTError(500, 'The "modelType" argument is required and must be a supported StashKu model type object.');
+        }
+        let schema = {};
+        let mapping = ModelUtility.map(modelType);
+        for (let [p, pDef] of mapping) {
+            schema[p] = pDef;
+        }
+        if (modelType.$stashku) {
+            schema.$stashku = modelType.$stashku;
+        }
+        return schema;
+    }
+
+    /**
      * Returns the StashKu resource name for the given model, if specified. Optionally checks for a specific action
      * name configuration and uses it if specified. If the resource is a function, it is called with and the return
      * value is returned as the resource name.
      * 
      * If a `resource` static property is not available on the model's `$stashku` property, the model constructor
      * name is used instead.
-     * @param {Modeling.AnyModel} modelType - The model "class" or constructor function.
+     * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
      * @param {String} [method] - The name of the method that should override the default value if it is explicitly
      * specified. If it is not found, but an `all` or `'*'` property is found, it is used instead.
      * @returns {String}
@@ -159,7 +181,7 @@ class ModelUtility {
 
     /**
      * Returns the "primary key" property names as specified on a model configuration type.
-     * @param {Modeling.AnyModel} modelType - The model "class" or constructor function.
+     * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
      * @returns {Array.<String>}
      */
     static pk(modelType) {
@@ -186,7 +208,7 @@ class ModelUtility {
      * @param {Modeling.Configuration} [configuration] - The $stashku model configuration.
      * @param {String} [className] - Optional argument to utilize a specific class name instead of generating one 
      * from the resource name.
-     * @returns {Modeling.AnyModel}
+     * @returns {Modeling.AnyModelType}
      */
     static generateModelType(resource, properties, configuration, className) {
         if (!resource) {
@@ -215,29 +237,41 @@ class ModelUtility {
         }
         Object.defineProperty(mt, 'name', { value: className });
         //add static properties
-        if (!configuration) {
-            let pascalName = Strings.camelify(pluralize.singular(resource), true);
-            let pascalNamePlural = Strings.camelify(pluralize.plural(resource), true);
-            let slug = Strings.slugify(pascalName, '-', true, true);
-            let slugPlural = Strings.slugify(pascalNamePlural, '-', true, true);
-            mt.$stashku = {
-                resource,
-                name: pascalName,
-                slug,
-                plural: {
-                    name: pascalNamePlural,
-                    slug: slugPlural
-                }
-            };
-        } else {
-            mt.$stashku = configuration;
-        }
         for (let [k, v] of properties) {
             if (v === null || typeof v === 'undefined') {
                 mt[k] = {};
             } else {
                 mt[k] = v;
             }
+        }
+        //add $stashku configuration static property
+        let pascalName = Strings.camelify(pluralize.singular(resource), true);
+        let pascalNamePlural = Strings.camelify(pluralize.plural(resource), true);
+        let slug = Strings.slugify(pascalName, '-', true, true);
+        let slugPlural = Strings.slugify(pascalNamePlural, '-', true, true);
+        if (!configuration) {
+            mt.$stashku = {};
+        } else {
+            mt.$stashku = configuration;
+        }
+        //add helper names to configration if missing
+        if (!mt.$stashku.resource) {
+            mt.$stashku.resource = resource;
+        }
+        if (!mt.$stashku.name) {
+            mt.$stashku.name = pascalName;
+        }
+        if (!mt.$stashku.slug) {
+            mt.$stashku.slug = slug;
+        }
+        if (!mt.$stashku.plural) {
+            mt.$stashku.plural = {};
+        }
+        if (!mt.$stashku.plural.name) {
+            mt.$stashku.plural.name = pascalNamePlural;
+        }
+        if (!mt.$stashku.plural.slug) {
+            mt.$stashku.plural.slug = slugPlural;
         }
         return mt;
     }

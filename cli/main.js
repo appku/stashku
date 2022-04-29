@@ -11,12 +11,17 @@ import ExportProcessor from './processors/export-processor.js';
 /**
  * @typedef MainState
  * @property {{stashKu:String, stashKuLog: String, stashKuCLI:String}} versions
+ * @property {CommandLineOptions} opts
+ * @property {*} args
  */
 
 /**
  * @typedef CommandLineOptions
  * @property {String} [log="error"]
  * @property {String} [env]
+ * @property {Boolean} [quiet=false]
+ * @property {Boolean} [verbose=false]
+ * @property {String} [format="json"]
  * @property {Boolean} [test=false]
  */
 
@@ -33,8 +38,6 @@ import ExportProcessor from './processors/export-processor.js';
  * @property {Boolean} [distinct=false]
  * @property {Boolean} [count=false]
  * @property {Array.<String>} [sortBy]
- * @property {String} [format="json"]
- * @property {Boolean} [quiet=false]
  * @property {String} [saveRequest]
  * @property {String} [loadRequest]
  */
@@ -94,13 +97,16 @@ class Main {
         this.cmd
             .version(`StashKu: v-${this.state.versions.stashKu}\nFairu: v-${this.state.versions.fairu}\n`)
             .option('-e, --env <filepath>', 'Specify a .env file to load. This .env will be loaded instead of any .env in the current working directory.')
+            .option('-q, --quiet', 'Do not output status information to the console.')
+            .option('-v, --verbose', 'Output extra details & logs about the command being executed.')
+            .addOption(new Option('--format <format>', 'Defines the format of the resulting data when converted to a string.').default('json').choices(['json', 'yaml', 'toml']))
             .option('--test', 'Use the in-memory engine preloaded with a "themes" resource for testing.')
             .showSuggestionAfterError()
             .showHelpAfterError();
         this.cmd
             .command('export <resource> <dirpath>').description('Exports a resource\'s model type via an OPTIONS request to a target modelling directory. This creates files for a base model class in an "generated" subfolder and an extending class (if it does not already exist or the `-f` argument is present). You can then import these classes directly into your package for use with StashKu and the engine of your choice.')
             .option('-f, --force', 'Forcibly overwrite the extending model class, if present.')
-            .option('--dry-run', 'Perform a dry-run of an export. Will not write files or create directories. Note: Output is logged under "debug" severity (see `-l` argument)')
+            .option('--dry-run', 'Perform a dry-run of an export. Will not write files or create directories.')
             .action(this.export.bind(this));
         this.cmd
             .command('get <resource|requestFile>').description('Runs a GET request on the target resource, or from a request definition file, and then optionally saves the results to file.')
@@ -111,8 +117,6 @@ class Main {
             .option('-d, --distinct', 'Retrieve only distinct (unique) results.')
             .option('-c, --count', 'Retrieve the count of records only (no data records).')
             .option('-sb, --sort-by <sorts>', 'List of properties to sort by. You can specify a direction after each property name (e.g. "-sb {FirstName} desc, {LastName} asc").')
-            .addOption(new Option('--format <format>', 'Defines the format of the resulting data when converted to a string.').default('json').choices(['json', 'yaml', 'toml']))
-            .option('-q, --quiet', 'Do not output the query or data result to the console.')
             .option('--save <filepath>', 'Saves the GET request to file. You can re-use these request files in place of the resource (see: <requestFile>).')
             .option('-O, --output <outputpath>', 'Saves the engine response to the specified file.')
             .action(this.request.bind(this));
@@ -132,13 +136,15 @@ class Main {
         let envStat = await fairu.including(envFilePath).nullify().stat();
         if (envStat !== null && envStat[0].stat) {
             if (envStat[0].stat.isDirectory()) {
-                throw new Error(`Target .env file "${envFilePath}" is a directory.`);
+                throw new Error(`The target .env file "${envFilePath}" is a directory.`);
             } else {
                 dotenv.config({ path: envFilePath });
             }
-            console.debug(`Loaded .env from "${envFilePath}".`);
+            if (!this.state.opts.quiet && this.state.opts.verbose) {
+                console.debug(`Loaded .env from "${envFilePath}" OK.`);
+            }
         } else {
-            console.warn(`Target .env file "${envFilePath}" was not found.`);
+            throw new Error(`The target .env file "${envFilePath}" was not found.`);
         }
     }
 
@@ -182,12 +188,16 @@ class Main {
             //load environment
             await this.configure();
             //start worker
-            console.log(`Starting the "${processor.options.method}" command...`);
-            console.debug(`Starting ${processor.options.method} processor with options:`, processor.options);
+            if (!this.state.opts.quiet && this.state.opts.verbose) {
+                console.debug(`Starting the "${processor.constructor.name}" with options:`, processor.options);
+            }
             await processor.start();
-            console.log('Done.');
+            if (!this.state.opts.quiet && this.state.opts.verbose) {
+                console.log('Done.');
+            }
         } catch (err) {
             console.error(err.message);
+            process.exit(1);
         }
     }
 
