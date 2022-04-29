@@ -210,9 +210,14 @@ class StashKu {
         } else if (typeof this.config.engine === 'string') {
             let enginePackageName = this.config.engine;
             //check if the configured engine is the same name as the package in current directory (if any).
-            let localPackage = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'));
-            if (localPackage.name === this.config.engine) {
-                enginePackageName = process.cwd();
+            let localPackageFilePath = path.join(process.cwd(), 'package.json');
+            try {
+                let localPackage = JSON.parse(fs.readFileSync(localPackageFilePath, 'utf8'));
+                if (localPackage.name === this.config.engine) {
+                    enginePackageName = process.cwd();
+                }
+            } catch (err) {
+                this.log.debug(`Failed to find package.json in current working directory. Tried "${localPackageFilePath}" but received: ${err?.message}`);
             }
             this.engine = import(enginePackageName)
                 .then(m => {
@@ -343,7 +348,7 @@ class StashKu {
                     this.log.debug(`[${reqID}] Modelling response data.`);
                     if (response.data && response.data.length) {
                         let counter = 0;
-                        for (let m of ModelUtility.model(request.metadata.model, ...response.data)) {
+                        for (let m of ModelUtility.model(request.metadata.model, request.method, ...response.data)) {
                             response.data[counter] = m;
                             counter++;
                         }
@@ -353,7 +358,7 @@ class StashKu {
                 await this.middlerun('response', request, response);
             } catch (err) {
                 if ((err instanceof RESTError) === false) {
-                    throw new RESTError(500, `StashKu error processing request: ${err.toString()}`);
+                    throw new RESTError(500, `gA StashKu internal error occurred while using storage engine "${this.engine.name}".`, err);
                 }
                 throw err;
             }

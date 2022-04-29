@@ -124,13 +124,6 @@ describe('.resource', () => {
             expect(ModelUtility.resource(m)).toBe('abc');
         }
     });
-    it('returns a string return value when the resource property is present as a callback function.', () => {
-        for (let m of [class TestModel { }, function TestModel2() { }]) {
-            m.$stashku = { resource: jest.fn(() => 'abc') };
-            expect(ModelUtility.resource(m)).toBe('abc');
-            expect(m.$stashku.resource).toHaveBeenCalled();
-        }
-    });
     it('returns a string value for a specific action on a resource object.', () => {
         for (let m of [class TestModel { }, function TestModel2() { }]) {
             for (let action of methods) {
@@ -140,35 +133,13 @@ describe('.resource', () => {
             }
         }
     });
-    it('returns a string return value for a specific action on a resource object with a callback function.', () => {
-        for (let m of [class TestModel { }, function TestModel2() { }]) {
-            for (let action of methods) {
-                m.$stashku = { resource: {} };
-                m.$stashku.resource[action] = jest.fn(() => 'abc');
-                expect(ModelUtility.resource(m, action)).toBe('abc');
-                expect(m.$stashku.resource[action]).toHaveBeenCalled();
-            }
-        }
-    });
-    it('falls-back to "all" or "*" property string values when the action property is not present.', () => {
+    it('falls-back to "all" or "*" property string values when the method property is not present.', () => {
         for (let m of [class TestModel { }, function TestModel2() { }]) {
             for (let action of methods) {
                 for (let fallback of ['all', '*']) {
                     m.$stashku = { resource: {} };
                     m.$stashku.resource[fallback] = 'abc';
                     expect(ModelUtility.resource(m, action)).toBe('abc');
-                }
-            }
-        }
-    });
-    it('falls-back to "all" or "*" property string return values from a callback when the action property is not present.', () => {
-        for (let m of [class TestModel { }, function TestModel2() { }]) {
-            for (let action of methods) {
-                for (let fallback of ['all', '*']) {
-                    m.$stashku = { resource: {} };
-                    m.$stashku.resource[fallback] = jest.fn(() => 'abc');
-                    expect(ModelUtility.resource(m, action)).toBe('abc');
-                    expect(m.$stashku.resource[fallback]).toHaveBeenCalled();
                 }
             }
         }
@@ -292,14 +263,26 @@ describe('.generateModelType', () => {
         expect(model.d).toBe(4949);
         expect(model.e).toBe(null);
     });
+    it('returns a class type with an auto-generated $stashku configuration.', () => {
+        let TestaBitModel = ModelUtility.generateModelType('contact_Records', properties);
+        expect(TestaBitModel.$stashku.resource).toBe('contact_Records');
+        expect(TestaBitModel.$stashku.name).toBe('ContactRecord');
+        expect(TestaBitModel.$stashku.slug).toBe('contact-record');
+        expect(TestaBitModel.$stashku.plural.name).toBe('ContactRecords');
+        expect(TestaBitModel.$stashku.plural.slug).toBe('contact-records');
+    });
 });
 
 describe('.model', () => {
-    it('yields nothing when the model type is invalid.', () => {
+    it('throws error when the model type is invalid.', () => {
         for (let invalid of invalidModelTypeValues) {
-            expect(ModelUtility.model(invalid).next().done).toBe(true);
-            expect(Array.from(ModelUtility.model(invalid))).toEqual([]);
+            expect(() => ModelUtility.model(invalid, 'get').next().done()).toThrow(/model/);
         }
+    });
+    it('throws error when the method is missing.', () => {
+        expect(() => ModelUtility.model(function MyModel() {}).next().done()).toThrow(/method/);
+        expect(() => ModelUtility.model(function MyModel() {}, '').next().done()).toThrow(/method/);
+        expect(() => ModelUtility.model(function MyModel() {}, null).next().done()).toThrow(/method/);
     });
     it('converts objects to model instances when specified.', () => {
         class TestModel {
@@ -310,7 +293,7 @@ describe('.model', () => {
             static get firstName() { return 'First_Name'; }
             static get lastName() { return { target: 'Last_Name' }; }
         }
-        let iterator = ModelUtility.model(TestModel, {}, null, undefined, { First_Name: 'abc', Last_Name: 123 });
+        let iterator = ModelUtility.model(TestModel, 'get', {}, null, undefined, { First_Name: 'abc', Last_Name: 123 });
         expect(iterator.next().value).toBeInstanceOf(TestModel);
         expect(iterator.next().value).toBeNull();
         expect(iterator.next().value).toBeNull();
@@ -325,7 +308,7 @@ describe('.model', () => {
             static get firstName() { return 'First_Name'; }
             static get lastName() { return { target: 'Last_Name' }; }
         }
-        let iterator = ModelUtility.model(TestModel, {}, { First_Name: 'abc', Last_Name: 123 }, { First_Name: 'def' });
+        let iterator = ModelUtility.model(TestModel, 'get', {}, { First_Name: 'abc', Last_Name: 123 }, { First_Name: 'def' });
         expect(iterator.next().value).toEqual({ firstName: null, lastName: null });
         expect(iterator.next().value).toEqual({ firstName: 'abc', lastName: 123 });
         expect(iterator.next().value).toEqual({ firstName: 'def', lastName: null });
@@ -339,7 +322,7 @@ describe('.model', () => {
             static get firstName() { return 'First_Name'; }
             static get lastName() { return { target: 'Last_Name', transform: (k, v) => v ? v : 'default' }; }
         }
-        let iterator = ModelUtility.model(TestModel, {}, { First_Name: 'abc', Last_Name: 123 }, { First_Name: 'def' });
+        let iterator = ModelUtility.model(TestModel, 'get', {}, { First_Name: 'abc', Last_Name: 123 }, { First_Name: 'def' });
         expect(iterator.next().value).toEqual({ firstName: null, lastName: 'default' });
         expect(iterator.next().value).toEqual({ firstName: 'abc', lastName: 123 });
         expect(iterator.next().value).toEqual({ firstName: 'def', lastName: 'default' });
@@ -347,11 +330,15 @@ describe('.model', () => {
 });
 
 describe('.unmodel', () => {
-    it('yields nothing when the model type is invalid.', () => {
+    it('throws error when the model type is invalid.', () => {
         for (let invalid of invalidModelTypeValues) {
-            expect(ModelUtility.unmodel(invalid).next().done).toBe(true);
-            expect(Array.from(ModelUtility.unmodel(invalid))).toEqual([]);
+            expect(() => ModelUtility.unmodel(invalid, 'post').next().done()).toThrow(/model/);
         }
+    });
+    it('throws error when the method is missing.', () => {
+        expect(() => ModelUtility.unmodel(function MyModel() {}).next().done()).toThrow(/method/);
+        expect(() => ModelUtility.unmodel(function MyModel() {}, '').next().done()).toThrow(/method/);
+        expect(() => ModelUtility.unmodel(function MyModel() {}, null).next().done()).toThrow(/method/);
     });
     it('converts model instances back to plain objects.', () => {
         class TestModel {
@@ -365,7 +352,7 @@ describe('.unmodel', () => {
         let m = new TestModel();
         m.firstName = 'abc';
         m.lastName = 123;
-        let iterator = ModelUtility.unmodel(TestModel, new TestModel(), null, undefined, m);
+        let iterator = ModelUtility.unmodel(TestModel, 'post', new TestModel(), null, undefined, m);
         expect(iterator.next().value.constructor).toBe(Object);
         expect(iterator.next().value).toBeNull();
         expect(iterator.next().value).toBeNull();
@@ -383,7 +370,7 @@ describe('.unmodel', () => {
         let m = new TestModel();
         m.firstName = 'abc';
         m.lastName = 123;
-        let iterator = ModelUtility.unmodel(TestModel, new TestModel(), m);
+        let iterator = ModelUtility.unmodel(TestModel, 'post', new TestModel(), m);
         expect(iterator.next().value).toEqual({ First_Name: null, Last_Name: null });
         expect(iterator.next().value).toEqual({ First_Name: 'abc', Last_Name: 123 });
     });
@@ -399,7 +386,7 @@ describe('.unmodel', () => {
         let m = new TestModel();
         m.firstName = 'abc';
         m.lastName = 123;
-        let iterator = ModelUtility.unmodel(TestModel, new TestModel(), m);
+        let iterator = ModelUtility.unmodel(TestModel, 'post', new TestModel(), m);
         expect(iterator.next().value).toEqual({ First_Name: null, Last_Name: 'default' });
         expect(iterator.next().value).toEqual({ First_Name: 'abc', Last_Name: 123 });
     });

@@ -331,36 +331,17 @@ class MemoryStorageEngine extends BaseStorageEngine {
         for (let m of matches) {
             let keys = Object.keys(m);
             for (let k of keys) {
-                let isNullOrUndefined = (m[k] === null || typeof m[k] === 'undefined');
-                let def = null;
+                let def = properties.get(k);
                 if (properties.has(k) === false) {
                     def = {
                         target: k,
                         type: m[k]?.constructor?.name || null,
-                        validate: ModelUtility.validators.required
                     };
                     properties.set(k, def);
-                } else {
-                    def = properties.get(k);
                 }
-                if (isNullOrUndefined) {
-                    delete def.validate;
-                }
-            }
-        }
-        //set defaults on non-null types
-        for (let [_, def] of properties) {
-            if (def.validate) {
-                switch (def.type) {
-                    case 'Number': def.default = 0; break;
-                    case 'String': def.default = ''; break;
-                    case 'Boolean': def.default = false; break;
-                    case 'Array': def.default = []; break;
-                    case 'Date': def.default = new Date(); break;
-                    case 'Map': def.default = new Map(); break;
-                    case 'Set': def.default = new Set(); break;
-                    case 'Buffer': def.default = Buffer.alloc(0); break;
-                    case 'ArrayBuffer': def.default = new ArrayBuffer(0); break;
+                //keep trying to discover the type if a value has not been previously found.
+                if (typeof def.type === 'undefined' || def.type === null) {
+                    def.type = m[k]?.constructor?.name || null;
                 }
             }
         }

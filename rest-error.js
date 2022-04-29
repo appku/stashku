@@ -12,8 +12,9 @@ class RESTError extends Error {
      * Creates a new RESTful error with a HTTP-compliant status code.
      * @param {Number} [code] - A standard HTTP-compliant status code.
      * @param {String} [message] - The error message.
+     * @param {Error} [innerError] - An inner error that was thrown.
      */
-    constructor(code, message) {
+    constructor(code, message, innerError) {
         super(message);
         //soft validate
         if (code < 400 || code >= 600 || validErrorCodes.indexOf(code) < 0) {
@@ -27,6 +28,9 @@ class RESTError extends Error {
         this.code = code;
 
         Error.captureStackTrace(this, RESTError);
+        if (innerError && innerError.stack) {
+            this.stack += '\n' + innerError.stack;
+        }
     }
 }
 

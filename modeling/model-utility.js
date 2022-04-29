@@ -2,49 +2,10 @@
 import pluralize from 'pluralize';
 import RESTError from '../rest-error.js';
 import Strings from '../utilities/strings.js';
-import ModelValidationError from './model-validation-error.js';
-
-const commonValidators = {
-    /**
-     * Ensures that a model property value is defined and non-`null`.
-     * @throws `ModelValidationError` when the value is `null` or `undefined`.
-     * @param {String} property - The name of the property being transformed.
-     * @param {*} value - The value of the property being transformed.
-     * @param {String} method - The method of the request being processed, either: "get", "post", "put", "patch", "delete", or "options".
-     * @param {String} id - The request processing identifier. This is unique to each request processed through a stashku instance.
-     */
-    required: (property, value, method, id) => {
-        if (typeof value === 'undefined' || value === null) {
-            throw new ModelValidationError(property, `A value for the "${property}" property is required, it must be defined and non-null.`);
-        }
-    },
-    /**
-     * Ensures that a model property value is *truthy*.
-     * @throws `ModelValidationError` when the value is not *truthy*.
-     * @param {String} property - The name of the property being transformed.
-     * @param {*} value - The value of the property being transformed.
-     * @param {String} method - The method of the request being processed, either: "get", "post", "put", "patch", "delete", or "options".
-     * @param {String} id - The request processing identifier. This is unique to each request processed through a stashku instance.
-     */
-    truthy: (property, value, method, id) => {
-        if (value) {
-            throw new ModelValidationError(property, `A truthy value for the "${property}" property must be set, the current value is "${value}".`);
-        }
-    },
-};
-
 /**
  * A utility class for working with StashKu-compatible model objects.
  */
 class ModelUtility {
-
-    /**
-     * A common set of validators that can be used within model property definitions.
-     * @see ModelProperty#validate
-     */
-    static get validators() {
-        return commonValidators;
-    }
 
     /**
      * Returns `true` if the model type object provided appears to be a class or constructor function, otherwise a
@@ -58,7 +19,6 @@ class ModelUtility {
 
     /**
      * Validates that the given objects only contain properties found in the specified model type.
-     * @throws Error if any of the specified objects do not match the specified model type.
      * @param {Modeling.AnyModel} modelType - The model "class" or constructor function to be checked.
      * @param {...Object} objects - The objects to evaluate.
      * @returns {Boolean} Returns `true` when all specified object's have only properties defined in the model type. If
@@ -98,7 +58,7 @@ class ModelUtility {
      * @returns {String}
      */
     static formatModelName(dirtyResourceName) {
-        return Strings.camelify(pluralize.singular(dirtyResourceName), true) + 'Model'; maxInterval
+        return Strings.camelify(pluralize.singular(dirtyResourceName), true) + 'Model';
     }
 
     /**
@@ -170,8 +130,6 @@ class ModelUtility {
                 let resType = typeof resource;
                 if (resType === 'string') {
                     return resource;
-                } else if (resType === 'function') {
-                    return resource(method); //resource is a function, call it and pass the action.
                 } else if (resType === 'object') {
                     let hasAction = (typeof resource[method] !== 'undefined');
                     if (hasAction === false) {
@@ -188,8 +146,6 @@ class ModelUtility {
                     resType = typeof resource[method];
                     if (resType === 'string') {
                         return resource[method];
-                    } else if (resType === 'function') {
-                        return resource[method](method);
                     }
                 }
                 //fallback to null if resource is present but no valid match
@@ -222,15 +178,15 @@ class ModelUtility {
     /**
      * Generates a model type class dynamically utilizing the given properties and configuration.
      * 
-     * @throws Error if the "typeName" argument is missing.
-     * @throws Error if the "properties" argument is missing.
-     * @throws Error if the "properties" argument is not a Map instance.
+     * @throws 500 `RESTError` if the "typeName" argument is missing.
+     * @throws 500 `RESTError` if the "properties" argument is missing.
+     * @throws 500 `RESTError` if the "properties" argument is not a Map instance.
      * @param {String} resource - The name of the target resource.
      * @param {Map.<String, Modeling.PropertyDefinition>} properties - The map of all properties definable for the model.
-     * @param {Modeling.ModelConfiguration} [configuration] - The $stashku model configuration.
+     * @param {Modeling.Configuration} [configuration] - The $stashku model configuration.
      * @param {String} [className] - Optional argument to utilize a specific class name instead of generating one 
      * from the resource name.
-     * @returns {*}
+     * @returns {Modeling.AnyModel}
      */
     static generateModelType(resource, properties, configuration, className) {
         if (!resource) {
@@ -260,7 +216,19 @@ class ModelUtility {
         Object.defineProperty(mt, 'name', { value: className });
         //add static properties
         if (!configuration) {
-            mt.$stashku = { resource };
+            let pascalName = Strings.camelify(pluralize.singular(resource), true);
+            let pascalNamePlural = Strings.camelify(pluralize.plural(resource), true);
+            let slug = Strings.slugify(pascalName, '-', true, true);
+            let slugPlural = Strings.slugify(pascalNamePlural, '-', true, true);
+            mt.$stashku = {
+                resource,
+                name: pascalName,
+                slug,
+                plural: {
+                    name: pascalNamePlural,
+                    slug: slugPlural
+                }
+            };
         } else {
             mt.$stashku = configuration;
         }
@@ -282,33 +250,48 @@ class ModelUtility {
     /**
      * Use a given model type to to convert the given storage object(s) into a model (instance) of the specified model 
      * type. If a property is not mapped in the model, it is not assigned to the model.
+     * @throws 500 `RESTError` if the "modelType" argument is missing or not a supported StashKu model type object.
+     * @throws 500 `RESTError` if the "method" argument is missing or not a string.
      * @template T
      * @param {T} modelType - The model "class" or constructor function.
+     * @param {String} method - The method of the request being processed, typically: "get", "post", "put", "patch",
+     * "delete", or "options".
      * @param  {...any} objects - The raw objects to be transmuted into a model.
      * @yields {Constructor.<T>}
      * @generator
      */
-    static * model(modelType, ...objects) {
-        if (ModelUtility.isValidType(modelType)) {
-            let mapping = ModelUtility.map(modelType);
-            for (let obj of objects) {
-                if (obj) {
-                    let model = new modelType();
-                    for (let [k, v] of mapping) {
-                        if (typeof obj[v.target] !== 'undefined') {
-                            model[k] = obj[v.target];
+    static * model(modelType, method, ...objects) {
+        if (ModelUtility.isValidType(modelType) === false) {
+            throw new RESTError(500, 'The "modelType" argument is required and must be a supported StashKu model type object.');
+        } else if (!method || typeof method !== 'string') {
+            throw new RESTError(500, 'The "method" argument is required and must be a string.');
+        }
+        let mapping = ModelUtility.map(modelType);
+        for (let obj of objects) {
+            if (obj) {
+                let model = new modelType();
+                for (let [k, v] of mapping) {
+                    if (typeof obj[v.target] !== 'undefined') {
+                        model[k] = obj[v.target];
+                    }
+                    if (v && v.transform) { //run a transform if present.
+                        model[k] = v.transform.call(modelType, k, model[k], obj, method, 'model');
+                    }
+                    if (v && v.omit) { //omit the property if warranted
+                        let omitted = (v.omit === true);
+                        if (typeof v.omit === 'function') {
+                            omitted = v.omit.call(modelType, k, model[k], obj, method, 'model');
+                        } else if (typeof v.omit === 'object' && v.omit[method] === true) {
+                            omitted = true;
                         }
-                        if (v && v.transform) { //run a transform if present.
-                            model[k] = v.transform.call(modelType, k, model[k], obj, 'model');
-                        }
-                        if (v && v.transform) { //run a transform if present.
-                            model[k] = v.transform.call(modelType, k, model[k], obj, 'model');
+                        if (omitted === true) {
+                            delete model[k];
                         }
                     }
-                    yield model;
-                } else {
-                    yield null;
                 }
+                yield model;
+            } else {
+                yield null;
             }
         }
     }
@@ -316,28 +299,46 @@ class ModelUtility {
     /**
      * Use a given model type to to revert a model back to a raw storage object with properties reprsenting those
      * used in storage.
+     * @throws 500 `RESTError` if the "modelType" argument is missing or not a supported StashKu model type object.
+     * @throws 500 `RESTError` if the "method" argument is missing or not a string.
      * @template T
      * @param {T} modelType - The model "class" or constructor function.
+     * @param {String} method - The method of the request being processed, typically: "get", "post", "put", "patch",
+     * "delete", or "options".
      * @param  {...Constructor.<T>} models - The modeled objects to be transformed back into a storage object.
      * @yields {Constructor.<T>}
      * @generator
      */
-    static * unmodel(modelType, ...models) {
-        if (ModelUtility.isValidType(modelType)) {
-            let mapping = ModelUtility.map(modelType);
-            for (let model of models) {
-                if (model) {
-                    let record = {};
-                    for (let [k, v] of mapping) {
-                        record[v.target] = model[k];
-                        if (v && v.transform) { //run a transform if present.
-                            record[v.target] = v.transform.call(modelType, v.target, record[v.target], model, 'unmodel');
+    static * unmodel(modelType, method, ...models) {
+        if (ModelUtility.isValidType(modelType) === false) {
+            throw new RESTError(500, 'The "modelType" argument is required and must be a supported StashKu model type object.');
+        } else if (!method || typeof method !== 'string') {
+            throw new RESTError(500, 'The "method" argument is required and must be a string.');
+        }
+        let mapping = ModelUtility.map(modelType);
+        for (let model of models) {
+            if (model) {
+                let record = {};
+                for (let [k, v] of mapping) {
+                    record[v.target] = model[k];
+                    if (v && v.transform) { //run a transform if present.
+                        record[v.target] = v.transform.call(modelType, v.target, record[v.target], model, method, 'unmodel');
+                    }
+                    if (v && v.omit) { //omit the property if warranted
+                        let omitted = (v.omit === true);
+                        if (typeof v.omit === 'function') {
+                            omitted = v.omit.call(modelType, k, model[k], model, method, 'model');
+                        } else if (typeof v.omit === 'object' && v.omit[method] === true) {
+                            omitted = true;
+                        }
+                        if (omitted === true) {
+                            delete record[v.target];
                         }
                     }
-                    yield record;
-                } else {
-                    yield null;
                 }
+                yield record;
+            } else {
+                yield null;
             }
         }
     }

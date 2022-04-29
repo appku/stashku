@@ -1,4 +1,4 @@
-///<reference path="modeling.d.js" />
+///<reference path="./modeling.d.js" />
 /**
  * The class for `{{= it.name}}` instances within the "{{= it.resource}}" resource.
  * Exported: {{= it.timestamp.toISOString()}}
@@ -27,10 +27,10 @@ class Base{{= it.name}} {
 
     /**
      * The StashKu resource configuration for this model.
-     * @type {Modeling.ModelConfiguration}
+     * @type {Modeling.Configuration}
      */
     static get $stashku() {
-        return {{=it.makeJSModelConfiguration(it.config, 2)}};
+        return {{=it.makeJSConfiguration(it.config, 2)}};
     }
     
 }

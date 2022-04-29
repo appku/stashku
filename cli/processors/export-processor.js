@@ -63,7 +63,7 @@ export default class ExportProcessor extends BaseProcessor {
                     makeJSDefinition: this.makeJSDefinition,
                     makePropertyJSDoc: this.makePropertyJSDoc,
                     makeJSDefault: this.makeJSDefault,
-                    makeJSModelConfiguration: this.makeJSModelConfiguration,
+                    makeJSConfiguration: this.makeJSConfiguration,
                     makeJSFunctionOrArrayFunctions: this.makeJSFunctionOrArrayFunctions
                 };
                 let baseModelContent = dots['base-model'](blueprint);
@@ -201,12 +201,12 @@ export default class ExportProcessor extends BaseProcessor {
 
     /**
      * Outputs a string of JavaScript that describes a model `$stashku` property.
-     * @param {Modeling.ModelConfiguration} config - The `$stashku` definition object.
+     * @param {Modeling.Configuration} config - The `$stashku` definition object.
      * @param {Number} indentLevel - The level of indent applied to contents (4-spaces per level).
      * @param {Boolean} indentFirstLine - Enable or disable indenting the first line of the returned string.
      * @returns {String}
      */
-    makeJSModelConfiguration(config, indentLevel, indentFirstLine = false) {
+    makeJSConfiguration(config, indentLevel, indentFirstLine = false) {
         let indent = '    ';
         let indentRoot = indent.repeat(indentLevel);
         if (config && config.resource) {

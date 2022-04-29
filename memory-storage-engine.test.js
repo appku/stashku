@@ -604,10 +604,7 @@ describe('#options', () => {
         expect(res.code).toBe(200);
         expect(res.data.length).toBe(1);
         expect(res.data[0].ID.target).toBe('ID');
-        expect(res.data[0].ID.default).toBe(0);
         expect(res.data[0].Name.target).toBe('Name');
-        expect(res.data[0].Name.default).toBe('');
         expect(res.data[0].HexCode.target).toBe('HexCode');
-        expect(res.data[0].HexCode.default).toBe('');
     });
 });
