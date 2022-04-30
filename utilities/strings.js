@@ -174,6 +174,33 @@ const Strings = {
      */
     tail: function (input, max) {
         return (input.length < max) ? input : input.substring(input.length - max).replace(/^.{3}/gi, '...');
+    },
+
+    /**
+     * Indents all or specific lines of text in a string.
+     * @param {String} input - The string to indent.
+     * @param {Number} [start] - The line index to start indenting.
+     * @param {Number} [end] - The line index to stop indenting after.
+     * @param {String} [indent="    "] - The indentation to use on each matched line. 
+     * @returns {String}
+     */
+    indent: function (input, start, end, indent = '    ') {
+        if (typeof input === 'string') {
+            let hasStart = !(typeof start === 'undefined' || start === null);
+            let hasEnd = !(typeof end === 'undefined' || end === null);
+            let counter = 0;
+            return input.replace(/^/gm, (_match, _index, _str) => {
+                let output = '';
+                if (hasStart === false || (hasStart && counter >= start)) {
+                    if (hasEnd === false || (hasEnd && counter <= end)) {
+                        output = indent;
+                    }
+                }
+                counter++;
+                return output;
+            });
+        }
+        return input;
     }
 
 };
