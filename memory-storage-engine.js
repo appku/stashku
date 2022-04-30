@@ -321,33 +321,42 @@ class MemoryStorageEngine extends BaseStorageEngine {
         //validate
         await super.options(request);
         let meta = request.metadata;
-        let from = this.resourceOf(request);
-        if (this.data.has(from) === false) {
-            throw new RESTError(404, `The requested resource "${meta.from}" was not found.`);
+        let resources = [];
+        let modelTypes = [];
+        if (request.metadata.from === '*') {
+            resources.push(...this.data.keys());
+        } else {
+            resources.push(this.resourceOf(request));
         }
-        let properties = new Map();
-        let matches = this.data.get(from);
-        //find properties - evaluate all records in resource
-        for (let m of matches) {
-            let keys = Object.keys(m);
-            for (let k of keys) {
-                let def = properties.get(k);
-                if (properties.has(k) === false) {
-                    def = {
-                        target: k,
-                        type: m[k]?.constructor?.name || null,
-                    };
-                    properties.set(k, def);
-                }
-                //keep trying to discover the type if a value has not been previously found.
-                if (typeof def.type === 'undefined' || def.type === null) {
-                    def.type = m[k]?.constructor?.name || null;
+        for (let from of resources) {
+            if (this.data.has(from) === false) {
+                throw new RESTError(404, `The requested resource "${meta.from}" was not found.`);
+            }
+            let properties = new Map();
+            let matches = this.data.get(from);
+            //find properties - evaluate all records in resource
+            for (let m of matches) {
+                let keys = Object.keys(m);
+                for (let k of keys) {
+                    let def = properties.get(k);
+                    if (properties.has(k) === false) {
+                        def = {
+                            target: k,
+                            type: m[k]?.constructor?.name || null,
+                        };
+                        properties.set(k, def);
+                    }
+                    //keep trying to discover the type if a value has not been previously found.
+                    if (typeof def.type === 'undefined' || def.type === null) {
+                        def.type = m[k]?.constructor?.name || null;
+                    }
                 }
             }
+            //generate model type and return
+            let mt = ModelUtility.generateModelType(from, properties, { resource: from });
+            modelTypes.push(mt);
         }
-        //generate model type and return
-        let mt = ModelUtility.generateModelType(meta.from, properties, { resource: from });
-        return new Response([mt], 1, 0, 1);
+        return new Response(modelTypes, modelTypes.length, 0, modelTypes.length);
     }
 
 }

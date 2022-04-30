@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+///<reference path="./cli.d.js" />
 /* eslint-disable no-console */
 import fairu from '@appku/fairu';
 import StashKu, { Response, RESTError } from '../stashku.js';
@@ -10,45 +11,8 @@ import RequestProcessor from './processors/request-processor.js';
 /**
  * @typedef MainState
  * @property {{stashKu:String, stashKuLog: String, stashKuCLI:String}} versions
- * @property {CommandLineOptions} opts
+ * @property {CLI.CommandLineOptions} opts
  * @property {*} args
- */
-
-/**
- * @typedef CommandLineOptions
- * @property {String} [log="error"]
- * @property {String} [env]
- * @property {Boolean} [quiet=false]
- * @property {Boolean} [verbose=false]
- * @property {String} [format="json"]
- * @property {Boolean} [test=false]
- */
-
-/**
- * @typedef GetCommandLineOptions
- * @property {CommandLineOptions} cli
- * @property {String} [method="get"]
- * @property {String} resource
- * @property {String} filePath
- * @property {String} [where]
- * @property {Number} [skip]
- * @property {Number} [take]
- * @property {Array.<String>} [prop]
- * @property {Boolean} [distinct=false]
- * @property {Boolean} [count=false]
- * @property {Array.<String>} [sortBy]
- * @property {String} [saveRequest]
- * @property {String} [loadRequest]
- */
-
-/**
- * @typedef ExportCommandLineOptions
- * @property {CommandLineOptions} cli
- * @property {String} [method="export"]
- * @property {String} resource
- * @property {String} dirPath
- * @property {Boolean} [force]
- * @property {Boolean} [dryRun]
  */
 
 class Main {
@@ -99,11 +63,12 @@ class Main {
             .option('-q, --quiet', 'Do not output status information to the console.')
             .option('-v, --verbose', 'Output extra details & logs about the command being executed.')
             .addOption(new Option('--format <format>', 'Defines the format of the resulting data when converted to a string.').default('json').choices(['json', 'yaml', 'toml']))
-            .option('--test', 'Use the in-memory engine preloaded with a "themes" resource for testing.')
+            .option('--test', 'Use the in-memory engine preloaded with a "themes" and "products" resources for testing.')
             .showSuggestionAfterError()
             .showHelpAfterError();
         this.cmd
-            .command('get <resource|requestFile>').description('Runs a GET request on the target resource, or from a request definition file, and then optionally saves the results to file.')
+            .command('get').description('Runs a GET request on the target resource, or from a request definition file, and then optionally saves the results to file.')
+            .argument('<resource|requestFile>', 'The name of the resource being targetted in the request, or a path to a file containing a saved options request.')
             .option('-w, --where <filter>', 'Specify a StashKu compatable filter string to utilize as a where-clause for the get query.')
             .option('-s, --skip <skip>', 'Skip over a number of records.', parseInt)
             .option('-t, --take <take>', 'Take only the first number of records.', parseInt)
@@ -115,7 +80,8 @@ class Main {
             .option('-O, --output <outputpath>', 'Saves the engine response to the specified file.')
             .action(this.request.bind(this));
         this.cmd
-            .command('options <resource|requestFile>').description('Runs an OPTIONS request to export a resource\'s model type. You can optionally specify an --export (-x) option to generate JavaScript model files into a target directory.')
+            .command('options').description('Runs an OPTIONS request to export a resource\'s model type. You can optionally specify an --export (-x) option to generate JavaScript model files into a target directory.')
+            .argument('<resource|requestFile|"*">', 'The name of the resource being targetted in the request, or a path to a file containing a saved options request, or a value "*" (use quotes) to target all resources in the request.')
             .option('-x, --export <exportpath>', 'Generates a base and extending JavaScript classes around the resulting OPTIONS response and writes them to a folder. If the extending class is already present, it is not overwritten, however, the base class is always written to a base/ subdirectory.')
             .option('-f, --force', 'Forces the overwrite of the extending JavaScript class file when using the --export (-x) option.')
             .option('--dry-run', 'Perform a dry-run of an export. Instead of writing files or creating directories directories, the generated files will be written to the console.')
@@ -155,7 +121,7 @@ class Main {
     /**
      * Runs a StashKu RESTful GET request and outputs the results to file or console.
      * @param {String} resource - The name of the target resource in the StashKu resource.
-     * @param {GetCommandLineOptions} [options] - The CLI options specified in object format.
+     * @param {CLI.GetCommandLineOptions | CLI.OptionsCommandLineOptions} [options] - The CLI options specified in object format.
      * @param {*} command - The CLI command that is being run.
      */
     async request(resource, options, command) {
@@ -183,7 +149,11 @@ class Main {
                 console.log('Done.');
             }
         } catch (err) {
-            console.error(err.message);
+            if (this.state.opts.verbose) {
+                throw err;
+            } else {
+                console.error(err.message);
+            }
             process.exit(1);
         }
     }

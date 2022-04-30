@@ -74,6 +74,14 @@ describe('#from', () => {
     });
 });
 
+describe('#all', () => {
+    it('sets the "from" metadata to a value of "*".', () => {
+        let r = new OptionsRequest().from('test');
+        r.all();
+        expect(r.metadata.from).toBe('*');
+    });
+});
+
 describe('#clear', () => {
     it('resets metadata object properties to default.', () => {
         let r = new OptionsRequest()

@@ -4,7 +4,7 @@ import Objects from '../utilities/objects.js';
 
 /**
  * This class defines a StashKu OPTIONS request that instructs StashKu to gather the schema for models from a 
- * particular resource.
+ * particular resource, and return a usable model (constructor) type.
  */
 class OptionsRequest {
     /**
@@ -54,7 +54,8 @@ class OptionsRequest {
      * across joins.
      * 
      * @throws Error if the "name" argument value is not a string or null.
-     * @param {String} name - The name of the target resource in data storage.
+     * @param {String} name - The name of the target resource in data storage. In an OPTIONS request you may also 
+     * specify a `*` value to retrieve all model types.
      * @returns {OptionsRequest}
      */
     from(name) {
@@ -63,6 +64,14 @@ class OptionsRequest {
         }
         this.metadata.from = name;
         return this;
+    }
+
+    /**
+     * Sets the request resource 'from' value to a "*" which instructs storage engines to retrieve all available
+     * model types instead of a specific resource.
+     */
+    all() {
+        this.metadata.from = '*';
     }
 
     /**

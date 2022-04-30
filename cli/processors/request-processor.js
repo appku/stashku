@@ -1,8 +1,10 @@
 /* eslint-disable no-console */
+///<reference path="../cli.d.js" />
 import BaseProcessor from './base-processor.js';
 import StashKu, { GetRequest, OptionsRequest, Filter, Sort } from '../../stashku.js';
 import ModelUtility from '../../modeling/model-utility.js';
 import fairu, { Util as FairuUtil } from '@appku/fairu';
+import OptionsExporter from '../options-exporter.js';
 
 /**
  * Runs a standard RESTful StashKu GET request using command line options to define the request metadata. Callers can
@@ -13,13 +15,13 @@ class RequestProcessor extends BaseProcessor {
     /**
      * Runs a standard RESTful StashKu request using command line options to define the request metadata. Callers can
      * optionally save output to file.
-     * @param {import('../main.js').GetCommandLineOptions} options - The command line options of the request.
+     * @param {CLI.GetCommandLineOptions | CLI.OptionsCommandLineOptions} options - The command line options of the request.
      */
     constructor(options) {
         super(options);
 
         /**
-         * @type {import('../main.js').GetCommandLineOptions}
+         * @type {CLI.GetCommandLineOptions | CLI.OptionsCommandLineOptions}
          */
         this.options = options;
     }
@@ -30,7 +32,8 @@ class RequestProcessor extends BaseProcessor {
     async start() {
         if (this.options.cli.test) {
             this.stash = new StashKu({ engine: 'memory' });
-            this.stash.engine.data.set('themes', fairu.including('./test/cli/data-themes.json').parse().readSync()[0].data);
+            this.stash.engine.data.set('products', fairu.including('./test/memory-storage-engine/data-products.json').parse().readSync()[0].data);
+            this.stash.engine.data.set('themes', fairu.including('./test/memory-storage-engine/data-themes.json').parse().readSync()[0].data);
         }
         let reqFile = await fairu.including(this.options.resource)
             .nullify()
@@ -73,6 +76,22 @@ class RequestProcessor extends BaseProcessor {
         //save output to file
         if (this.options.output) {
             await fairu.including(this.options.output).stringify().write(res);
+        }
+        //handle options exporting
+        if (this.options.method === 'options') {
+            let exportMap = await new OptionsExporter().export(res, {
+                dirPath: this.options.dirPath,
+                overwrite: !!this.options.force
+            });
+            if (!this.options.cli.quiet && this.options.cli.verbose) {
+                for (let [resource, mt] of exportMap) {
+                    if (mt) {
+                        console.log(`/** ${resource} base: **/\n${mt.base}\n\n/**${resource} extending: **/\n${mt.extending}`);
+                    } else {
+                        console.log(`${resource}: <null>`);
+                    }
+                }
+            }
         }
     }
 
