@@ -23,7 +23,7 @@ const dots = dot.process({ path: path.resolve(__dirname + '/../templates') });
  * Runs a standard RESTful StashKu OPTIONS request using command line options to create a model type definition
  * that can be exported to a directory with a base-class and extending class file (if not already present).
  */
-class ExportProcessor extends BaseProcessor {
+class OptionsExporter extends BaseProcessor {
     // eslint-disable-next-line valid-jsdoc
     /**
      * Runs a standard RESTful StashKu OPTIONS request using command line options to create a model type definition

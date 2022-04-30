@@ -6,7 +6,6 @@ import { Command, Option } from 'commander/esm.mjs';
 import { createRequire } from 'module';
 import dotenv from 'dotenv';
 import RequestProcessor from './processors/request-processor.js';
-import ExportProcessor from './processors/export-processor.js';
 
 /**
  * @typedef MainState
@@ -104,11 +103,6 @@ class Main {
             .showSuggestionAfterError()
             .showHelpAfterError();
         this.cmd
-            .command('export <resource> <dirpath>').description('Exports a resource\'s model type via an OPTIONS request to a target modelling directory. This creates files for a base model class in an "generated" subfolder and an extending class (if it does not already exist or the `-f` argument is present). You can then import these classes directly into your package for use with StashKu and the engine of your choice.')
-            .option('-f, --force', 'Forcibly overwrite the extending model class, if present.')
-            .option('--dry-run', 'Perform a dry-run of an export. Will not write files or create directories.')
-            .action(this.export.bind(this));
-        this.cmd
             .command('get <resource|requestFile>').description('Runs a GET request on the target resource, or from a request definition file, and then optionally saves the results to file.')
             .option('-w, --where <filter>', 'Specify a StashKu compatable filter string to utilize as a where-clause for the get query.')
             .option('-s, --skip <skip>', 'Skip over a number of records.', parseInt)
@@ -117,6 +111,14 @@ class Main {
             .option('-d, --distinct', 'Retrieve only distinct (unique) results.')
             .option('-c, --count', 'Retrieve the count of records only (no data records).')
             .option('-sb, --sort-by <sorts>', 'List of properties to sort by. You can specify a direction after each property name (e.g. "-sb {FirstName} desc, {LastName} asc").')
+            .option('--save <filepath>', 'Saves the GET request to file. You can re-use these request files in place of the resource (see: <requestFile>).')
+            .option('-O, --output <outputpath>', 'Saves the engine response to the specified file.')
+            .action(this.request.bind(this));
+        this.cmd
+            .command('options <resource|requestFile>').description('Runs an OPTIONS request to export a resource\'s model type. You can optionally specify an --export (-x) option to generate JavaScript model files into a target directory.')
+            .option('-x, --export <exportpath>', 'Generates a base and extending JavaScript classes around the resulting OPTIONS response and writes them to a folder. If the extending class is already present, it is not overwritten, however, the base class is always written to a base/ subdirectory.')
+            .option('-f, --force', 'Forces the overwrite of the extending JavaScript class file when using the --export (-x) option.')
+            .option('--dry-run', 'Perform a dry-run of an export. Instead of writing files or creating directories directories, the generated files will be written to the console.')
             .option('--save <filepath>', 'Saves the GET request to file. You can re-use these request files in place of the resource (see: <requestFile>).')
             .option('-O, --output <outputpath>', 'Saves the engine response to the specified file.')
             .action(this.request.bind(this));
@@ -144,25 +146,10 @@ class Main {
                 console.debug(`Loaded .env from "${envFilePath}" OK.`);
             }
         } else {
-            throw new Error(`The target .env file "${envFilePath}" was not found.`);
+            if (!this.state.opts.quiet && this.state.opts.verbose) {
+                console.debug(`The target .env file "${envFilePath}" was not found.`);
+            }
         }
-    }
-
-    /**
-     * Runs a StashKu RESTful OPTIONS request and generates a model type base-class and extending class and writes the
-     * definitions to the specified directory.
-     * @param {String} resource - The name of the target resource in the StashKu resource.
-     * @param {String} dirPath - The writable directory that will retain extending models and base-class files.
-     * @param {ExportCommandLineOptions} options - The CLI options specified in object format.
-     * @param {*} command - The CLI command that is being run.
-     */
-    async export(resource, dirPath, options, command) {
-        let workerOptions = Object.assign({}, options);
-        workerOptions.method = command.name();
-        workerOptions.resource = resource;
-        workerOptions.dirPath = dirPath;
-        workerOptions.cli = this.cmd.opts();
-        await this.process(new ExportProcessor(workerOptions));
     }
 
     /**
