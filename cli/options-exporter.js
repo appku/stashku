@@ -5,7 +5,7 @@ import StashKu from '../stashku.js';
 import OptionsRequest from '../requests/options-request.js';
 import ModelUtility from '../modeling/model-utility.js';
 import fairu, { Util as FairuUtil } from '@appku/fairu';
-import strings from '../utilities/strings.js';
+import Strings from '../utilities/strings.js';
 import Response from '../response.js';
 import path from 'path';
 
@@ -41,16 +41,14 @@ class OptionsExporter {
             for (let mt of optionsResponse.data) {
                 let blueprint = {
                     name: mt.name,
-                    slug: strings.slugify(mt.name, '-', true, true),
+                    slug: Strings.slugify(mt.name, '-', true, true),
                     config: mt.$stashku,
                     timestamp: new Date(),
                     resource: mt.$stashku.resource,
                     mapping: ModelUtility.map(mt),
-                    makeJSDefinition: this.makeJSDefinition,
+                    toJavaScriptString: this.toJavaScriptString,
                     makePropertyJSDoc: this.makePropertyJSDoc,
-                    makeJSDefault: this.makeJSDefault,
-                    makeJSConfiguration: this.makeJSConfiguration,
-                    makeJSFunctionOrArrayFunctions: this.makeJSFunctionOrArrayFunctions
+                    toJavascriptPropertyDefaultReference: this.toJavascriptPropertyDefaultReference
                 };
                 let baseModelContent = dots['base-model'](blueprint);
                 let extModelContent = dots.model(blueprint);
@@ -68,63 +66,84 @@ class OptionsExporter {
     }
 
     /**
-     * Creates a string representation of the property definition object.
-     * @param {Modeling.PropertyDefinition} definition - The property definition object.
-     * @param {Number} indentLevel - The level of indent applied to contents (4-spaces per level).
-     * @param {Boolean} indentFirstLine - Enable or disable indenting the first line of the returned string.
-     * @returns {String}
+     * Converts a supported StashKu model property value to a string representation. 
+     * @param {*} value - The value to be converted to a string.
+     * @param {Number} [indentLevel=0] - The level of indent applied to contents (4-spaces per level).
+     * @param {Boolean} [indentFirstLine=false] - Enable or disable indenting the first line of the returned string.
+     * @returns {String} 
      */
-    makeJSDefinition(definition, indentLevel = 0, indentFirstLine = false) {
+    toJavaScriptString(value, indentLevel = 0, indentFirstLine = false) {
         let indent = '    ';
         let indentRoot = indent.repeat(indentLevel);
-        let output = (indentFirstLine ? indentRoot : '') + '{';
-        if (definition && definition.target) {
-            output += `\n${indentRoot}${indent}target: '${definition.target}'`;
-            if (definition.type) {
-                output += `,\n${indentRoot}${indent}type: '${definition.type}'`;
-            }
-            if (typeof definition.default !== 'undefined') {
-                output += `,\n${indentRoot}${indent}default: ${this.makeJSDefault(definition)}`;
-            }
-            // if (definition.precision) {
-            //     output += `${indent}    precision: ${definition.precision}\n`;
-            // }
-            // if (definition.radix) {
-            //     output += `${indent}    radix: ${definition.radix}\n`;
-            // }
-            // if (definition.charLength) {
-            //     output += `${indent}    charLength: ${definition.charLength}\n`;
-            // }
-            if (definition.omit) {
-                if (typeof definition.omit === 'boolean') {
-                    output += `,\n${indentRoot}${indent}omit: ${definition.omit}`;
-                } else if (Array.isArray(definition.omit)) {
-                    output += `,\n${indentRoot}${indent}omit: ${this.makeJSFunctionOrArrayFunctions(definition.omit, indentLevel + 1, false)}`;
+        let valueType = typeof value;
+        let output = (indentFirstLine ? indentRoot : '');
+        let parents = arguments[3] || [];
+        //prevent circular values by forcing a null result
+        if (parents && value && parents.some(a => a === value)) {
+            output += 'null';
+        } else {
+            parents.push(value);
+            if (value && value.constructor === Object) {
+                let keys = Object.keys(value);
+                if (keys.length > 0) {
+                    output += '{';
+                    for (let ki = 0; ki < keys.length; ki++) {
+                        output += `\n${indentRoot}${indent}${keys[ki]}: ${this.toJavaScriptString(value[keys[ki]], indentLevel + 1, false, parents)}`;
+                        if (ki < keys.length - 1) {
+                            output += ',';
+                        }
+                    }
+                    output += `\n${indentRoot}}`;
+                } else {
+                    output += '{}';
                 }
+            } else if (Array.isArray(value)) {
+                if (value.length > 0) {
+                    output += '[';
+                    for (let iv = 0; iv < value.length; iv++) {
+                        output += `\n${this.toJavaScriptString(value[iv], indentLevel + 1, true, parents)}`;
+                        if (iv < value.length - 1) {
+                            output += ',';
+                        }
+                    }
+                    output += `\n${indentRoot}]`;
+                } else {
+                    output += '[]';
+                }
+            } else if (valueType === 'undefined') {
+                output += valueType;
+            } else if (value === null) {
+                output += 'null';
+            } else if (value === NaN) { // eslint-disable-line use-isnan
+                output += 'NaN';
+            } else if (valueType === 'boolean' || valueType === 'number') {
+                output += value.toString();
+            } else if (valueType === 'string') {
+                output += `'${value}'`;
+            } else if (value instanceof Date) {
+                output += `new Date('${value.toISOString()}')`;
+            } else if (value instanceof Buffer) {
+                if (value.byteLength) {
+                    output += `Buffer.from('${value.toString('base64')}', 'base64')`;
+                } else {
+                    output += 'Buffer.alloc(0)';
+                }
+            } else if (valueType === 'function') {
+                output += Strings.indent(value.toString(), 1, null, indentRoot);
             }
-            if (definition.pk) {
-                output += `,\n${indentRoot}${indent}pk: ${definition.pk}`;
-            }
-            if (definition.transform) {
-                output += `,\n${indentRoot}${indent}transform: ${this.makeJSFunctionOrArrayFunctions(definition.transform, indentLevel + 1, false)}`;
-            }
-            if (definition.validate) {
-                output += `,\n${indentRoot}${indent}validate: ${this.makeJSFunctionOrArrayFunctions(definition.validate, indentLevel + 1, false)}`;
-            }
-            output += '\n' + indentRoot;
         }
-        return output + '}';
+        return output;
     }
 
     /**
      * Creates a string representation of the property definition object.
      * @param {String} property - The property name.
      * @param {Modeling.PropertyDefinition} definition - The property definition object.
-     * @param {Number} indentLevel - The level of indent applied to contents (4-spaces per level).
-     * @param {Boolean} indentFirstLine - Enable or disable indenting the first line of the returned string.
+     * @param {Number} [indentLevel=0] - The level of indent applied to contents (4-spaces per level).
+     * @param {Boolean} [indentFirstLine=false] - Enable or disable indenting the first line of the returned string.
      * @returns {String}
      */
-    makePropertyJSDoc(property, definition, indentLevel, indentFirstLine = false) {
+    makePropertyJSDoc(property, definition, indentLevel = 0, indentFirstLine = false) {
         let indent = '    ';
         let indentRoot = indent.repeat(indentLevel);
         let output = (indentFirstLine ? indentRoot + '/**' : '/**');
@@ -150,96 +169,22 @@ class OptionsExporter {
     }
 
     /**
-     * Returns the computed JavaScript value string for a property definition's default value.
-     * @param {*} definition - The StashKu property definition.
+     * Creates a string representation of the property definition object.
      * @param {String} className - The name of the model class.
      * @param {String} propertyName - The name of the property we are creating a default value for.
+     * @param {Modeling.PropertyDefinition} definition - The StashKu property definition.
      * @returns {String}
      */
-    makeJSDefault(definition, className, propertyName) {
-        if (typeof definition.default !== 'undefined') {
-            //handle special JS values
-            if (definition.default === null) {
-                return 'null';
-            } else if (definition.default === Infinity) {
-                return 'Infinity';
-                // eslint-disable-next-line use-isnan
-            } else if (definition.default === NaN) {
-                return 'NaN';
-            }
-            //output JS representation by type.
-            if (definition.type === 'Boolean' || definition.type === 'Number') {
-                return definition.default.toString();
-            } else if (definition.type === 'String') {
-                return `'${definition.default}'`;
-            } else if (definition.type === 'Date') {
-                return `new Date('${definition.default.toISOString()}')`;
-            } else if (definition.type === 'Buffer') {
-                if (definition.default.byteLength) {
-                    return `Buffer.from('${definition.default.toString('base64')}', 'base64')`;
-                } else {
-                    return 'Buffer.alloc(0)';
-                }
-            }
-        } else {
-            return 'null';
+    toJavascriptPropertyDefaultReference(className, propertyName, definition) {
+        let defaultType = typeof definition.default;
+        if (!className) {
+            className = 'this.constructor';
         }
-    }
-
-    /**
-     * Outputs a string of JavaScript that describes a model `$stashku` property.
-     * @param {Modeling.Configuration} config - The `$stashku` definition object.
-     * @param {Number} indentLevel - The level of indent applied to contents (4-spaces per level).
-     * @param {Boolean} indentFirstLine - Enable or disable indenting the first line of the returned string.
-     * @returns {String}
-     */
-    makeJSConfiguration(config, indentLevel, indentFirstLine = false) {
-        let indent = '    ';
-        let indentRoot = indent.repeat(indentLevel);
-        if (config && config.resource) {
-            let output = (indentFirstLine ? indentRoot : '') + '{';
-            output += `\n${indentRoot}${indent}resource: '${config.resource}'`;
-            if (config.name) {
-                output += `\n${indentRoot}${indent}name: '${config.name}'`;
-            }
-            if (config.slug) {
-                output += `\n${indentRoot}${indent}slug: '${config.slug}'`;
-            }
-            if (config.plural) {
-                output += `\n${indentRoot}${indent}plural: {`;
-                if (config.plural.name) {
-                    output += `\n${indentRoot}${indent}${indent}name: '${config.plural.name}'`;
-                }
-                if (config.plural.slug) {
-                    output += `\n${indentRoot}${indent}${indent}name: '${config.plural.slug}'`;
-                }
-                output += `\n${indentRoot}${indent}}`;
-            }
-            return output + '\n' + indentRoot + '}';
+        if (defaultType === 'function') {
+            return `${className}.${propertyName}.default()`;
         }
-        return '{}';
+        return `${className}.${propertyName}.default ?? null`;
     }
-
-    /**
-     * Outputs a string of JavaScript defining a function or array of functions.
-     * @param {Array.<Function>|Function} func - The property definition object.
-     * @param {Number} indentLevel - The level of indent applied to contents (4-spaces per level).
-     * @param {Boolean} indentFirstLine - Enable or disable indenting the first line of the returned string.
-     * @returns {String}
-     */
-    makeJSFunctionOrArrayFunctions(func, indentLevel, indentFirstLine = false) {
-        let indent = '   ';
-        let indentRoot = indent.repeat(indentLevel);
-        if (Array.isArray(func)) {
-            let output = (indentFirstLine ? indentRoot : '') + '{\n';
-            return output + indent + '}';
-        } else if (typeof obj === 'function') {
-            let output = func.toString();
-            return output;
-        }
-        return 'null';
-    }
-
 }
 
 export default OptionsExporter;

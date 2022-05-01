@@ -1,15 +1,14 @@
 import Base{{= it.name}} from './base/base-{{= it.slug}}.js';
 
 /**
- * The class for `{{= it.name}}` instances.
+ * The extending class for `{{= it.name}}` instances within the "{{= it.resource}}" resource.
+ * This class is generated once unless you perform a forced Options export over it.
+ * You can add customizations to this class to customize the model behavior.
  */
 class {{= it.name}} extends Base{{= it.name}} {
     constructor() {
         super();
     }
-    
-    // This class is generated once if not found.
-    // You can add customizations to this class and they will not be overwritten by subsequent extracts.
 
 }
 
