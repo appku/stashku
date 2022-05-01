@@ -1,6 +1,6 @@
 ///<reference path="./modeling.d.js" />
 /**
- * The base class for `{{= it.name}}` instances within the "{{= it.resource}}" resource.
+ * The base class for `{{= it.name}}` instances for the "{{= it.resource}}" storage resource.
  * Exported: {{= it.timestamp.toISOString()}}
  *
  * **WARNING**    
@@ -24,7 +24,6 @@ class Base{{= it.name}} {
         return {{=it.toJavaScriptString(def, 2)}};
     }
     {{ } }}
-
     /**
      * The StashKu resource configuration for this model.
      * @type {Modeling.Configuration}

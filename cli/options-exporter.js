@@ -18,6 +18,7 @@ const __dirname = (
 dot.templateSettings.strip = false;
 dot.log = false; //disable console output
 const dots = dot.process({ path: path.resolve(__dirname, './templates') });
+const modelingTypesFilePath = path.resolve(__dirname, '../modeling/modeling.d.js');
 
 /**
  * Class that is responsible for exporting the `Response` to an StashKu `OptionsRequest`.
@@ -41,7 +42,7 @@ class OptionsExporter {
             for (let mt of optionsResponse.data) {
                 let blueprint = {
                     name: mt.name,
-                    slug: Strings.slugify(mt.name, '-', true, true),
+                    slug: mt?.$stashku?.slug || Strings.slugify(mt.name, '-', true, true),
                     config: mt.$stashku,
                     timestamp: new Date(),
                     resource: mt.$stashku.resource,
@@ -56,10 +57,19 @@ class OptionsExporter {
                     base: baseModelContent,
                     extending: extModelContent
                 });
-                // if (this.options.dryRun) {
-                //     console.log(baseModelContent);
-                //     console.log(extModelContent);
-                // }
+                if (outputConfig && outputConfig.dirPath) {
+                    let exportFilePaths = {
+                        base: fairu.join(outputConfig.dirPath, 'base/', `base-${blueprint.slug}.js`),
+                        extending: fairu.join(outputConfig.dirPath, `${blueprint.slug}.js`),
+                        modelingTypes: fairu.join(outputConfig.dirPath, 'base/', 'modeling.d.js'),
+                    };
+                    await fairu.including(exportFilePaths.base).ensure().write(baseModelContent);
+                    let mtypes = await fairu.including(modelingTypesFilePath).read();
+                    await fairu.including(exportFilePaths.modelingTypes).ensure().write(mtypes[0].data);
+                    if (outputConfig.overwrite) {
+                        await fairu.including(exportFilePaths.extending).ensure().write(extModelContent);
+                    }
+                }
             }
         }
         return mapping;

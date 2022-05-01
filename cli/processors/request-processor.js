@@ -80,10 +80,10 @@ class RequestProcessor extends BaseProcessor {
         //handle options exporting
         if (this.options.method === 'options') {
             let exportMap = await new OptionsExporter().export(res, {
-                dirPath: this.options.dirPath,
+                dirPath: this.options.export,
                 overwrite: !!this.options.force
             });
-            if (!this.options.cli.quiet && this.options.cli.verbose) {
+            if (!this.options.cli.quiet && this.options.dryRun) {
                 for (let [resource, mt] of exportMap) {
                     if (mt) {
                         console.log(`/** ${resource} base: **/\n${mt.base}\n\n/**${resource} extending: **/\n${mt.extending}`);

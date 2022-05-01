@@ -82,7 +82,7 @@ class Main {
         this.cmd
             .command('options').description('Runs an OPTIONS request to export a resource\'s model type. You can optionally specify an --export (-x) option to generate JavaScript model files into a target directory.')
             .argument('<resource|requestFile|"*">', 'The name of the resource being targetted in the request, or a path to a file containing a saved options request, or a value "*" (use quotes) to target all resources in the request.')
-            .option('-x, --export <exportpath>', 'Generates a base and extending JavaScript classes around the resulting OPTIONS response and writes them to a folder. If the extending class is already present, it is not overwritten, however, the base class is always written to a base/ subdirectory.')
+            .option('-x, --export <exportPath>', 'Generates a base and extending JavaScript classes around the resulting OPTIONS response and writes them to a folder. If the extending class is already present, it is not overwritten, however, the base class is always written to a base/ subdirectory.')
             .option('-f, --force', 'Forces the overwrite of the extending JavaScript class file when using the --export (-x) option.')
             .option('--dry-run', 'Perform a dry-run of an export. Instead of writing files or creating directories directories, the generated files will be written to the console.')
             .option('--save <filepath>', 'Saves the GET request to file. You can re-use these request files in place of the resource (see: <requestFile>).')

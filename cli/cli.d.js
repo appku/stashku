@@ -33,9 +33,9 @@
 /**
  * @typedef CLI.OptionsCommandLineOptions
  * @property {CLI.CommandLineOptions} cli
- * @property {String} [method="export"]
+ * @property {String} [method="options"]
  * @property {String} resource
- * @property {String} dirPath
+ * @property {String} export
  * @property {Boolean} [force]
  * @property {Boolean} [dryRun]
  */
