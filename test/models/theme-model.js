@@ -33,7 +33,7 @@ export default class ThemeModel {
 
     static get hexCode() {
         return {
-            target: 'HexCode', 
+            target: 'Hex_Code', 
             validate: [
                 (v, def) => typeof v === 'string',
                 (v, def) => v?.length === 7
