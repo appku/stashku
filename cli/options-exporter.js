@@ -18,7 +18,6 @@ const __dirname = (
 dot.templateSettings.strip = false;
 dot.log = false; //disable console output
 const dots = dot.process({ path: path.resolve(__dirname, './templates') });
-const modelingTypesFilePath = path.resolve(__dirname, '../modeling/modeling.d.js');
 
 /**
  * Class that is responsible for exporting the `Response` to an StashKu `OptionsRequest`.
@@ -67,8 +66,7 @@ class OptionsExporter {
                         .when((ps) => outputConfig.overwrite || ps.exists === false)
                         .ensure()
                         .write(extModelContent);
-                    // let mtypes = await fairu.including(modelingTypesFilePath).read();
-                    // await fairu.including(exportFilePaths.modelingTypes).ensure().write(mtypes[0].data);
+                    await fairu.cp(path.join(__dirname, '../modeling/modeling.d.js'), path.join(outputConfig.dirPath, 'base/', 'modeling.d.js'));
                 }
             }
         }
@@ -92,8 +90,8 @@ class OptionsExporter {
         if (parents && value && parents.some(a => a === value)) {
             output += 'null';
         } else {
-            parents.push(value);
             if (value && value.constructor === Object) {
+                parents.push(value);
                 let keys = Object.keys(value);
                 if (keys.length > 0) {
                     output += '{';
@@ -108,6 +106,7 @@ class OptionsExporter {
                     output += '{}';
                 }
             } else if (Array.isArray(value)) {
+                parents.push(value);
                 if (value.length > 0) {
                     output += '[';
                     for (let iv = 0; iv < value.length; iv++) {
