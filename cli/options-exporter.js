@@ -4,7 +4,7 @@ import dot from 'dot';
 import StashKu from '../stashku.js';
 import OptionsRequest from '../requests/options-request.js';
 import ModelUtility from '../modeling/model-utility.js';
-import Fairu from '@appku/fairu';
+import fairu from '@appku/fairu';
 import Strings from '../utilities/strings.js';
 import Response from '../response.js';
 import path from 'path';
@@ -58,11 +58,11 @@ class OptionsExporter {
                     extending: extModelContent
                 });
                 if (outputConfig && outputConfig.dirPath) {
-                    await Fairu
+                    await fairu
                         .with(p => p.join(outputConfig.dirPath, 'base/', `base-${blueprint.slug}.js`))
                         .ensure()
                         .write(baseModelContent);
-                    await Fairu
+                    await fairu
                         .with(p => p.join(outputConfig.dirPath, `${blueprint.slug}.js`))
                         .when((ps) => outputConfig.overwrite || ps.exists === false)
                         .ensure()

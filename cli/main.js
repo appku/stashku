@@ -3,7 +3,7 @@
 /* eslint-disable no-console */
 import StashKu, { Response, RESTError } from '../stashku.js';
 import { Command, Option } from 'commander/esm.mjs';
-import Fairu from '@appku/fairu';
+import fairu from '@appku/fairu';
 import dotenv from 'dotenv';
 import RequestProcessor from './processors/request-processor.js';
 
@@ -86,7 +86,7 @@ class Main {
      */
     async configure() {
         this.state.opts = this.cmd.opts();
-        let pathStates = await Fairu.with(p => this.state.opts.env ?? p.join(process.cwd(), '.env'))
+        let pathStates = await fairu.with(p => this.state.opts.env ?? p.join(process.cwd(), '.env'))
             .throw(false)
             .discover();
         if (pathStates.length && pathStates[0].stats) {
