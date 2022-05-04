@@ -4,7 +4,7 @@ import dot from 'dot';
 import StashKu from '../stashku.js';
 import OptionsRequest from '../requests/options-request.js';
 import ModelUtility from '../modeling/model-utility.js';
-import fairu, { Util as FairuUtil } from '@appku/fairu';
+import Fairu from '@appku/fairu';
 import Strings from '../utilities/strings.js';
 import Response from '../response.js';
 import path from 'path';
@@ -58,17 +58,17 @@ class OptionsExporter {
                     extending: extModelContent
                 });
                 if (outputConfig && outputConfig.dirPath) {
-                    let exportFilePaths = {
-                        base: fairu.join(outputConfig.dirPath, 'base/', `base-${blueprint.slug}.js`),
-                        extending: fairu.join(outputConfig.dirPath, `${blueprint.slug}.js`),
-                        modelingTypes: fairu.join(outputConfig.dirPath, 'base/', 'modeling.d.js'),
-                    };
-                    await fairu.including(exportFilePaths.base).ensure().write(baseModelContent);
-                    let mtypes = await fairu.including(modelingTypesFilePath).read();
-                    await fairu.including(exportFilePaths.modelingTypes).ensure().write(mtypes[0].data);
-                    if (outputConfig.overwrite) {
-                        await fairu.including(exportFilePaths.extending).ensure().write(extModelContent);
-                    }
+                    await Fairu
+                        .with(p => p.join(outputConfig.dirPath, 'base/', `base-${blueprint.slug}.js`))
+                        .ensure()
+                        .write(baseModelContent);
+                    await Fairu
+                        .with(p => p.join(outputConfig.dirPath, `${blueprint.slug}.js`))
+                        .when((ps) => outputConfig.overwrite || ps.exists === false)
+                        .ensure()
+                        .write(extModelContent);
+                    // let mtypes = await fairu.including(modelingTypesFilePath).read();
+                    // await fairu.including(exportFilePaths.modelingTypes).ensure().write(mtypes[0].data);
                 }
             }
         }

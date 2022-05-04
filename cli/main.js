@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 ///<reference path="./cli.d.js" />
 /* eslint-disable no-console */
-import fairu from '@appku/fairu';
 import StashKu, { Response, RESTError } from '../stashku.js';
 import { Command, Option } from 'commander/esm.mjs';
-import { createRequire } from 'module';
+import Fairu from '@appku/fairu';
 import dotenv from 'dotenv';
 import RequestProcessor from './processors/request-processor.js';
 
@@ -46,19 +45,9 @@ class Main {
         this.state = {
             args: Array.from(process.argv)
         };
-        //discover state
-        let require = createRequire(import.meta.url);
-        let packages = fairu.including(
-            './package.json', //stashku
-            fairu.join(fairu.dirname(require.resolve('@appku/fairu')), 'package.json') //stashku-log
-        ).nullify().parse().readSync();
-        this.state.versions = {
-            stashKu: packages[0].data?.version || '[Error Reading Version]',
-            fairu: packages[1].data?.version || '[Error Reading Version]'
-        };
         //setup CLI
         this.cmd
-            .version(`StashKu: v-${this.state.versions.stashKu}\nFairu: v-${this.state.versions.fairu}\n`)
+            .version(`StashKu: v-${process.env.npm_package_version}`)
             .option('-e, --env <filepath>', 'Specify a .env file to load. This .env will be loaded instead of any .env in the current working directory.')
             .option('-q, --quiet', 'Do not output status information to the console.')
             .option('-v, --verbose', 'Output extra details & logs about the command being executed.')
@@ -97,23 +86,21 @@ class Main {
      */
     async configure() {
         this.state.opts = this.cmd.opts();
-        let envFilePath = fairu.join(process.cwd(), '.env');
-        if (this.state.opts.env) {
-            envFilePath = this.state.opts.env;
-        }
-        let envStat = await fairu.including(envFilePath).nullify().stat();
-        if (envStat !== null && envStat[0].stat) {
-            if (envStat[0].stat.isDirectory()) {
-                throw new Error(`The target .env file "${envFilePath}" is a directory.`);
+        let pathStates = await Fairu.with(p => this.state.opts.env ?? p.join(process.cwd(), '.env'))
+            .throw(false)
+            .discover();
+        if (pathStates.length && pathStates[0].stats) {
+            if (pathStates[0].stats.isDirectory()) {
+                throw new Error(`The target .env file "${pathStates[0].path}" is a directory.`);
             } else {
-                dotenv.config({ path: envFilePath });
+                dotenv.config({ path: pathStates[0].path });
             }
             if (!this.state.opts.quiet && this.state.opts.verbose) {
-                console.debug(`Loaded .env from "${envFilePath}" OK.`);
+                console.debug(`Loaded .env from "${pathStates[0].path}" OK.`);
             }
         } else {
             if (!this.state.opts.quiet && this.state.opts.verbose) {
-                console.debug(`The target .env file "${envFilePath}" was not found.`);
+                console.debug(`The target .env file "${pathStates[0].path}" was not found.`);
             }
         }
     }

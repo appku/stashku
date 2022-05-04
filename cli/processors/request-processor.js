@@ -3,7 +3,7 @@
 import BaseProcessor from './base-processor.js';
 import StashKu, { GetRequest, OptionsRequest, Filter, Sort } from '../../stashku.js';
 import ModelUtility from '../../modeling/model-utility.js';
-import fairu, { Util as FairuUtil } from '@appku/fairu';
+import Fairu from '@appku/fairu';
 import OptionsExporter from '../options-exporter.js';
 
 /**
@@ -32,12 +32,12 @@ class RequestProcessor extends BaseProcessor {
     async start() {
         if (this.options.cli.test) {
             this.stash = new StashKu({ engine: 'memory' });
-            this.stash.engine.data.set('products', fairu.including('./test/memory-storage-engine/data-products.json').parse().readSync()[0].data);
-            this.stash.engine.data.set('themes', fairu.including('./test/memory-storage-engine/data-themes.json').parse().readSync()[0].data);
+            this.stash.engine.data.set('products', (await Fairu.with('./test/memory-storage-engine/data-products.json').format(Fairu.Format.json).read())[0].data);
+            this.stash.engine.data.set('themes',  (await Fairu.with('./test/memory-storage-engine/data-themes.json').format(Fairu.Format.json).read())[0].data);
         }
-        let reqFile = await fairu.including(this.options.resource)
-            .nullify()
-            .parse()
+        let reqFile = await Fairu.with(this.options.resource)
+            .throw(false)
+            .format(Fairu.Format.json)
             .read();
         //build the request
         let req = null;
@@ -53,7 +53,7 @@ class RequestProcessor extends BaseProcessor {
         }
         //save query to file (do this early to help facilitate troubleshooting).
         if (this.options.save) {
-            await fairu.including(this.options.save).stringify().write(req);
+            await Fairu.with(this.options.save).stringify(Fairu.Format.json).write(req);
         }
         //run the request
         if (!this.options.cli.quiet && this.options.cli.verbose) {
@@ -71,11 +71,11 @@ class RequestProcessor extends BaseProcessor {
                     outputObj.data.push(ModelUtility.schema(res.data[i]));
                 }
             }
-            console.log(FairuUtil.stringify(this.options.cli.format, outputObj));
+            console.log(Fairu.stringify(this.options.cli.format, outputObj));
         }
         //save output to file
         if (this.options.output) {
-            await fairu.including(this.options.output).stringify().write(res);
+            await Fairu.with(this.options.output).format(this.options.cli.format).write(res);
         }
         //handle options exporting
         if (this.options.method === 'options') {
