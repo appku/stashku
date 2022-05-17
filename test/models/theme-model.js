@@ -1,65 +1,103 @@
-import GetRequest from './requests/get-request.js';
-import PostRequest from './requests/post-request.js';
-import PutRequest from './requests/put-request.js';
-import PatchRequest from './requests/patch-request.js';
-import DeleteRequest from './requests/delete-request.js';
-
-export default class ThemeModel {
+class ThemeModel {
     constructor() {
-        this.id = 0;
-        this.name = '';
-        this.hexCode = null;
+        
+        /**
+         * @type {Number}
+         */
+        this.ID = this.constructor.ID.default ?? null;
+        
+        /**
+         * @type {String}
+         */
+        this.Name = this.constructor.Name.default ?? null;
+        
+        /**
+         * @type {String}
+         */
+        this.HexCode = this.constructor.HexCode.default ?? null;
+        
     }
-
-    //#region Stashku Static Definitions
-
-    static get id() {
+    
+    /**
+     * StashKu property definition for ID.
+     * @type {Modeling.PropertyDefinition}
+     */
+    static get ID() {
         return {
             target: 'ID',
-            pk: true,
-            validate: (v, def) => typeof v === 'number'
+            default: 1,
+            omit: {
+                post: true
+            },
+            type: 'Number'
         };
     }
 
-    static get name() {
+    /**
+     * StashKu property definition for NameAndHex.
+     * @type {Modeling.PropertyDefinition}
+     */
+    static get NameAndHex() {
+        return {
+            default: () => {
+                return this.Name + this.Hex_Code;
+            },
+            omit: true,
+            type: 'String'
+        };
+    }
+    
+    /**
+     * StashKu property definition for Name.
+     * @type {Modeling.PropertyDefinition}
+     */
+    static get Name() {
         return {
             target: 'Name',
-            validate: [
-                (v, def) => typeof v === 'string',
-                (v, def) => v?.length > 1
-            ]
-        };
-    }
-
-    static get hexCode() {
-        return {
-            target: 'Hex_Code', 
-            validate: [
-                (v, def) => typeof v === 'string',
-                (v, def) => v?.length === 7
-            ]
-        };
-    }
-
-    static get $stashku() {
-        return {
-            resource: {
-                '*': 'Theme', //default, can also use the property name "all".
-                'get': 'Theme',
-                'post': 'Theme',
-                'put': (action) => 'Theme', //can be a callback
-                'patch': 'Theme',
-                'delete': null
-            },
-            override: {
-                'get': new GetRequest(),
-                'post': new PostRequest(),
-                'put': new PutRequest(),
-                'patch': new PatchRequest(),
-                'delete': new DeleteRequest()
+            type: 'String',
+            omit: {
+                delete: true
             }
         };
     }
-
-    //#endregion
+    
+    /**
+     * StashKu property definition for Hex_Code.
+     * @type {Modeling.PropertyDefinition}
+     */
+    static get HexCode() {
+        return {
+            target: 'Hex_Code',
+            type: 'String',
+            omit: {
+                delete: true
+            }
+        };
+    }
+    
+    /**
+     * The StashKu resource configuration for this model.
+     * @type {Modeling.Configuration}
+     */
+    static get $stashku() {
+        return {
+            resource: {
+                get: 'get_themes',
+                post: 'post_themes',
+                put: 'put_themes',
+                patch: 'patch_themes',
+                delete: 'delete_themes',
+                options: 'options_themes'
+            },
+            name: 'Theme',
+            slug: 'theme',
+            plural: {
+                name: 'Themes',
+                slug: 'themes'
+            }
+        };
+    }
+    
 }
+
+export default ThemeModel;

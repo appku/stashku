@@ -74,7 +74,7 @@ class Main {
             .option('-x, --export <exportPath>', 'Generates a base and extending JavaScript classes around the resulting OPTIONS response and writes them to a folder. If the extending class is already present, it is not overwritten, however, the base class is always written to a base/ subdirectory.')
             .option('-f, --force', 'Forces the overwrite of the extending JavaScript class file when using the --export (-x) option.')
             .option('--dry-run', 'Perform a dry-run of an export. Instead of writing files or creating directories directories, the generated files will be written to the console.')
-            .option('--save <filepath>', 'Saves the GET request to file. You can re-use these request files in place of the resource (see: <requestFile>).')
+            .option('--save <filepath>', 'Saves the OPTIONS request to file. You can re-use these request files in place of the resource (see: <requestFile>).')
             .option('-O, --output <outputpath>', 'Saves the engine response to the specified file.')
             .action(this.request.bind(this));
     }
