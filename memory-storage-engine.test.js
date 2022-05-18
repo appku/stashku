@@ -222,7 +222,7 @@ describe('#get', () => {
     it('returns only specific properties', async () => {
         let res = await memory.get(new GetRequest()
             .from('themes')
-            .properties('HexCode', 'Name')
+            .properties('Hex_Code', 'Name')
         );
         expect(res).toBeInstanceOf(Response);
         expect(res.data.length).toBe(100);
@@ -232,7 +232,7 @@ describe('#get', () => {
         for (let o of res.data) {
             expect(o.ID).toBeUndefined();
             expect(o.Name).not.toBeUndefined();
-            expect(o.HexCode).not.toBeUndefined();
+            expect(o.Hex_Code).not.toBeUndefined();
         }
     });
     it('responds with property values derrived from a defined model.', async () => {
@@ -249,14 +249,14 @@ describe('#get', () => {
         for (let o of res.data) {
             expect(o.ID).not.toBeUndefined();
             expect(o.Name).not.toBeUndefined();
-            expect(o.HexCode).toBeUndefined();
+            expect(o.Hex_Code).toBeUndefined();
         }
         //handles additional properties
-        res = await memory.get(new GetRequest().model(Theme).properties('HexCode'));
+        res = await memory.get(new GetRequest().model(Theme).properties('Hex_Code'));
         for (let o of res.data) {
             expect(o.ID).not.toBeUndefined();
             expect(o.Name).not.toBeUndefined();
-            expect(o.HexCode).not.toBeUndefined();
+            expect(o.Hex_Code).not.toBeUndefined();
         }
     });
     it('responds with plain data objects (stashku handles model conversion post response).', async () => {
@@ -374,8 +374,8 @@ describe('#put', () => {
         try {
             await memory.put(new PutRequest()
                 .to('themes')
-                .objects({ HexCode: 'green', value: 123 })
-                .pk('HexCode')
+                .objects({ Hex_Code: 'green', value: 123 })
+                .pk('Hex_Code')
             );
         } catch (err) {
             expect(err.toString()).toMatch(/multiple.+primary key/i);
@@ -432,8 +432,8 @@ describe('#put', () => {
     it('updates existing objects matched by multiple keys.', async () => {
         let res = await memory.put(new PutRequest()
             .to('themes')
-            .objects({ ID: 2, HexCode: '#0D98BA', value: 222 }, { ID: 9999, value: 9999 }, { ID: 3, HexCode: 'test', value: 333 })
-            .pk('ID', 'HexCode')
+            .objects({ ID: 2, Hex_Code: '#0D98BA', value: 222 }, { ID: 9999, value: 9999 }, { ID: 3, Hex_Code: 'test', value: 333 })
+            .pk('ID', 'Hex_Code')
         );
         expect(res).toBeInstanceOf(Response);
         expect(res.data.length).toBe(1);
@@ -605,6 +605,6 @@ describe('#options', () => {
         expect(res.data.length).toBe(1);
         expect(res.data[0].ID.target).toBe('ID');
         expect(res.data[0].Name.target).toBe('Name');
-        expect(res.data[0].HexCode.target).toBe('HexCode');
+        expect(res.data[0].HexCode.target).toBe('Hex_Code');
     });
 });

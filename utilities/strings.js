@@ -134,7 +134,12 @@ const Strings = {
             input = words.reduce((pv, cv, i) => {
                 if (cv.length) {
                     let uppered = cv.toUpperCase();
-                    if (words.length === 1 && uppered === cv) { //if a single word name and uppercase, always just return lowercase.
+                    //if a single word name and uppercase, always just return lowercase.
+                    if (uppered === 'ID' || uppered == 'UUID' || uppered === 'GUID') {
+                        //except for certain acronyms
+                        count++;
+                        return pv + uppered;
+                    } else if (words.length === 1 && uppered === cv) {
                         count++;
                         return cv.toLowerCase();
                     } else if (uppered !== cv) { //word is not all uppercase

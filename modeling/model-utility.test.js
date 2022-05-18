@@ -245,11 +245,11 @@ describe('.generateModelType', () => {
             expect(dynamicModel).toBeTruthy();
             expect(dynamicModel.name).toBe('TestaBitModel');
             expect(dynamicModel.$stashku.resource).toBe('testa-bits');
-            expect(dynamicModel.a).toEqual({});
-            expect(dynamicModel.b).toEqual({ pk: false });
-            expect(dynamicModel.c).toEqual({});
-            expect(dynamicModel.d).toEqual({ target: 'z', default: 4949, required: false });
-            expect(dynamicModel.e).toEqual({ pk: true });
+            expect(dynamicModel.A).toEqual({});
+            expect(dynamicModel.B).toEqual({ pk: false });
+            expect(dynamicModel.C).toEqual({});
+            expect(dynamicModel.D).toEqual({ target: 'z', default: 4949, required: false });
+            expect(dynamicModel.E).toEqual({ pk: true });
             expect(dynamicModel.$stashku.resource).toBe('testa-bits');
             expect(dynamicModel.$stashku.name).toBe('TestaBit');
             expect(dynamicModel.$stashku.slug).toBe('testa-bit');
@@ -262,11 +262,11 @@ describe('.generateModelType', () => {
         let TestaBitModel = ModelUtility.generateModelType('testa-bits', properties, mc);
         let model = new TestaBitModel();
         expect(model).toBeInstanceOf(TestaBitModel);
-        expect(model.a).toBe(null);
-        expect(model.b).toBe(null);
-        expect(model.c).toBe(null);
-        expect(model.d).toBe(4949);
-        expect(model.e).toBe(null);
+        expect(model.A).toBe(null);
+        expect(model.B).toBe(null);
+        expect(model.C).toBe(null);
+        expect(model.D).toBe(4949);
+        expect(model.E).toBe(null);
     });
     it('returns a class type with an auto-generated $stashku configuration.', () => {
         let TestaBitModel = ModelUtility.generateModelType('contact_Records', properties);

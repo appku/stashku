@@ -6,11 +6,12 @@ import PatchRequest from './requests/patch-request.js';
 import DeleteRequest from './requests/delete-request.js';
 import Response from './response.js';
 import Filter from './filter.js';
-import thenby from 'thenby';
 import RESTError from './rest-error.js';
-import deepEqual from 'deep-is';
 import ModelUtility from './modeling/model-utility.js';
 import OptionsRequest from './requests/options-request.js';
+import Strings from './utilities/strings.js';
+import deepEqual from 'deep-is';
+import thenby from 'thenby';
 
 /**
  * @typedef MemoryStorageEngineConfiguration
@@ -338,6 +339,7 @@ class MemoryStorageEngine extends BaseStorageEngine {
             for (let m of matches) {
                 let keys = Object.keys(m);
                 for (let k of keys) {
+                    //build definition
                     let def = properties.get(k);
                     if (properties.has(k) === false) {
                         def = {

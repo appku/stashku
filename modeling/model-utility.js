@@ -218,9 +218,21 @@ class ModelUtility {
         } else if ((properties instanceof Map) === false) {
             throw new RESTError(500, 'The "properties" argument must be of type Map.');
         }
+        let sortedProperties = new Map();
+        //pascal-case keys
+        for (let [k, v] of properties) {
+            let formattedKey = Strings.camelify(k, true);
+            if (formattedKey != k && properties.has(formattedKey) === false) {
+                sortedProperties.set(formattedKey, v);
+            } else {
+                sortedProperties.set(k, v);
+            }
+        }
+        //sort
+        sortedProperties = new Map([...sortedProperties.entries()].sort());
         //create model type closure
         let mtConstructor = function () {
-            for (let [k, v] of properties) {
+            for (let [k, v] of sortedProperties) {
                 let typeOfValue = typeof v;
                 if (v === null || typeOfValue === 'undefined') {
                     this[k] = null;
@@ -237,7 +249,7 @@ class ModelUtility {
         }
         Object.defineProperty(mt, 'name', { value: className });
         //add static properties
-        for (let [k, v] of properties) {
+        for (let [k, v] of sortedProperties) {
             if (v === null || typeof v === 'undefined') {
                 mt[k] = {};
             } else {

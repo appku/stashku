@@ -68,7 +68,12 @@ describe('.slugify', () => {
 
 describe('.camelify', () => {
     it('creates valid camel-case strings.', () => {
-        expect(Strings.camelify('ID')).toBe('id');
+        expect(Strings.camelify('ID')).toBe('ID');
+        expect(Strings.camelify('UUID')).toBe('UUID');
+        expect(Strings.camelify('GUID')).toBe('GUID');
+        expect(Strings.camelify('Id')).toBe('ID');
+        expect(Strings.camelify('UuID')).toBe('UUID');
+        expect(Strings.camelify('GUId')).toBe('GUID');
         expect(Strings.camelify('hello WORLD 123...')).toBe('helloWORLD123');
         expect(Strings.camelify('Lala^**## Stuff')).toBe('lalaStuff');
         expect(Strings.camelify('Lala^**## Stuff', true)).toBe('LalaStuff');
@@ -78,6 +83,10 @@ describe('.camelify', () => {
         expect(Strings.camelify('OrderID')).toBe('orderID');
         expect(Strings.camelify('Order_ID')).toBe('orderID');
         expect(Strings.camelify('Order_ID', true)).toBe('OrderID');
+        expect(Strings.camelify('Order_GuID')).toBe('orderGUID');
+        expect(Strings.camelify('Order_GUID', true)).toBe('OrderGUID');
+        expect(Strings.camelify('Order_UuID')).toBe('orderUUID');
+        expect(Strings.camelify('Order_UUID', true)).toBe('OrderUUID');
         expect(Strings.camelify('SQL server')).toBe('SQLServer');
         expect(Strings.camelify('SQL-server')).toBe('SQLServer');
         expect(Strings.camelify('SQL_Server')).toBe('SQLServer');
