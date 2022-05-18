@@ -1,3 +1,4 @@
+///<reference path="../modeling/modeling.d.js" />
 import Filter from '../filter.js';
 import Sort from '../sort.js';
 import ModelUtility from '../modeling/model-utility.js';
@@ -29,8 +30,6 @@ class GetRequest {
             distinct: false,
             /** @type {Boolean} */
             count: false,
-            /** @type {*} */
-            model: null,
             /** @type {Map.<String, *>} */
             headers: null
         };
@@ -49,18 +48,27 @@ class GetRequest {
      * 
      * If a `null` value is passed, the model is removed - but metadata on the request will remain.
      * @throws Error when the `modelType` argument is not `null`, a class, or a constructor object.
-     * @param {*} modelType - The model "class" or constructor function.
+     * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
+     * @param {Boolean} [overwrite = false] - Optional flag that, when `true`, overwrites request settings and values
+     * with the model's (where applicable).
      * @returns {GetRequest}
      * @private
      */
-    model(modelType) {
+    model(modelType, overwrite = false) {
         if (modelType !== null && ModelUtility.isValidType(modelType) === false) {
             throw new Error('Invalid "modelType" argument. The value must be null, a class, or a constructor object');
         }
-        this.metadata.model = modelType;
         if (modelType) {
-            this.from(ModelUtility.resource(modelType, this.method));
-            this.properties(...ModelUtility.map(modelType).keys());
+            if (overwrite === true || !this.metadata.from) {
+                this.from(ModelUtility.resource(modelType, this.method));
+            }
+            if (overwrite === true || !this.metadata.properties || this.metadata.properties.length === 0) {
+                let targets = [];
+                for (let v of ModelUtility.map(modelType).values()) {
+                    targets.push(v.target);
+                }
+                this.properties(...targets);
+            }
         }
         return this;
     }
@@ -100,9 +108,9 @@ class GetRequest {
     }
 
     /**
-     * Adds properties in the GET request. If the property is already present, it is ignored.    
+     * Adds properties to the GET request. If the property is already present, it is ignored.    
      * If a `null` value is passed, all properties are cleared from the request.
-     * @param  {...String} [properties] - Spread of property names (aka: columns) to get from data storage.
+     * @param  {...String|Modeling.PropertyDefinition} [properties] - Spread of property names (aka: columns) to get from data storage.
      * @returns {GetRequest}
      */
     properties(...properties) {
@@ -113,11 +121,15 @@ class GetRequest {
             this.metadata.properties = [];
         } else {
             for (let f of properties) {
-                if (f !== null && typeof f !== 'string') {
+                let prop = f;
+                if (f.target && typeof f.target === 'string') {
+                    prop = f.target;
+                }
+                if (typeof prop !== 'string') {
                     throw new Error('Invalid "properties" argument. The array contains a non-string value.');
                 }
-                if (f && this.metadata.properties.some(v => v === f) == false) {
-                    this.metadata.properties.push(f);
+                if (this.metadata.properties.some(v => v === prop) == false) {
+                    this.metadata.properties.push(prop);
                 }
             }
         }

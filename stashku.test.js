@@ -10,6 +10,7 @@ import Filter from './filter.js';
 import Sort from './sort.js';
 import jest from 'jest-mock';
 import fs from 'fs/promises';
+import ThemeModel from './test/models/theme-model.js';
 
 const samples = {
     products: null,
@@ -20,12 +21,6 @@ beforeAll(async () => {
     samples.products = JSON.parse(await fs.readFile('./test/memory-storage-engine/data-products.json', 'utf8'));
     samples.themes = JSON.parse(await fs.readFile('./test/memory-storage-engine/data-themes.json', 'utf8'));
 });
-
-class Theme {
-    static get ID() { return 'ID'; }
-    static get Name() { return 'Name'; }
-    static get HexCode() { return 'HexCode'; }
-}
 
 describe('~exports', () => {
     it('exports the GetRequest class', () => {
@@ -286,9 +281,12 @@ describe('#get', () => {
         for (let p in samples) {
             stash.engine.data.set(p, samples[p]);
         }
-        let res = await stash.model(Theme).get();
+        let res = await stash.model(ThemeModel).get();
         for (let m of res.data) {
-            expect(m).toBeInstanceOf(Theme);
+            expect(typeof m.HexCode).toBe('string');
+            expect(typeof m.ID).toBe('number');
+            expect(typeof m.Name).toBe('string');
+            expect(m).toBeInstanceOf(ThemeModel);
         }
     });
 });
@@ -305,7 +303,7 @@ describe('#post', () => {
         for (let p in samples) {
             stash.engine.data.set(p, samples[p]);
         }
-        let res = await stash.model(Theme).post((r, m) => r
+        let res = await stash.model(samples.ThemeModel).post((r, m) => r
             .objects(
                 { ID: 155, Name: 'Cobbler' },
                 { ID: 156, Name: 'Cobbler' },
@@ -315,7 +313,7 @@ describe('#post', () => {
         expect(res.total).toBe(3);
         for (let m of res.data) {
             expect(m.Name).toBe('Cobbler');
-            expect(m).toBeInstanceOf(Theme);
+            expect(m).toBeInstanceOf(samples.ThemeModel);
         }
     });
 });
@@ -332,7 +330,7 @@ describe('#put', () => {
         for (let p in samples) {
             stash.engine.data.set(p, samples[p]);
         }
-        let res = await stash.model(Theme).put((r, m) => r
+        let res = await stash.model(samples.ThemeModel).put((r, m) => r
             .pk(m.ID)
             .objects({
                 ID: 5,
@@ -342,7 +340,7 @@ describe('#put', () => {
         expect(res.total).toBe(1);
         for (let m of res.data) {
             expect(m.Name).toBe('Banana Toast');
-            expect(m).toBeInstanceOf(Theme);
+            expect(m).toBeInstanceOf(samples.ThemeModel);
         }
     });
 });
@@ -359,7 +357,7 @@ describe('#patch', () => {
         for (let p in samples) {
             stash.engine.data.set(p, samples[p]);
         }
-        let res = await stash.model(Theme).patch((r, m) => r
+        let res = await stash.model(samples.ThemeModel).patch((r, m) => r
             .template({
                 Name: 'Hello Neptune'
             })
@@ -368,7 +366,7 @@ describe('#patch', () => {
         expect(res.total).toBe(1);
         for (let m of res.data) {
             expect(m.Name).toBe('Hello Neptune');
-            expect(m).toBeInstanceOf(Theme);
+            expect(m).toBeInstanceOf(samples.ThemeModel);
         }
     });
 });
@@ -385,12 +383,12 @@ describe('#delete', () => {
         for (let p in samples) {
             stash.engine.data.set(p, samples[p]);
         }
-        let res = await stash.model(Theme).delete((r, m) => r
+        let res = await stash.model(samples.ThemeModel).delete((r, m) => r
             .where(f => f.and(m.ID, f.OP.LESSTHAN, 5))
         );
         expect(res.total).toBe(4);
         for (let m of res.data) {
-            expect(m).toBeInstanceOf(Theme);
+            expect(m).toBeInstanceOf(samples.ThemeModel);
         }
     });
 });
@@ -407,10 +405,10 @@ describe('#options', () => {
         for (let p in samples) {
             stash.engine.data.set(p, samples[p]);
         }
-        let res = await stash.model(Theme).options((r, m) => r.from('Themes'));
+        let res = await stash.model(samples.ThemeModel).options((r, m) => r.from('Themes'));
         expect(res.total).toBe(1);
         for (let m of res.data) {
-            expect(m).toBeInstanceOf(Theme);
+            expect(m).toBeInstanceOf(samples.ThemeModel);
         }
     });
 });

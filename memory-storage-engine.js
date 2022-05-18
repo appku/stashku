@@ -107,7 +107,7 @@ class MemoryStorageEngine extends BaseStorageEngine {
      * @override
      * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {GetRequest} request - The GET request to send to the storage engine.
-     * @returns {Response} Returns the data objects from storage matching request criteria.
+     * @returns {Promise.<Response>} Returns the data objects from storage matching request criteria.
      */
     async get(request) {
         //validate
@@ -177,7 +177,7 @@ class MemoryStorageEngine extends BaseStorageEngine {
      * @description
      * This will create the resource in memory if it does not already exist.
      * @param {PostRequest} request - The POST request to send to the storage engine.
-     * @returns {Response} Returns the data objects from storage that were created with the request criteria.
+     * @returns {Promise.<Response>} Returns the data objects from storage that were created with the request criteria.
      */
     async post(request) {
         //validate
@@ -209,7 +209,7 @@ class MemoryStorageEngine extends BaseStorageEngine {
      * @override
      * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {PutRequest} request - The PUT request to send to the storage engine.
-     * @returns {Response} Returns the data objects from storage that were updated with the request criteria. This 
+     * @returns {Promise.<Response>} Returns the data objects from storage that were updated with the request criteria. This 
      * *__could potentially not__* exactly match the objects requested to be updated, as some may have been deleted from storage or
      * some may not match the primary key criteria.
      */
@@ -252,7 +252,7 @@ class MemoryStorageEngine extends BaseStorageEngine {
      * @override
      * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {PatchRequest} request - The PATCH request to send to the storage engine.
-     * @returns {Response} Returns a response with the total number of the objects affected in storage. No data
+     * @returns {Promise.<Response>} Returns a response with the total number of the objects affected in storage. No data
      * objects are typically returned with this request.
      */
     async patch(request) {
@@ -285,7 +285,7 @@ class MemoryStorageEngine extends BaseStorageEngine {
      * resource until a new record is added under that resource name).
      * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {DeleteRequest} request - The DELETE request to send to the storage engine.
-     * @returns {Response} Returns the data objects from storage that were deleted with the request criteria.
+     * @returns {Promise.<Response>} Returns the data objects from storage that were deleted with the request criteria.
      */
     async delete(request) {
         await super.delete(request); //validate
@@ -318,7 +318,7 @@ class MemoryStorageEngine extends BaseStorageEngine {
      * @override
      * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {OptionsRequest} request - The OPTIONS request to send to the storage engine.
-     * @returns {Response} Returns a response with a single data object- the dynamically created model configuration.
+     * @returns {Promise.<Response>} Returns a response with a single data object- the dynamically created model configuration.
      */
     async options(request) {
         //validate

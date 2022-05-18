@@ -250,7 +250,7 @@ class StashKu {
      *  - "done": Indicates the callback was made after the engine has completed the response and the action is about to
      * complete (StashKu hands off the storage engine response to the caller).
      * @param {GetRequest|PostRequest|PutRequest|PatchRequest|DeleteRequest|OptionsRequest} request - The request object being specified.
-     * @param {Response} response - The response object (`null` if not prepared yet).
+     * @param {Promise.<Response>} response - The response object (`null` if not prepared yet).
      */
     async middlerun(state, request, response) {
         if (SUPPORTED_STATES.indexOf(state) < 0) {
@@ -305,20 +305,24 @@ class StashKu {
         if (!requestType) {
             throw new Error('A "requestType" parameter argument is required.');
         }
+        //build request
+        let reqModel = this.config?.proxy?.model;
         if (typeof request === 'function') {
             //process callback
             let tmp = new requestType();
-            if (this.config && this.config.proxy && this.config.proxy.model) {
-                tmp.model(this.config.proxy.model);
+            if (reqModel) {
+                request(tmp, reqModel);
+                tmp.model(reqModel);
+            } else {
+                request(tmp);
             }
-            request(tmp, tmp.metadata.model);
             request = tmp;
         } else if ((request instanceof requestType) === false) {
             throw new Error(`The "request" argument must be a callback function or ${requestType.name} instance.`);
         } else if (!this.engine) {
             throw new Error('A StashKu storage engine has not been loaded. An engine must be configured before operations are allowed.');
-        } else if (this.config && this.config.proxy && this.config.proxy.model) {
-            request.model(this.config.proxy.model);
+        } else if (reqModel) {
+            request.model(reqModel);
         }
         //pre-process request
         let response = null;
@@ -343,12 +347,12 @@ class StashKu {
                 this.log.debug(`[${reqID}] Sending "${request.method}" request to engine "${this.engine.name}".`);
                 response = await this.engine[request.method](request);
                 this.log.debug(`[${reqID}] Received response for "${request.method}" request from engine "${this.engine.name}".`);
-                if (request.metadata.model) {
+                if (reqModel) {
                     //convert data
                     this.log.debug(`[${reqID}] Modelling response data.`);
                     if (response.data && response.data.length) {
                         let counter = 0;
-                        for (let m of ModelUtility.model(request.metadata.model, request.method, ...response.data)) {
+                        for (let m of ModelUtility.model(reqModel, request.method, ...response.data)) {
                             response.data[counter] = m;
                             counter++;
                         }
@@ -453,7 +457,7 @@ class StashKu {
      * @throws Error if the storage engine fails to return a response.
      * @throws Error if the storage engine returns an invalid response object.
      * @param {GetRequest | GetRequestCallback} [request] - The GET request to send to the storage engine.
-     * @returns {Response.<I>} Returns the data objects from storage matching request criteria.
+     * @returns {Promise.<Response.<I>>} Returns the data objects from storage matching request criteria.
      */
     async get(request) {
         return await this._handle(request ?? new GetRequest(), GetRequest);
@@ -482,7 +486,7 @@ class StashKu {
      * @throws Error if the storage engine fails to return a response.
      * @throws Error if the storage engine returns an invalid response object.
      * @param {PostRequest | PostRequestCallback} request - The POST request to send to the storage engine.
-     * @returns {Response.<I>} Returns the data objects from storage that were created with the request criteria.
+     * @returns {Promise.<Response.<I>>} Returns the data objects from storage that were created with the request criteria.
      */
     async post(request) {
         return await this._handle(request, PostRequest);
@@ -505,14 +509,14 @@ class StashKu {
      * let person2 = { ID: 2, FirstName: 'Suzy', LastName: 'CraftyMine' };
      * await sk.put(r => r
      *     .objects(person1, person2)
-     *     .key('ID')
+     *     .pk('ID')
      *     .to('Contacts')
      * );
      * 
      * @throws Error if the storage engine fails to return a response.
      * @throws Error if the storage engine returns an invalid response object.
      * @param {PutRequest | PutRequestCallback} request - The PUT request to send to the storage engine.
-     * @returns {Response.<I>} Returns the data objects from storage that were updated with the request criteria. This 
+     * @returns {Promise.<Response.<I>>} Returns the data objects from storage that were updated with the request criteria. This 
      * *__may not__* exactly match the objects requested to be updated, as some may have been deleted from storage or
      * some may not match the key criteria.
      */
@@ -544,7 +548,7 @@ class StashKu {
      * @throws Error if the storage engine fails to return a response.
      * @throws Error if the storage engine returns an invalid response object.
      * @param {PatchRequest | PatchRequestCallback} request - The PATCH request to send to the storage engine.
-     * @returns {Response.<I>} Returns a response with the total number of the objects affected in storage. No data
+     * @returns {Promise.<Response.<I>>} Returns a response with the total number of the objects affected in storage. No data
      * objects are typically returned with this request.
      */
     async patch(request) {
@@ -570,7 +574,7 @@ class StashKu {
      * );
      * @throws Error if the "request" argument is not a callback function or `DeleteRequest` instance.
      * @param {DeleteRequest | DeleteRequestCallback} request - The DELETE request to send to the storage engine.
-     * @returns {Response.<I>} Returns the data objects from storage that were deleted with the request criteria.
+     * @returns {Promise.<Response.<I>>} Returns the data objects from storage that were deleted with the request criteria.
      */
     async delete(request) {
         return await this._handle(request, DeleteRequest);
@@ -593,7 +597,7 @@ class StashKu {
      * );
      * @throws Error if the "request" argument is not a callback function or `OptionsRequest` instance.
      * @param {OptionsRequest | OptionsRequestCallback} request - The OPTIONS request to send to the storage engine.
-     * @returns {Response.<I>} Returns a response with a single data object- the dynamically created model 
+     * @returns {Promise.<Response.<I>>} Returns a response with a single data object- the dynamically created model 
      * configuration.
      */
     async options(request) {
@@ -611,7 +615,7 @@ class StashKu {
      * @param {fs.PathOrFileDescriptor} jsonFile - The file path to the JSON formatted file defining a single StashKu request.
      * @param {{encoding: String, flag: String} | String | fs.BufferEncodingOption} [fsOptions] - File encoding options.
      * @param {ModelNameResolveCallback} [modelNameResolver] - Callback function that resolves a model name into a model type (constructor/class).
-     * @returns {DeleteRequest | GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest}
+     * @returns {Promise.<DeleteRequest | GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest>}
      */
     static async requestFromFile(jsonFile, fsOptions, modelNameResolver) {
         let f = await fsAsync.readFile(jsonFile, fsOptions);

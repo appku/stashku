@@ -62,19 +62,10 @@ class ModelUtility {
     }
 
     /**
-     * Returns a property name mapping between stored objects and model objects. StashKu model types must have static
-     * properties named after the instance properties to be mapped. The value of those properties should be the name 
-     * used in the stored object, or a definition of the mapping including the name and any additional metadata.
+     * Returns a map of modelled properties (keys) and their definitions (values). The value is a property definition
+     * that details how the modelled property maps to the underlying storage, including the actual storage `target`.
      * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
      * @returns {Map.<String, Modeling.PropertyDefinition>}
-     * 
-     * @example
-     * // If you had a row of data in a StashKu accessible database table with a column named 
-     * // "Person_First_Name", but you wanted to have it mapped to a model's "firstName" property - the model type
-     * // would declare:
-     * static get firstName() { 
-     *     return 'Person_First_Name';
-     * }
      */
     static map(modelType) {
         let propMap = new Map();
@@ -319,11 +310,14 @@ class ModelUtility {
                 for (let [k, v] of mapping) {
                     if (typeof obj[v.target] !== 'undefined') {
                         model[k] = obj[v.target];
+                    } else if (typeof v.default === 'undefined') {
+                        //not given by input object, and no default defined- nuke property from model instance.
+                        delete model[k]; 
                     }
-                    if (v && v.transform) { //run a transform if present.
+                    if (v.transform) { //run a transform if present.
                         model[k] = v.transform.call(modelType, k, model[k], obj, method, 'model');
                     }
-                    if (v && v.omit) { //omit the property if warranted
+                    if (v.omit && typeof model[k] !== 'undefined') { //omit the property if warranted
                         let omitted = (v.omit === true);
                         if (typeof v.omit === 'function') {
                             omitted = v.omit.call(modelType, k, model[k], obj, method, 'model');
@@ -343,7 +337,7 @@ class ModelUtility {
     }
 
     /**
-     * Use a given model type to to revert a model back to a raw storage object with properties reprsenting those
+     * Use a given model type to to revert a model back to a raw storage object with properties representing those
      * used in storage.
      * @throws 500 `RESTError` if the "modelType" argument is missing or not a supported StashKu model type object.
      * @throws 500 `RESTError` if the "method" argument is missing or not a string.

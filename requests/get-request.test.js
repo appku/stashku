@@ -31,11 +31,6 @@ describe('#model', () => {
         let r = new GetRequest();
         expect(r.model(class MyModel { })).toBe(r);
     });
-    it('sets the metadata "model" property.', () => {
-        class MyModel { }
-        let r = new GetRequest().model(MyModel);
-        expect(r.metadata.model).toBe(MyModel);
-    });
     it('sets the metadata "from" property using the model resource name.', () => {
         class MyModel {
             static get $stashku() {
@@ -46,11 +41,6 @@ describe('#model', () => {
         expect(r.metadata.from).toBe('abc');
         r = new GetRequest().model(class TestModel { });
         expect(r.metadata.from).toBe('TestModels');
-    });
-    it('removes the metadata "model" property when null is passed.', () => {
-        let r = new GetRequest().model(class MyModel { });
-        r.model(null);
-        expect(r.metadata.model).toBeNull();
     });
     it('adds to the metadata "properties" property.', () => {
         class MyModel {
@@ -122,10 +112,15 @@ describe('#properties', () => {
         r.properties('a', 'b', 'c');
         expect(r.metadata.properties).toEqual(['a', 'b', 'c']);
     });
+    it('sets the "properties" metadata when PropertyDefinition arguments are provided.', () => {
+        let r = new GetRequest();
+        r.properties({ target: 'a' }, { target: 'b' }, { target: 'c' });
+        expect(r.metadata.properties).toEqual(['a', 'b', 'c']);
+    });
     it('ignores "properties" that have already been added.', () => {
         let r = new GetRequest();
         r.properties('a', 'b', 'c');
-        r.properties('c', 'a', 'q');
+        r.properties('c', { target: 'a' }, 'q');
         expect(r.metadata.properties).toEqual(['a', 'b', 'c', 'q']);
     });
     it('recreates the "properties" metadata as an array if not already an array.', () => {
@@ -233,7 +228,15 @@ describe('#sort', () => {
         expect(r.sort(null)).toBe(r);
         expect(r.sort('test', 'abc', Sort.asc('yolo'))).toBe(r);
     });
-    it('accepts a kendo-like array of sorts.', () => {
+    it('accepts a Sort-like array of objects.', () => {
+        let r = new GetRequest();
+        expect(r.sort([{ property: 'ID', dir: 'asc' }])).toBe(r);
+        expect(r.metadata.sorts.length).toBe(1);
+        expect(r.metadata.sorts[0]).toBeInstanceOf(Sort);
+        expect(r.metadata.sorts[0].property).toBe('ID');
+        expect(r.metadata.sorts[0].dir).toBe('asc');
+    });
+    it('accepts a kendo-like array of objects.', () => {
         let r = new GetRequest();
         expect(r.sort([{ field: 'ID', dir: 'asc' }])).toBe(r);
         expect(r.metadata.sorts.length).toBe(1);
@@ -513,10 +516,8 @@ describe('#meta', () => {
 });
 
 describe('#toJSON', () => {
-    class ThemeModel { }
     it('returns the metadata to utilize for JSON stringifying.', () => {
         let r = new GetRequest()
-            .model(ThemeModel)
             .where(Filter
                 .or('test0', Filter.OP.EQUALS, 1)
                 .or('test1', Filter.OP.EQUALS, 2)
@@ -529,7 +530,6 @@ describe('#toJSON', () => {
             .take(123)
             .sort(new Sort('FirstName', Sort.DIR.DESC));
         let parsed = JSON.parse(JSON.stringify(r));
-        expect(parsed.model).toEqual(r.metadata.model.name);
         expect(parsed.from).toEqual(r.metadata.from);
         expect(parsed.skip).toEqual(r.metadata.skip);
         expect(parsed.take).toEqual(r.metadata.take);

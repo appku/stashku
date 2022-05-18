@@ -98,7 +98,7 @@ class BaseStorageEngine {
      * @throws A 400 REST error if the request missing required metadata.
      * @throws A 400 REST error if the request metadata is missing a required "from" value.
      * @param {GetRequest} request - The GET request to send to the storage engine.
-     * @returns {Response} Returns the data objects from storage matching request criteria.
+     * @returns {Promise.<Response>} Returns the data objects from storage matching request criteria.
      * @abstract
      */
     async get(request) {
@@ -124,7 +124,7 @@ class BaseStorageEngine {
      * @throws A 400 REST error if the request missing required metadata.
      * @throws A 400 REST error if the request metadata is missing a required "to" value.
      * @param {PostRequest} request - The POST request to send to the storage engine.
-     * @returns {Response} Returns the data objects from storage that were created with the request criteria.
+     * @returns {Promise.<Response>} Returns the data objects from storage that were created with the request criteria.
      * @abstract
      */
     async post(request) {
@@ -151,7 +151,7 @@ class BaseStorageEngine {
      * @throws A 400 REST error if the request metadata is missing a required "to" value.
      * @throws A 400 REST error if the request metadata is missing at least one "pk" value.
      * @param {PutRequest} request - The PUT request to send to the storage engine.
-     * @returns {Response} Returns the data objects from storage that were updated with the request criteria. This 
+     * @returns {Promise.<Response>} Returns the data objects from storage that were updated with the request criteria. This 
      * *__may not__* exactly match the objects requested to be updated, as some may have been deleted from storage or
      * some may not match the key criteria.
      * @abstract
@@ -184,7 +184,7 @@ class BaseStorageEngine {
      * @throws A 400 REST error if the request metadata is missing "where" conditions to match objects in storage and
      * is not enabled to affect all objects.
      * @param {PatchRequest} request - The PATCH request to send to the storage engine.
-     * @returns {Response} Returns a response with the total number of the objects affected in storage. No data
+     * @returns {Promise.<Response>} Returns a response with the total number of the objects affected in storage. No data
      * objects are typically returned with this request.
      * @abstract
      */
@@ -217,7 +217,7 @@ class BaseStorageEngine {
      * @throws A 400 REST error if the request metadata is missing "where" conditions to match objects in storage and
      * is not enabled to affect all objects.
      * @param {DeleteRequest} request - The DELETE request to send to the storage engine.
-     * @returns {Response} Returns the data objects from storage that were deleted with the request criteria.
+     * @returns {Promise.<Response>} Returns the data objects from storage that were deleted with the request criteria.
      * @abstract
      */
     async delete(request) {
@@ -248,7 +248,7 @@ class BaseStorageEngine {
      * @throws A 400 REST error if the request metadata is missing "where" conditions to match objects in storage and
      * is not enabled to affect all objects.
      * @param {OptionsRequest} request - The OPTIONS request to send to the storage engine.
-     * @returns {Response} Returns a response with a single data object- the dynamically created model configuration.
+     * @returns {Promise.<Response>} Returns a response with a single data object- the dynamically created model configuration.
      * @abstract
      */
     async options(request) {

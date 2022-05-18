@@ -17,6 +17,10 @@ class ThemeModel {
         this.HexCode = this.constructor.HexCode.default ?? null;
         
     }
+
+    get NameAndHex() {
+        return this.Name + this.HexCode;
+    }
     
     /**
      * StashKu property definition for ID.
@@ -26,24 +30,11 @@ class ThemeModel {
         return {
             target: 'ID',
             default: 1,
+            pk: true,
             omit: {
                 post: true
             },
             type: 'Number'
-        };
-    }
-
-    /**
-     * StashKu property definition for NameAndHex.
-     * @type {Modeling.PropertyDefinition}
-     */
-    static get NameAndHex() {
-        return {
-            default: () => {
-                return this.Name + this.Hex_Code;
-            },
-            omit: true,
-            type: 'String'
         };
     }
     
@@ -81,14 +72,7 @@ class ThemeModel {
      */
     static get $stashku() {
         return {
-            resource: {
-                get: 'get_themes',
-                post: 'post_themes',
-                put: 'put_themes',
-                patch: 'patch_themes',
-                delete: 'delete_themes',
-                options: 'options_themes'
-            },
+            resource: 'themes',
             name: 'Theme',
             slug: 'theme',
             plural: {
