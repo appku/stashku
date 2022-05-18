@@ -51,10 +51,10 @@ describe('#configure', () => {
     });
     it('sets the caseSensitive property from a the environmental variable.', () => {
         let engine = new MemoryStorageEngine();
-        process.env.STASHKU_MEMORY_CASESENSITIVE = true;
+        process.env.STASHKU_MEMORY_CASE_SENSITIVE = true;
         engine.configure();
         expect(engine.config.caseSensitive).toBe(true);
-        delete process.env.STASHKU_MEMORY_CASESENSITIVE;
+        delete process.env.STASHKU_MEMORY_CASE_SENSITIVE;
     });
 });
 

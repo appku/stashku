@@ -53,13 +53,6 @@ class BaseStorageEngine {
          */
         this.log = null;
 
-        /**
-         * A mapping of all loaded `ModelSchema`s into the storage engine which should be used for object and 
-         * RESTful action validation and configuration (per resource).
-         * @type {Map.<String, ModelSchema>}
-         */
-        this.schemas = new Map();
-
     }
 
     /**

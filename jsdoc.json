@@ -8,7 +8,7 @@
     ],
     "source": {
         "include": [
-            "./"
+            "./", "package.json"
         ],
         "exclude": [
             "./node_modules",
@@ -33,7 +33,7 @@
         "monospaceLinks": false
     },
     "metadata": {
-        "title": "AppKu: StashKu",
+        "title": "@AppKu/StashKu",
         "logo": "https://avatars.githubusercontent.com/u/76977527?s=400",
         "links": [
             { "icon": "globe", "url": "https://appku.com" },

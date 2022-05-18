@@ -69,8 +69,8 @@ class MemoryStorageEngine extends BaseStorageEngine {
         if (limit) {
             this.config.limit = limit;
         }
-        if (process.env.STASHKU_MEMORY_CASESENSITIVE) {
-            this.config.caseSensitive = !!process.env.STASHKU_MEMORY_CASESENSITIVE.match(/^[tTyY1]/);
+        if (process.env.STASHKU_MEMORY_CASE_SENSITIVE) {
+            this.config.caseSensitive = !!process.env.STASHKU_MEMORY_CASE_SENSITIVE.match(/^[tTyY1]/);
         }
     }
 
@@ -174,6 +174,7 @@ class MemoryStorageEngine extends BaseStorageEngine {
 
     /**
      * @override
+     * @description
      * This will create the resource in memory if it does not already exist.
      * @param {PostRequest} request - The POST request to send to the storage engine.
      * @returns {Response} Returns the data objects from storage that were created with the request criteria.
@@ -279,6 +280,7 @@ class MemoryStorageEngine extends BaseStorageEngine {
 
     /**
      * @override
+     * @description
      * If the last item from memory is deleted, the resource is also deleted from memory (resulting in a 404 for the
      * resource until a new record is added under that resource name).
      * @throws 404 Error when the requested resource is has not been stored in memory.
