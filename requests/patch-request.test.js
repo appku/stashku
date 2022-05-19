@@ -29,17 +29,7 @@ describe('#model', () => {
         let r = new PatchRequest();
         expect(r.model(class MyModel { })).toBe(r);
     });
-    it('sets the metadata "model" property.', () => {
-        class MyModel { }
-        let r = new PatchRequest().model(MyModel);
-        expect(r.metadata.model).toBe(MyModel);
-    });
-    it('removes the metadata "model" property when null is passed.', () => {
-        let r = new PatchRequest().model(class MyModel { });
-        r.model(null);
-        expect(r.metadata.model).toBeNull();
-    });
-    it('sets the metadata "to" property.', () => {
+    it('sets the metadata "to" property using the model resource name if not already set.', () => {
         class MyModel {
             static get $stashku() {
                 return { resource: 'abc' };
@@ -47,6 +37,10 @@ describe('#model', () => {
         }
         let r = new PatchRequest().model(MyModel);
         expect(r.metadata.to).toBe('abc');
+        r = new PatchRequest().model(class TestModel { });
+        expect(r.metadata.to).toBe('TestModels');
+        r = new PatchRequest().to('someresource').model(MyModel);
+        expect(r.metadata.to).toBe('someresource');
     });
 });
 
@@ -320,16 +314,13 @@ describe('#meta', () => {
 });
 
 describe('#toJSON', () => {
-    class ThemeModel { }
     it('returns the metadata to utilize for JSON stringifying.', () => {
         let r = new PatchRequest()
-            .model(ThemeModel)
             .to('Goose')
             .headers({ hello: 'world' })
             .template({ Bob: 'Sue', Hi: 12345 })
             .count();
         let parsed = JSON.parse(JSON.stringify(r));
-        expect(parsed.model).toEqual(r.metadata.model.name);
         expect(parsed.to).toEqual(r.metadata.to);
         expect(parsed.count).toEqual(r.metadata.count);
         expect(parsed.template).toEqual({ Bob: 'Sue', Hi: 12345 });

@@ -25,8 +25,6 @@ class PatchRequest {
             to: null, 
             /** @type {Boolean} */
             count: false,
-            /** @type {*} */
-            model: null,
             /** @type {Map.<String, *>} */
             headers: null
         };
@@ -48,17 +46,20 @@ class PatchRequest {
      * 
      * If a `null` value is passed, the model is removed - but metadata on the request will remain.
      * @throws Error when the `modelType` argument is not `null`, a class, or a constructor object.
-     * @param {*} modelType - The model "class" or constructor function.
+     * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
+     * @param {Boolean} [overwrite = false] - Optional flag that, when `true`, overwrites request settings and values
+     * with the model's (where applicable).
      * @returns {PatchRequest}
      * @private
      */
-    model(modelType) {
+    model(modelType, overwrite = false) {
         if (modelType !== null && ModelUtility.isValidType(modelType) === false) {
             throw new Error('Invalid "modelType" argument. The value must be null, a class, or a constructor object');
         }
-        this.metadata.model = modelType;
         if (modelType) {
-            this.to(ModelUtility.resource(modelType, this.method));
+            if (overwrite === true || !this.metadata.to) {
+                this.to(ModelUtility.resource(modelType, this.method));
+            }
         }
         return this;
     }
@@ -71,7 +72,7 @@ class PatchRequest {
      * 
      * Calling this function without an argument *enables* counting without data.
      * @param {Boolean} [enabled=true] - A `true` enables the count-only result. A `false` disables it.
-     * @returns {GetRequest}
+     * @returns {PatchRequest}
      */
     count(enabled) {
         if (typeof enabled === 'undefined') {
@@ -89,7 +90,7 @@ class PatchRequest {
      * Calling this method without an argument will set the request to *enable* the deletion of all objects.
      * @param {Boolean} [enabled=true] - Enable or disable the deletion of all records when no `where` filters have
      * been defined.
-     * @returns {DeleteRequest}
+     * @returns {PatchRequest}
      */
     all(enabled) {
         if (arguments.length === 0) {
@@ -252,7 +253,6 @@ class PatchRequest {
         if (this.metadata.headers) {
             metaClone.headers = Objects.fromEntries(this.metadata.headers);
         }
-        metaClone.model = this.metadata?.model?.name;
         metaClone.method = this.method;
         return metaClone;
     }

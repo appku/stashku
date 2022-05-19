@@ -31,7 +31,7 @@ describe('#model', () => {
         let r = new GetRequest();
         expect(r.model(class MyModel { })).toBe(r);
     });
-    it('sets the metadata "from" property using the model resource name.', () => {
+    it('sets the metadata "from" property using the model resource name if not already set.', () => {
         class MyModel {
             static get $stashku() {
                 return { resource: 'abc' };
@@ -41,6 +41,8 @@ describe('#model', () => {
         expect(r.metadata.from).toBe('abc');
         r = new GetRequest().model(class TestModel { });
         expect(r.metadata.from).toBe('TestModels');
+        r = new GetRequest().from('someresource').model(MyModel);
+        expect(r.metadata.from).toBe('someresource');
     });
     it('adds to the metadata "properties" property.', () => {
         class MyModel {

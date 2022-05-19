@@ -26,25 +26,18 @@ describe('#model', () => {
         let r = new OptionsRequest();
         expect(r.model(class MyModel { })).toBe(r);
     });
-    it('sets the metadata "model" property.', () => {
-        class MyModel { }
-        let r = new OptionsRequest().model(MyModel);
-        expect(r.metadata.model).toBe(MyModel);
-    });
-    it('removes the metadata "model" property when null is passed.', () => {
-        let r = new OptionsRequest().model(class MyModel { });
-        r.model(null);
-        expect(r.metadata.model).toBeNull();
-    });
-    it('sets the metadata "from" property.', () => {
+    it('sets the metadata "from" property using the model resource name if not already set.', () => {
         class MyModel {
             static get $stashku() {
                 return { resource: 'abc' };
             }
         }
-        let r = new OptionsRequest();
-        r.model(MyModel);
+        let r = new OptionsRequest().model(MyModel);
         expect(r.metadata.from).toBe('abc');
+        r = new OptionsRequest().model(class TestModel { });
+        expect(r.metadata.from).toBe('TestModels');
+        r = new OptionsRequest().from('someresource').model(MyModel);
+        expect(r.metadata.from).toBe('someresource');
     });
 });
 
@@ -199,14 +192,11 @@ describe('#headers', () => {
 });
 
 describe('#toJSON', () => {
-    class ThemeModel { }
     it('returns the metadata to utilize for JSON stringifying.', () => {
         let r = new OptionsRequest()
-            .model(ThemeModel)
             .from('Goose')
             .headers({ hello: 'world' });
         let parsed = JSON.parse(JSON.stringify(r));
-        expect(parsed.model).toEqual(r.metadata.model.name);
         expect(parsed.from).toEqual(r.metadata.from);
         expect(parsed.headers).toEqual({ hello: 'world' });
         expect(parsed.method).toBe('options');

@@ -368,7 +368,6 @@ class GetRequest {
         if (this.metadata.headers) {
             metaClone.headers = Objects.fromEntries(this.metadata.headers);
         }
-        metaClone.model = this.metadata?.model?.name;
         metaClone.method = this.method;
         return metaClone;
     }

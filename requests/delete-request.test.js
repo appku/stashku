@@ -26,25 +26,18 @@ describe('#model', () => {
         let r = new DeleteRequest();
         expect(r.model(class MyModel { })).toBe(r);
     });
-    it('sets the metadata "model" property.', () => {
-        class MyModel { }
-        let r = new DeleteRequest().model(MyModel);
-        expect(r.metadata.model).toBe(MyModel);
-    });
-    it('removes the metadata "model" property when null is passed.', () => {
-        let r = new DeleteRequest().model(class MyModel { });
-        r.model(null);
-        expect(r.metadata.model).toBeNull();
-    });
-    it('sets the metadata "from" property.', () => {
+    it('sets the metadata "from" property using the model resource name if not already set.', () => {
         class MyModel {
             static get $stashku() {
                 return { resource: 'abc' };
             }
         }
-        let r = new DeleteRequest();
-        r.model(MyModel);
+        let r = new DeleteRequest().model(MyModel);
         expect(r.metadata.from).toBe('abc');
+        r = new DeleteRequest().model(class TestModel { });
+        expect(r.metadata.from).toBe('TestModels');
+        r = new DeleteRequest().from('someresource').model(MyModel);
+        expect(r.metadata.from).toBe('someresource');
     });
 });
 
@@ -301,10 +294,8 @@ describe('#meta', () => {
 });
 
 describe('#toJSON', () => {
-    class ThemeModel {}
     it('returns the metadata to utilize for JSON stringifying.', () => {
         let dr = new DeleteRequest()
-            .model(ThemeModel)
             .where(Filter
                 .or('test0', Filter.OP.EQUALS, 1)
                 .or('test1', Filter.OP.EQUALS, 2)
@@ -315,7 +306,6 @@ describe('#toJSON', () => {
             .headers({ hello: 'world' })
             .count();
         let parsed = JSON.parse(JSON.stringify(dr));
-        expect(parsed.model).toEqual(dr.metadata.model.name);
         expect(parsed.all).toEqual(dr.metadata.all);
         expect(parsed.from).toEqual(dr.metadata.from);
         expect(parsed.count).toEqual(dr.metadata.count);

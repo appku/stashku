@@ -31,17 +31,7 @@ describe('#model', () => {
         let r = new PutRequest();
         expect(r.model(class MyModel { })).toBe(r);
     });
-    it('sets the metadata "model" property.', () => {
-        class MyModel { }
-        let r = new PutRequest().model(MyModel);
-        expect(r.metadata.model).toBe(MyModel);
-    });
-    it('removes the metadata "model" property when null is passed.', () => {
-        let r = new PutRequest().model(class MyModel { });
-        r.model(null);
-        expect(r.metadata.model).toBeNull();
-    });
-    it('sets the metadata "to" property.', () => {
+    it('sets the metadata "to" property using the model resource name if not already set.', () => {
         class MyModel {
             static get $stashku() {
                 return { resource: 'abc' };
@@ -49,11 +39,13 @@ describe('#model', () => {
         }
         let r = new PutRequest().model(MyModel);
         expect(r.metadata.to).toBe('abc');
+        r = new PutRequest().model(class TestModel { });
+        expect(r.metadata.to).toBe('TestModels');
+        r = new PutRequest().to('someresource').model(MyModel);
+        expect(r.metadata.to).toBe('someresource');
     });
-    it('sets and replaces any pks on the request.', () => {
-        let r = new PutRequest().pk('ID');
-        expect(r.metadata.pk).toEqual(['ID']);
-        r.model(class MyModel {
+    it('set the metadata "pk" property using the model defined pk properties, if not already set.', () => {
+        class MyModel {
             static get Key() {
                 return { pk: true };
             }
@@ -61,10 +53,15 @@ describe('#model', () => {
                 return { target: 'world' };
             }
             static get Toast() {
-                return { pk: true };
+                return { target: 'Butter', pk: true };
             }
-        });
-        expect(r.metadata.pk).toEqual(['Key', 'Toast']);
+        }
+        let r = new PutRequest().pk('ID');
+        expect(r.metadata.pk).toEqual(['ID']);
+        r.model(MyModel);
+        expect(r.metadata.pk).toEqual(['ID']);
+        r = new PutRequest().model(MyModel);
+        expect(r.metadata.pk).toEqual(['Key', 'Butter']);
     });
 });
 
@@ -356,16 +353,13 @@ describe('#meta', () => {
 });
 
 describe('#toJSON', () => {
-    class ThemeModel { }
     it('returns the metadata to utilize for JSON stringifying.', () => {
         let r = new PutRequest()
-            .model(ThemeModel)
             .to('Goose')
             .headers({ hello: 'world' })
             .objects({ Bob: 'Sue', Hi: 12345 }, { Hi: true })
             .pk('ID');
         let parsed = JSON.parse(JSON.stringify(r));
-        expect(parsed.model).toEqual(r.metadata.model.name);
         expect(parsed.to).toEqual(r.metadata.to);
         expect(parsed.count).toEqual(r.metadata.count);
         expect(parsed.objects).toEqual([{ Bob: 'Sue', Hi: 12345 }, { Hi: true }]);

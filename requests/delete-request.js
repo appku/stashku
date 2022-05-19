@@ -20,8 +20,6 @@ class DeleteRequest {
             from: null,
             /** @type {Boolean} */
             count: false,
-            /** @type {*} */
-            model: null,
             /** @type {Map.<String, *>} */
             headers: null
         };
@@ -39,17 +37,20 @@ class DeleteRequest {
      * 
      * If a `null` value is passed, the model is removed - but metadata on the request will remain.
      * @throws Error when the `modelType` argument is not `null`, a class, or a constructor object.
-     * @param {*} modelType - The model "class" or constructor function.
+     * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
+     * @param {Boolean} [overwrite = false] - Optional flag that, when `true`, overwrites request settings and values
+     * with the model's (where applicable).
      * @returns {DeleteRequest}
      * @private
      */
-    model(modelType) {
+    model(modelType, overwrite = false) {
         if (modelType !== null && ModelUtility.isValidType(modelType) === false) {
             throw new Error('Invalid "modelType" argument. The value must be null, a class, or a constructor object');
         }
-        this.metadata.model = modelType;
-        if (modelType !== null) {
-            this.from(ModelUtility.resource(modelType, this.method));
+        if (modelType) {
+            if (overwrite === true || !this.metadata.from) {
+                this.from(ModelUtility.resource(modelType, this.method));
+            }
         }
         return this;
     }
@@ -223,7 +224,6 @@ class DeleteRequest {
         if (this.metadata.headers) {
             metaClone.headers = Objects.fromEntries(this.metadata.headers);
         }
-        metaClone.model = this.metadata?.model?.name;
         metaClone.method = this.method;
         return metaClone;
     }
