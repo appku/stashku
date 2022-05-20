@@ -103,8 +103,9 @@ class ModelUtility {
     }
 
     /**
-     * Takes a model type and generates a module with the same static properties used to define the model - all
-     * property definitions and the stashku configuration.
+     * Takes a model type and generates an object with the same properties used to define the model - all
+     * property definitions and the `$stashku` configuration. If the `$stashku` property is not found it is generated
+     * with a `resource` property and derived value.
      * @throws 500 `RESTError` if the "modelType" argument is missing or not a supported StashKu model type object.
      * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
      * @returns {*}
@@ -118,8 +119,10 @@ class ModelUtility {
         for (let [p, pDef] of mapping) {
             schema[p] = pDef;
         }
-        if (modelType.$stashku) {
+        if (typeof modelType.$stashku === 'object') {
             schema.$stashku = modelType.$stashku;
+        } else {
+            schema.$stashku = { resource: ModelUtility.resource(modelType) };
         }
         return schema;
     }
@@ -210,16 +213,18 @@ class ModelUtility {
             throw new RESTError(500, 'The "properties" argument must be of type Map.');
         }
         let sortedProperties = new Map();
+        //presort
+        properties = new Map([...properties.entries()].sort());
         //pascal-case keys
         for (let [k, v] of properties) {
             let formattedKey = Strings.camelify(k, true);
-            if (formattedKey != k && properties.has(formattedKey) === false) {
+            if (formattedKey != k && sortedProperties.has(formattedKey) === false) {
                 sortedProperties.set(formattedKey, v);
             } else {
                 sortedProperties.set(k, v);
             }
         }
-        //sort
+        //sort final
         sortedProperties = new Map([...sortedProperties.entries()].sort());
         //create model type closure
         let mtConstructor = function () {
@@ -248,10 +253,6 @@ class ModelUtility {
             }
         }
         //add $stashku configuration static property
-        let pascalName = Strings.camelify(pluralize.singular(resource), true);
-        let pascalNamePlural = Strings.camelify(pluralize.plural(resource), true);
-        let slug = Strings.slugify(pascalName, '-', true, true);
-        let slugPlural = Strings.slugify(pascalNamePlural, '-', true, true);
         if (!configuration) {
             mt.$stashku = {};
         } else {
@@ -262,19 +263,19 @@ class ModelUtility {
             mt.$stashku.resource = resource;
         }
         if (!mt.$stashku.name) {
-            mt.$stashku.name = pascalName;
+            mt.$stashku.name = Strings.camelify(pluralize.singular(resource), true);
         }
         if (!mt.$stashku.slug) {
-            mt.$stashku.slug = slug;
+            mt.$stashku.slug = Strings.slugify(mt.$stashku.name, '-', true, true);
         }
         if (!mt.$stashku.plural) {
             mt.$stashku.plural = {};
         }
         if (!mt.$stashku.plural.name) {
-            mt.$stashku.plural.name = pascalNamePlural;
+            mt.$stashku.plural.name = Strings.camelify(pluralize.plural(mt.$stashku.name), true);
         }
         if (!mt.$stashku.plural.slug) {
-            mt.$stashku.plural.slug = slugPlural;
+            mt.$stashku.plural.slug = Strings.slugify(mt.$stashku.plural.name, '-', true, true);
         }
         return mt;
     }
@@ -309,30 +310,34 @@ class ModelUtility {
         let mapping = ModelUtility.map(modelType);
         for (let obj of objects) {
             if (obj) {
-                let model = new modelType();
-                for (let [k, v] of mapping) {
-                    if (typeof obj[v.target] !== 'undefined') {
-                        model[k] = obj[v.target];
-                    } else if (typeof v.default === 'undefined') {
-                        //not given by input object, and no default defined- nuke property from model instance.
-                        delete model[k];
-                    }
-                    if (v.transform) { //run a transform if present.
-                        model[k] = v.transform.call(modelType, k, model[k], obj, method, 'model');
-                    }
-                    if (v.omit && typeof model[k] !== 'undefined') { //omit the property if warranted
-                        let omitted = (v.omit === true);
-                        if (typeof v.omit === 'function') {
-                            omitted = v.omit.call(modelType, k, model[k], obj, method, 'model');
-                        } else if (typeof v.omit === 'object' && v.omit[method] === true) {
-                            omitted = true;
-                        }
-                        if (omitted === true) {
+                if (obj instanceof modelType) {
+                    yield obj; //nothing to do, already modelType
+                } else {
+                    let model = new modelType();
+                    for (let [k, v] of mapping) {
+                        if (typeof obj[v.target] !== 'undefined') {
+                            model[k] = obj[v.target];
+                        } else if (typeof v.default === 'undefined') {
+                            //not given by input object, and no default defined- nuke property from model instance.
                             delete model[k];
                         }
+                        if (v.transform) { //run a transform if present.
+                            model[k] = v.transform.call(modelType, k, model[k], obj, method, 'model');
+                        }
+                        if (v.omit && typeof model[k] !== 'undefined') { //omit the property if warranted
+                            let omitted = (v.omit === true);
+                            if (typeof v.omit === 'function') {
+                                omitted = v.omit.call(modelType, k, model[k], obj, method, 'model');
+                            } else if (typeof v.omit === 'object' && (v.omit.all === true || v.omit[method] === true)) {
+                                omitted = true;
+                            }
+                            if (omitted === true) {
+                                delete model[k];
+                            }
+                        }
                     }
+                    yield model;
                 }
-                yield model;
             } else {
                 yield null;
             }
@@ -375,7 +380,7 @@ class ModelUtility {
                             let omitted = (v.omit === true);
                             if (typeof v.omit === 'function') {
                                 omitted = v.omit.call(modelType, k, model[k], model, method, 'model');
-                            } else if (typeof v.omit === 'object' && v.omit[method] === true) {
+                            } else if (typeof v.omit === 'object' && (v.omit.all === true || v.omit[method] === true)) {
                                 omitted = true;
                             }
                             if (omitted === true) {
@@ -385,7 +390,7 @@ class ModelUtility {
                     }
                     yield record;
                 } else {
-                    yield model;
+                    yield model; //nothing to do, already not a modelType.
                 }
             } else {
                 yield null;

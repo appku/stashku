@@ -112,6 +112,32 @@ describe('.map', () => {
     });
 });
 
+describe('.schema', () => {
+    it('throws a REST error when given an invalid model type.', () => {
+        for (let i = 4; i < invalidModelTypeValues.length; i++) {
+            expect(() => ModelUtility.schema(invalidModelTypeValues[i])).toThrow(/modelType/);
+        }
+    });
+    it('returns a schema object representing the information about the model.', () => {
+        class TestModel {
+            static get FirstName() { return 'First_Name'; }
+
+            static get $stashku() {
+                return { resource: 'test' };
+            }
+        }
+        expect(ModelUtility.schema(TestModel).FirstName).toEqual({ target: 'First_Name' });
+        expect(ModelUtility.schema(TestModel).$stashku).toEqual({ resource: 'test' });
+    });
+    it('returns a schema object and generates the $stashku object.', () => {
+        class TestModel {
+            static get FirstName() { return 'First_Name'; }
+        }
+        expect(ModelUtility.schema(TestModel).FirstName).toEqual({ target: 'First_Name' });
+        expect(ModelUtility.schema(TestModel).$stashku).toEqual({ resource: 'TestModels' });
+    });
+});
+
 describe('.resource', () => {
     it('returns null when an invalid model type is specified.', () => {
         for (let invalid of invalidModelTypeValues) {
@@ -285,9 +311,28 @@ describe('.generateModelType', () => {
         });
         expect(TestaBitModel.$stashku.resource).toBe('horse_Records');
         expect(TestaBitModel.$stashku.name).toBe('Banana');
-        expect(TestaBitModel.$stashku.slug).toBe('horse-record');
-        expect(TestaBitModel.$stashku.plural.name).toBe('HorseRecords');
+        expect(TestaBitModel.$stashku.slug).toBe('banana');
+        expect(TestaBitModel.$stashku.plural.name).toBe('Bananas');
         expect(TestaBitModel.$stashku.plural.slug).toBe('dancing-frogs');
+    });
+    it('retains properties that may collide through pascal-case conversion..', () => {
+        let TestaBitModel = ModelUtility.generateModelType('Contacts', new Map([
+            ['first-name', { target: 'first-name' }],
+            ['first_name', { target: 'first_name' }],
+            ['first name', { target: 'first name' }],
+            ['FIRSTname', { target: 'firstname' }],
+        ]), {
+            name: 'ContactRecordModel'
+        });
+        expect(TestaBitModel.$stashku.resource).toBe('Contacts');
+        expect(TestaBitModel.$stashku.name).toBe('ContactRecordModel');
+        expect(TestaBitModel.$stashku.slug).toBe('contact-record-model');
+        expect(TestaBitModel.$stashku.plural.name).toBe('ContactRecordModels');
+        expect(TestaBitModel.$stashku.plural.slug).toBe('contact-record-models');
+        expect(TestaBitModel.FIRSTname).toEqual({ target: 'firstname' });
+        expect(TestaBitModel.FirstName).toEqual({ target: 'first name' });
+        expect(TestaBitModel.first_name).toEqual({ target: 'first_name' });
+        expect(TestaBitModel['first-name']).toEqual({ target: 'first-name' });
     });
 });
 
@@ -341,9 +386,71 @@ describe('.model', () => {
             static get lastName() { return { target: 'Last_Name', transform: (k, v) => v ? v : 'default' }; }
         }
         let iterator = ModelUtility.model(TestModel, 'get', { First_Name: null }, { First_Name: 'abc', Last_Name: 123 }, { First_Name: 'def', Last_Name: null });
-        expect(iterator.next().value).toEqual({ firstName: null, lastName: 'default'  });
+        expect(iterator.next().value).toEqual({ firstName: null, lastName: 'default' });
         expect(iterator.next().value).toEqual({ firstName: 'abc', lastName: 123 });
         expect(iterator.next().value).toEqual({ firstName: 'def', lastName: 'default' });
+    });
+    it('skips constructing models over objects that are already instances of the model type', () => {
+        class TestModel {
+            constructor() {
+                this.A = null;
+            }
+            static get A() { return 'AAA'; }
+        }
+        let m = new TestModel();
+        m.A = 'yoyo';
+        m.B = 'b';
+        let iterator = ModelUtility.model(TestModel, 'get', { AAA: null }, m, { AAA: 'abc', bogus: 123 });
+        expect(iterator.next().value).toEqual({ A: null });
+        expect(iterator.next().value).toEqual({ A: 'yoyo', B: 'b' });
+        expect(iterator.next().value).toEqual({ A: 'abc' });
+    });
+    it('correctly omits properties that are marked so.', () => {
+        class TestModel {
+            constructor() {
+            }
+            static get a() { return 'a'; }
+            static get om_any() { return { target: 'om_any', omit: true }; }
+        }
+        let omits = ['all', 'get', 'put', 'post', 'patch', 'delete', 'options'];
+        for (let i = 0; i <= omits.length; i++) {
+            let omit = {};
+            omit[omits[i]] = true;
+            TestModel[`om_${omits[i]}`] = { target: `om_${omits[i]}`, omit: omit };
+        }
+        let test = { a: 'hello', om_any: 'yoyo' };
+        for (let i = 0; i < omits.length; i++) {
+            test[`om_${omits[i]}`] = `hello ${i}`;
+        }
+        for (let i = 0; i < omits.length; i++) {
+            let iterator = ModelUtility.model(TestModel, omits[i], test);
+            let nextModel = iterator.next().value;
+            expect(nextModel).toBeInstanceOf(TestModel);
+            let sample = Object.assign({}, test);
+            delete sample.om_any;
+            delete sample.om_all;
+            delete sample[`om_${omits[i]}`];
+            expect(nextModel).toEqual(sample);
+        }
+    });
+    it('correctly omits properties determined by callback function.', () => {
+        class TestModel {
+            constructor() {
+            }
+            static get a() { return 'a'; }
+            static get b() {
+                return { target: 'b', omit: () => true };
+            }
+            static get c() {
+                return { target: 'c', omit: () => false };
+            }
+        }
+        let iterator = ModelUtility.model(TestModel, 'get', { a: 'hello', b: 'world', c: '!!!' });
+        let nextModel = iterator.next().value;
+        expect(nextModel).toBeInstanceOf(TestModel);
+        expect(nextModel.a).toBe('hello');
+        expect(nextModel.b).toBeUndefined();
+        expect(nextModel.c).toBe('!!!');
     });
 });
 
@@ -407,5 +514,73 @@ describe('.unmodel', () => {
         let iterator = ModelUtility.unmodel(TestModel, 'post', new TestModel(), m);
         expect(iterator.next().value).toEqual({ First_Name: null, Last_Name: 'default' });
         expect(iterator.next().value).toEqual({ First_Name: 'abc', Last_Name: 123 });
+    });
+    it('skips constructing objects over models that are not instances of the model type', () => {
+        class TestModel {
+            constructor() {
+                this.A = null;
+            }
+            static get A() { return 'AAA'; }
+        }
+        let m = new TestModel();
+        m.A = 'yoyo';
+        m.B = 'b';
+        let iterator = ModelUtility.unmodel(TestModel, 'get', { AAA: null }, m, { AAA: 'abc', bogus: 123 });
+        expect(iterator.next().value).toEqual({ AAA: null });
+        expect(iterator.next().value).toEqual({ AAA: 'yoyo' });
+        expect(iterator.next().value).toEqual({ AAA: 'abc', bogus: 123 });
+    });
+    it('correctly omits properties that are marked so.', () => {
+        class TestModel {
+            constructor() {
+            }
+            static get a() { return 'a'; }
+            static get om_any() { return { target: 'om_any', omit: true }; }
+        }
+        let omits = ['all', 'get', 'put', 'post', 'patch', 'delete', 'options'];
+        for (let i = 0; i <= omits.length; i++) {
+            let omit = {};
+            omit[omits[i]] = true;
+            TestModel[`om_${omits[i]}`] = { target: `om_${omits[i]}`, omit: omit };
+        }
+        let test = new TestModel();
+        test.a= 'hello';
+        test.om_any ='yoyo';
+        for (let i = 0; i < omits.length; i++) {
+            test[`om_${omits[i]}`] = `hello ${i}`;
+        }
+        for (let i = 0; i < omits.length; i++) {
+            let iterator = ModelUtility.unmodel(TestModel, omits[i], test);
+            let nextModel = iterator.next().value;
+            expect(nextModel.constructor).toBeInstanceOf(Object);
+            let sample = Object.assign({}, test);
+            delete sample.om_any;
+            delete sample.om_all;
+            delete sample[`om_${omits[i]}`];
+            expect(nextModel).toEqual(sample);
+        }
+    });
+    it('correctly omits properties determined by callback function.', () => {
+        class TestModel {
+            constructor() {
+            }
+            static get a() { return 'a'; }
+            static get b() {
+                return { target: 'b', omit: () => true };
+            }
+            static get c() {
+                return { target: 'c', omit: () => false };
+            }
+        }
+        let m = new TestModel();
+        m.a = 'hello';
+        m.b = 'world';
+        m.c = '!!!';
+        let iterator = ModelUtility.unmodel(TestModel, 'get', m);
+        let nextModel = iterator.next().value;
+        expect(nextModel.constructor).toBe(Object);
+        expect(nextModel.a).toBe('hello');
+        expect(nextModel.b).toBeUndefined();
+        expect(nextModel.c).toBe('!!!');
     });
 });
