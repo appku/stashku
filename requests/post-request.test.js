@@ -285,7 +285,6 @@ describe('#meta', () => {
 });
 
 describe('#toJSON', () => {
-    class ThemeModel { }
     it('returns the metadata to utilize for JSON stringifying.', () => {
         let r = new PostRequest()
             .to('Goose')

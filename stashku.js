@@ -335,10 +335,6 @@ class StashKu {
         } catch (err) {
             throw new RESTError(500, `The StashKu storage engine "${this.config.engine}" could not be loaded. ${err.toString()}`);
         }
-        if (request.validate) {
-            this.log.debug(`[${reqID}] Running "${request.method}" request validation.`);
-            await request.validate(reqID);
-        }
         this.log.debug(`[${reqID}] Running "${request.method}" request middleware.`);
         await this.middlerun('request', request, response);
         if (this.engine[request.method]) {

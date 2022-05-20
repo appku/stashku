@@ -1,27 +1,29 @@
+let idCounter = 150;
+
 class ThemeModel {
     constructor() {
-        
+
         /**
          * @type {Number}
          */
-        this.ID = this.constructor.ID.default ?? null;
-        
+        this.ID = this.constructor.ID.default();
+
         /**
          * @type {String}
          */
         this.Name = this.constructor.Name.default ?? null;
-        
+
         /**
          * @type {String}
          */
         this.HexCode = this.constructor.HexCode.default ?? null;
-        
+
     }
 
     get NameAndHex() {
         return this.Name + this.HexCode;
     }
-    
+
     /**
      * StashKu property definition for ID.
      * @type {Modeling.PropertyDefinition}
@@ -29,15 +31,12 @@ class ThemeModel {
     static get ID() {
         return {
             target: 'ID',
-            default: 1,
+            default: () => ++idCounter,
             pk: true,
-            omit: {
-                post: true
-            },
             type: 'Number'
         };
     }
-    
+
     /**
      * StashKu property definition for Name.
      * @type {Modeling.PropertyDefinition}
@@ -51,7 +50,7 @@ class ThemeModel {
             }
         };
     }
-    
+
     /**
      * StashKu property definition for Hex_Code.
      * @type {Modeling.PropertyDefinition}
@@ -60,12 +59,13 @@ class ThemeModel {
         return {
             target: 'Hex_Code',
             type: 'String',
+            default: '#000000',
             omit: {
                 delete: true
             }
         };
     }
-    
+
     /**
      * The StashKu resource configuration for this model.
      * @type {Modeling.Configuration}
@@ -81,7 +81,7 @@ class ThemeModel {
             }
         };
     }
-    
+
 }
 
 export default ThemeModel;

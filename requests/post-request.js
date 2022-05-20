@@ -51,6 +51,9 @@ class PostRequest {
             if (overwrite === true || !this.metadata.to) {
                 this.to(ModelUtility.resource(modelType, this.method));
             }
+            if (this.metadata.objects) {
+                this.metadata.objects = Array.from(ModelUtility.unmodel(modelType, this.method, ...this.metadata.objects));
+            }
         }
         return this;
     }

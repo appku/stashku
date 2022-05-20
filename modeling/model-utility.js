@@ -286,7 +286,10 @@ class ModelUtility {
 
     /**
      * Use a given model type to to convert the given storage object(s) into a model (instance) of the specified model 
-     * type. If a property is not mapped in the model, it is not assigned to the model.
+     * type. If a property is not mapped in the model, the property (and value) will *not* be assigned to the model.
+     * 
+     * This method is called by StashKu after a response is returned by the underlying engine (and a model is being
+     * used) but before it is handed back to the caller.
      * @throws 500 `RESTError` if the "modelType" argument is missing or not a supported StashKu model type object.
      * @throws 500 `RESTError` if the "method" argument is missing or not a string.
      * @template T
@@ -312,7 +315,7 @@ class ModelUtility {
                         model[k] = obj[v.target];
                     } else if (typeof v.default === 'undefined') {
                         //not given by input object, and no default defined- nuke property from model instance.
-                        delete model[k]; 
+                        delete model[k];
                     }
                     if (v.transform) { //run a transform if present.
                         model[k] = v.transform.call(modelType, k, model[k], obj, method, 'model');
@@ -337,8 +340,11 @@ class ModelUtility {
     }
 
     /**
-     * Use a given model type to to revert a model back to a raw storage object with properties representing those
-     * used in storage.
+     * Use a specified model type to revert models back to a regular (untyped) object.
+     * 
+     * Certain StashKu requests will call this automatically before the request is sent to the underlying engine.    
+     * A PATCH request will attempt to unmodel it's template.    
+     * A PUT & POST request will attempt to unmodel it's objects.
      * @throws 500 `RESTError` if the "modelType" argument is missing or not a supported StashKu model type object.
      * @throws 500 `RESTError` if the "method" argument is missing or not a string.
      * @template T
@@ -358,25 +364,29 @@ class ModelUtility {
         let mapping = ModelUtility.map(modelType);
         for (let model of models) {
             if (model) {
-                let record = {};
-                for (let [k, v] of mapping) {
-                    record[v.target] = model[k];
-                    if (v && v.transform) { //run a transform if present.
-                        record[v.target] = v.transform.call(modelType, v.target, record[v.target], model, method, 'unmodel');
-                    }
-                    if (v && v.omit) { //omit the property if warranted
-                        let omitted = (v.omit === true);
-                        if (typeof v.omit === 'function') {
-                            omitted = v.omit.call(modelType, k, model[k], model, method, 'model');
-                        } else if (typeof v.omit === 'object' && v.omit[method] === true) {
-                            omitted = true;
+                if (model instanceof modelType) {
+                    let record = {};
+                    for (let [k, v] of mapping) {
+                        record[v.target] = model[k];
+                        if (v && v.transform) { //run a transform if present.
+                            record[v.target] = v.transform.call(modelType, v.target, record[v.target], model, method, 'unmodel');
                         }
-                        if (omitted === true) {
-                            delete record[v.target];
+                        if (v && v.omit) { //omit the property if warranted
+                            let omitted = (v.omit === true);
+                            if (typeof v.omit === 'function') {
+                                omitted = v.omit.call(modelType, k, model[k], model, method, 'model');
+                            } else if (typeof v.omit === 'object' && v.omit[method] === true) {
+                                omitted = true;
+                            }
+                            if (omitted === true) {
+                                delete record[v.target];
+                            }
                         }
                     }
+                    yield record;
+                } else {
+                    yield model;
                 }
-                yield record;
             } else {
                 yield null;
             }

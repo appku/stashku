@@ -218,7 +218,7 @@ describe('.pk', () => {
 describe('.generateModelType', () => {
     it('throws an error if the "typeName" argument is missing.', () => {
         expect(() => { ModelUtility.generateModelType('', new Map(), {}); }).toThrow(/resource.+required/);
-        expect(() => { ModelUtility.generateModelType(null, new Map(),{}); }).toThrow(/resource.+required/);
+        expect(() => { ModelUtility.generateModelType(null, new Map(), {}); }).toThrow(/resource.+required/);
         expect(() => { ModelUtility.generateModelType(undefined, new Map(), {}); }).toThrow(/resource.+required/);
     });
     it('throws an error if the "properties" argument is missing.', () => {
@@ -239,7 +239,7 @@ describe('.generateModelType', () => {
         e: { pk: true }
     }));
     it('returns a class type with the proper configuration.', () => {
-        let configs = [null, {resource: 'testa-bits'}];
+        let configs = [null, { resource: 'testa-bits' }];
         for (let mc of configs) {
             let dynamicModel = ModelUtility.generateModelType('testa-bits', properties, mc);
             expect(dynamicModel).toBeTruthy();
@@ -258,7 +258,7 @@ describe('.generateModelType', () => {
         }
     });
     it('returns a class type that constructs with defined properties.', () => {
-        let mc = {resource: 'testa-bits'};
+        let mc = { resource: 'testa-bits' };
         let TestaBitModel = ModelUtility.generateModelType('testa-bits', properties, mc);
         let model = new TestaBitModel();
         expect(model).toBeInstanceOf(TestaBitModel);
@@ -298,9 +298,9 @@ describe('.model', () => {
         }
     });
     it('throws error when the method is missing.', () => {
-        expect(() => ModelUtility.model(function MyModel() {}).next().done()).toThrow(/method/);
-        expect(() => ModelUtility.model(function MyModel() {}, '').next().done()).toThrow(/method/);
-        expect(() => ModelUtility.model(function MyModel() {}, null).next().done()).toThrow(/method/);
+        expect(() => ModelUtility.model(function MyModel() { }).next().done()).toThrow(/method/);
+        expect(() => ModelUtility.model(function MyModel() { }, '').next().done()).toThrow(/method/);
+        expect(() => ModelUtility.model(function MyModel() { }, null).next().done()).toThrow(/method/);
     });
     it('converts objects to model instances when specified.', () => {
         class TestModel {
@@ -326,8 +326,8 @@ describe('.model', () => {
             static get firstName() { return 'First_Name'; }
             static get lastName() { return { target: 'Last_Name' }; }
         }
-        let iterator = ModelUtility.model(TestModel, 'get', {}, { First_Name: 'abc', Last_Name: 123 }, { First_Name: 'def' });
-        expect(iterator.next().value).toEqual({ firstName: null, lastName: null });
+        let iterator = ModelUtility.model(TestModel, 'get', { First_Name: null }, { First_Name: 'abc', Last_Name: 123 }, { First_Name: 'def', Last_Name: null });
+        expect(iterator.next().value).toEqual({ firstName: null });
         expect(iterator.next().value).toEqual({ firstName: 'abc', lastName: 123 });
         expect(iterator.next().value).toEqual({ firstName: 'def', lastName: null });
     });
@@ -340,8 +340,8 @@ describe('.model', () => {
             static get firstName() { return 'First_Name'; }
             static get lastName() { return { target: 'Last_Name', transform: (k, v) => v ? v : 'default' }; }
         }
-        let iterator = ModelUtility.model(TestModel, 'get', {}, { First_Name: 'abc', Last_Name: 123 }, { First_Name: 'def' });
-        expect(iterator.next().value).toEqual({ firstName: null, lastName: 'default' });
+        let iterator = ModelUtility.model(TestModel, 'get', { First_Name: null }, { First_Name: 'abc', Last_Name: 123 }, { First_Name: 'def', Last_Name: null });
+        expect(iterator.next().value).toEqual({ firstName: null, lastName: 'default'  });
         expect(iterator.next().value).toEqual({ firstName: 'abc', lastName: 123 });
         expect(iterator.next().value).toEqual({ firstName: 'def', lastName: 'default' });
     });
@@ -354,9 +354,9 @@ describe('.unmodel', () => {
         }
     });
     it('throws error when the method is missing.', () => {
-        expect(() => ModelUtility.unmodel(function MyModel() {}).next().done()).toThrow(/method/);
-        expect(() => ModelUtility.unmodel(function MyModel() {}, '').next().done()).toThrow(/method/);
-        expect(() => ModelUtility.unmodel(function MyModel() {}, null).next().done()).toThrow(/method/);
+        expect(() => ModelUtility.unmodel(function MyModel() { }).next().done()).toThrow(/method/);
+        expect(() => ModelUtility.unmodel(function MyModel() { }, '').next().done()).toThrow(/method/);
+        expect(() => ModelUtility.unmodel(function MyModel() { }, null).next().done()).toThrow(/method/);
     });
     it('converts model instances back to plain objects.', () => {
         class TestModel {

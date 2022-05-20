@@ -303,17 +303,20 @@ describe('#post', () => {
         for (let p in samples) {
             stash.engine.data.set(p, samples[p]);
         }
-        let res = await stash.model(samples.ThemeModel).post((r, m) => r
+        let res = await stash.model(ThemeModel).post((r, m) => r
             .objects(
-                { ID: 155, Name: 'Cobbler' },
-                { ID: 156, Name: 'Cobbler' },
-                { ID: 157, Name: 'Cobbler' }
+                { Name: 'Cobbler' },
+                { Name: 'Cobbler' },
+                { Name: 'Cobbler' }
             )
         );
         expect(res.total).toBe(3);
         for (let m of res.data) {
+            expect(typeof m.ID).toBe('number');
+            expect(m.ID).toBeGreaterThan(150);
             expect(m.Name).toBe('Cobbler');
-            expect(m).toBeInstanceOf(samples.ThemeModel);
+            expect(m.HexCode).toBe('#000000');
+            expect(m).toBeInstanceOf(ThemeModel);
         }
     });
 });
