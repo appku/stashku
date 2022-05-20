@@ -214,7 +214,11 @@ class StashKu {
             try {
                 let localPackage = JSON.parse(fs.readFileSync(localPackageFilePath, 'utf8'));
                 if (localPackage.name === this.config.engine) {
-                    enginePackageName = process.cwd();
+                    if (localPackage.type === 'module') {
+                        enginePackageName = path.join(process.cwd(), localPackage.main);
+                    } else {
+                        enginePackageName = process.cwd();
+                    }
                 }
             } catch (err) {
                 this.log.debug(`Failed to find package.json in current working directory. Tried "${localPackageFilePath}" but received: ${err?.message}`);

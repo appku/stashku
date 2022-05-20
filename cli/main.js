@@ -70,12 +70,12 @@ class Main {
             .action(this.request.bind(this));
         this.cmd
             .command('options').description(
-                'Runs an OPTIONS request to export a resource\'s model type. ' + 
-                'You can optionally specify an --export (-x) option to generate JavaScript model files into a target directory.\n\n' + 
-                'Example:\n' + 
+                'Runs an OPTIONS request to export a resource\'s model type. ' +
+                'You can optionally specify an --export (-x) option to generate JavaScript model files into a target directory.\n\n' +
+                'Example:\n' +
                 'Run a "*" options request on the testing (in-memory engine) with verbose (-v) output and send generated classes to console (--dry-run).\n' +
-                '> stashku -v --test options --dry-run "*"\n\n' + 
-                'Example:\n' + 
+                '> stashku -v --test options --dry-run "*"\n\n' +
+                'Example:\n' +
                 'Run a request on a specific resource and export to a "models" directory.\n' +
                 '> stashku options dbo.Contacts -x ./models'
             )
@@ -143,6 +143,9 @@ class Main {
             await processor.start();
             if (!this.state.opts.quiet && this.state.opts.verbose) {
                 console.log('Done.');
+            }
+            if (processor.stash) {
+                await processor.stash.destroy();
             }
         } catch (err) {
             if (this.state.opts.verbose) {
