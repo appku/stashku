@@ -333,7 +333,7 @@ describe('#put', () => {
         for (let p in samples) {
             stash.engine.data.set(p, samples[p]);
         }
-        let res = await stash.model(samples.ThemeModel).put((r, m) => r
+        let res = await stash.model(ThemeModel).put((r, m) => r
             .pk(m.ID)
             .objects({
                 ID: 5,
@@ -341,9 +341,34 @@ describe('#put', () => {
             })
         );
         expect(res.total).toBe(1);
-        for (let m of res.data) {
-            expect(m.Name).toBe('Banana Toast');
-            expect(m).toBeInstanceOf(samples.ThemeModel);
+        for (let rm of res.data) {
+            expect(rm.ID).toBe(5);
+            expect(rm.Name).toBe('Banana Toast');
+            expect(rm).toBeInstanceOf(ThemeModel);
+        }
+    });
+    it('updates a specific record using a model.', async () => {
+        let stash = new StashKu();
+        for (let p in samples) {
+            stash.engine.data.set(p, samples[p]);
+        }
+        let m = new ThemeModel();
+        m.ID = 6;
+        m.Name = 'Soda Pop';
+        let res = await stash.model(ThemeModel).put(r => r.objects(m));
+        expect(res.total).toBe(1);
+        for (let rm of res.data) {
+            expect(rm.ID).toBe(6);
+            expect(rm.Name).toBe('Soda Pop');
+            expect(rm).toBeInstanceOf(ThemeModel);
+            expect(rm).not.toBe(m);
+        }
+        for (let v of stash.engine.data.get('themes')) {
+            if (v.ID === 6) {
+                expect(v.Name).toBe('Soda Pop');
+            } else {
+                expect(v.Name).not.toBe('Soda Pop');
+            }
         }
     });
 });
@@ -360,7 +385,7 @@ describe('#patch', () => {
         for (let p in samples) {
             stash.engine.data.set(p, samples[p]);
         }
-        let res = await stash.model(samples.ThemeModel).patch((r, m) => r
+        let res = await stash.model(ThemeModel).patch((r, m) => r
             .template({
                 Name: 'Hello Neptune'
             })
@@ -369,7 +394,7 @@ describe('#patch', () => {
         expect(res.total).toBe(1);
         for (let m of res.data) {
             expect(m.Name).toBe('Hello Neptune');
-            expect(m).toBeInstanceOf(samples.ThemeModel);
+            expect(m).toBeInstanceOf(ThemeModel);
         }
     });
 });
@@ -386,12 +411,12 @@ describe('#delete', () => {
         for (let p in samples) {
             stash.engine.data.set(p, samples[p]);
         }
-        let res = await stash.model(samples.ThemeModel).delete((r, m) => r
+        let res = await stash.model(ThemeModel).delete((r, m) => r
             .where(f => f.and(m.ID, f.OP.LESSTHAN, 5))
         );
         expect(res.total).toBe(4);
         for (let m of res.data) {
-            expect(m).toBeInstanceOf(samples.ThemeModel);
+            expect(m).toBeInstanceOf(ThemeModel);
         }
     });
 });
@@ -408,10 +433,10 @@ describe('#options', () => {
         for (let p in samples) {
             stash.engine.data.set(p, samples[p]);
         }
-        let res = await stash.model(samples.ThemeModel).options((r, m) => r.from('Themes'));
+        let res = await stash.model(ThemeModel).options((r, m) => r.from('Themes'));
         expect(res.total).toBe(1);
         for (let m of res.data) {
-            expect(m).toBeInstanceOf(samples.ThemeModel);
+            expect(m).toBeInstanceOf(ThemeModel);
         }
     });
 });

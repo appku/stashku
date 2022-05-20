@@ -1,3 +1,4 @@
+///<reference path="./modeling/modeling.d.js" />
 
 /**
  * @typedef FilterCondition
@@ -103,7 +104,7 @@ class Filter {
 
     /**
      * Create a new `Filter` instance and opening with a logical "and" operator.
-     * @param {String|Filter|FilterLogicalGroup} property - The property affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter}
@@ -114,7 +115,7 @@ class Filter {
 
     /**
      * Create a new `Filter` instance and opening with a logical "or" operator.
-     * @param {String|Filter|FilterLogicalGroup} property - The property affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter}
@@ -150,7 +151,7 @@ class Filter {
 
     /**
      * Adds a new condition using a logical "or" operator.
-     * @param {String|Filter|FilterLogicalGroup} property - The property affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter}
@@ -161,7 +162,7 @@ class Filter {
 
     /**
      * Adds a new condition using a logical "or" operator.
-     * @param {String|Filter|FilterLogicalGroup} property - The property affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter}
@@ -173,7 +174,7 @@ class Filter {
     /**
      * Adds a new condition or filter group to the tree using the given logical operator.
      * @param {String} logic - The logical operator.
-     * @param {String|Filter|FilterLogicalGroup} property - The property affected by the filter.
+     * @param {String|Filter|FilterLogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter} 
@@ -206,9 +207,11 @@ class Filter {
                 return this; //empty filter
             }
         }
-        if (property.logic && property.filters) {
+        if (property.logic && property.filters) { // a filter condition
             this._current.filters.push(property);
             return this;
+        } else if (property.target) { //a property definition
+            property = property.target;
         }
         //add a condition
         if (this._current.logic === logic) {

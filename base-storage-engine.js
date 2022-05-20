@@ -202,7 +202,7 @@ class BaseStorageEngine {
             } else if (!request.metadata.template) {
                 throw new RESTError(400, 'The request is missing at a defined "template" object.');
             } else if (!request.metadata.all && (!request.metadata.where || Filter.isEmpty(request.metadata.where))) {
-                throw new RESTError(400, 'The request is missing "where" conditions to match objects in storage and is not enabled to affect all objects.');
+                throw new RESTError(400, 'The request is missing "where" conditions to match objects in storage. If the intention is to affect all objects, the "all" flag must be enabled.');
             }
         }
     }

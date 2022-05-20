@@ -1,3 +1,4 @@
+///<reference path="../modeling/modeling.d.js" />
 import Filter from '../filter.js';
 import ModelUtility from '../modeling/model-utility.js';
 import Objects from '../utilities/objects.js';
@@ -22,7 +23,7 @@ class PatchRequest {
             /** @type {Filter} */
             where: null,
             /** @type {String} */
-            to: null, 
+            to: null,
             /** @type {Boolean} */
             count: false,
             /** @type {Map.<String, *>} */
@@ -59,6 +60,11 @@ class PatchRequest {
         if (modelType) {
             if (overwrite === true || !this.metadata.to) {
                 this.to(ModelUtility.resource(modelType, this.method));
+            }
+            if (this.metadata.template) {
+                for (let m of ModelUtility.unmodel(modelType, this.method, this.metadata.template)) {
+                    this.metadata.template = m; 
+                }
             }
         }
         return this;

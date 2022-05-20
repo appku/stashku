@@ -29,7 +29,7 @@ class RESTError extends Error {
 
         Error.captureStackTrace(this, RESTError);
         if (innerError && innerError.stack) {
-            this.stack += '\n' + innerError.stack;
+            this.stack += `${innerError.message}\n${innerError.stack}`;
         }
     }
 }

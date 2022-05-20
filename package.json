@@ -34,6 +34,9 @@
         "testEnvironment": "node",
         "testPathIgnorePatterns": [
             "/node_modules/"
+        ],
+        "coveragePathIgnorePatterns": [
+            "/test/"
         ]
     },
     "engines": {

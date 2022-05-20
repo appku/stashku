@@ -603,8 +603,19 @@ describe('#options', () => {
         let res = await memory.options(new OptionsRequest('Themes'));
         expect(res.code).toBe(200);
         expect(res.data.length).toBe(1);
+        expect(res.total).toBe(1);
+        expect(res.affected).toBe(0);
+        expect(res.returned).toBe(1);
         expect(res.data[0].ID.target).toBe('ID');
         expect(res.data[0].Name.target).toBe('Name');
         expect(res.data[0].HexCode.target).toBe('Hex_Code');
+    });
+    it('discovers all model types when the resource is a "*".', async () => {
+        let res = await memory.options(new OptionsRequest('*'));
+        expect(res.code).toBe(200);
+        expect(res.data.length).toBe(2);
+        expect(res.total).toBe(2);
+        expect(res.affected).toBe(0);
+        expect(res.returned).toBe(2);
     });
 });

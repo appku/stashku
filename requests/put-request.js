@@ -1,3 +1,4 @@
+///<reference path="../modeling/modeling.d.js" />
 import ModelUtility from '../modeling/model-utility.js';
 import Objects from '../utilities/objects.js';
 
@@ -62,6 +63,9 @@ class PutRequest {
                     .pk(null)
                     .pk(...ModelUtility.pk(modelType));
             }
+            if (this.metadata.objects) {
+                this.metadata.objects = Array.from(ModelUtility.unmodel(modelType, this.method, ...this.metadata.objects));
+            }
         }
         return this;
     }
@@ -89,7 +93,7 @@ class PutRequest {
      * Defines the primary key property name(s) used to uniquely identify each object defined in the request and storage
      * resource.    
      * If a `null` value is passed, all PKs are cleared from the request.
-     * @param  {...String|Array.<String>} primaryKeys - Spread of property names used to uniquely identify each object.
+     * @param  {...String|Array.<String | Modeling.PropertyDefinition>} primaryKeys - Spread of property names used to uniquely identify each object.
      * @returns {PutRequest}
      */
     pk(...primaryKeys) {
@@ -101,11 +105,15 @@ class PutRequest {
         } else {
             primaryKeys = primaryKeys.flat();
             for (let k of primaryKeys) {
-                if (k !== null && typeof k !== 'string') {
+                let prop = k;
+                if (k.target && typeof k.target === 'string') {
+                    prop = k.target;
+                }
+                if (typeof prop !== 'string') {
                     throw new Error('Invalid "primaryKeys" argument. The array contains a non-string value.');
                 }
-                if (k && this.metadata.pk.indexOf(k) < 0) {
-                    this.metadata.pk.push(k);
+                if (prop && this.metadata.pk.indexOf(prop) < 0) {
+                    this.metadata.pk.push(prop);
                 }
             }
         }

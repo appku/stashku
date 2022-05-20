@@ -108,6 +108,12 @@ describe('#pk', () => {
         r.pk('c', 'a', 'q');
         expect(r.metadata.pk).toEqual(['a', 'b', 'c', 'q']);
     });
+    it('adds pks that are Modelling PropertyDefinitions.', () => {
+        let r = new PutRequest();
+        r.pk('a', { target: 'b' }, 'c');
+        r.pk('c', 'a', { target: 'q' });
+        expect(r.metadata.pk).toEqual(['a', 'b', 'c', 'q']);
+    });
     it('recreates the "pk" metadata as an array if not already an array.', () => {
         let r = new PutRequest();
         r.metadata.pk = null;
