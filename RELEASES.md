@@ -1,3 +1,10 @@
+# v-0.5.0: Full Model Support
+- Supports modeling through all requests.
+- Added CLI interface and bin command "stashku".
+
+# v-0.4.9: Final Pre-model Supporting Version
+- Bug fixes, general stability corrections.
+
 # v-0.4.3: JSON Stringify Support
 - New `fromObject` support to `Filter` class.
 - New `requestFromFile` and `requestFromObject` static StashKu functions to generate request instances from untyped objects (or JSON files).

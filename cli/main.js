@@ -69,7 +69,16 @@ class Main {
             .option('-O, --output <outputpath>', 'Saves the engine response to the specified file.')
             .action(this.request.bind(this));
         this.cmd
-            .command('options').description('Runs an OPTIONS request to export a resource\'s model type. You can optionally specify an --export (-x) option to generate JavaScript model files into a target directory.')
+            .command('options').description(
+                'Runs an OPTIONS request to export a resource\'s model type. ' + 
+                'You can optionally specify an --export (-x) option to generate JavaScript model files into a target directory.\n\n' + 
+                'Example:\n' + 
+                'Run a "*" options request on the testing (in-memory engine) with verbose (-v) output and send generated classes to console (--dry-run).\n' +
+                '> stashku -v --test options --dry-run "*"\n\n' + 
+                'Example:\n' + 
+                'Run a request on a specific resource and export to a "models" directory.\n' +
+                '> stashku options dbo.Contacts -x ./models'
+            )
             .argument('<resource|requestFile|"*">', 'The name of the resource being targetted in the request, or a path to a file containing a saved options request, or a value "*" (use quotes) to target all resources in the request.')
             .option('-x, --export <exportPath>', 'Generates a base and extending JavaScript classes around the resulting OPTIONS response and writes them to a folder. If the extending class is already present, it is not overwritten, however, the base class is always written to a base/ subdirectory.')
             .option('-f, --force', 'Forces the overwrite of the extending JavaScript class file when using the --export (-x) option.')

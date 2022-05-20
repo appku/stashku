@@ -83,6 +83,20 @@ describe('.formatModelName', () => {
         expect(ModelUtility.formatModelName('[john].[jumped[')).toBe('JohnJumpedModel');
         expect(ModelUtility.formatModelName('[acro.NYM].[OK[')).toBe('AcroNYMOKModel');
     });
+    it('returns a formatted pascalCase name when given dirty values with a different suffix.', () => {
+        expect(ModelUtility.formatModelName('test-yoda')).toBe('TestYodaModel');
+        expect(ModelUtility.formatModelName('test-yoda', 'Data')).toBe('TestYodaData');
+        expect(ModelUtility.formatModelName('test-yoda', null)).toBe('TestYoda');
+        expect(ModelUtility.formatModelName('test-yoda', '')).toBe('TestYoda');
+    });
+    it('strips out database-schema-like prefixes by default.', () => {
+        expect(ModelUtility.formatModelName('dbo.test-yoda')).toBe('TestYodaModel');
+        expect(ModelUtility.formatModelName('dbo.Contact_Records')).toBe('ContactRecordModel');
+        expect(ModelUtility.formatModelName('rpt.Contact_Records')).toBe('ContactRecordModel');
+        expect(ModelUtility.formatModelName('etl.Contact_Records')).toBe('ContactRecordModel');
+        expect(ModelUtility.formatModelName('etl.ETLLog')).toBe('ETLLogModel');
+        expect(ModelUtility.formatModelName('rpt.Rpt.Log')).toBe('RptLogModel');
+    });
 });
 
 describe('.map', () => {

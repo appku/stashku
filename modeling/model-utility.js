@@ -54,11 +54,26 @@ class ModelUtility {
     /**
      * Attempts to format a generic resource name into a model class name in PascalCase format.
      * The resource name is always suffixed with the word "Model".
+     * 
+     * This function leverages the `STASHKU_MODEL_NAME_REMOVE` environmental setting, which allows you to configure
+     * one or more regular expressions that are removed from a generated model's class name (derived from a resource
+     * name). By default the configured expressions will strip "dbo.", "etl.", and "rpt." prefixes from resource names.
      * @param {String} dirtyResourceName - The resource name value to be formatted.
+     * @param {String} [suffix="Model"] - A suffix attached to the model name. Defaults to "Model".
      * @returns {String}
      */
-    static formatModelName(dirtyResourceName) {
-        return Strings.camelify(pluralize.singular(dirtyResourceName), true) + 'Model';
+    static formatModelName(dirtyResourceName, suffix = 'Model') {
+        let removes = ['/^dbo./i', '/^etl./i', '/^rpt./i'];
+        if (process.env.STASHKU_MODEL_NAME_REMOVE) {
+            removes = JSON.parse(process.env.STASHKU_MODEL_NAME_REMOVE);
+        }
+        if (removes && Array.isArray(removes)) {
+            for (let rStr of removes) {
+                let reg = Strings.toRegExp(rStr);
+                dirtyResourceName = dirtyResourceName.replace(reg, '');
+            }
+        }
+        return Strings.camelify(pluralize.singular(dirtyResourceName), true) + (suffix ?? '');
     }
 
     /**
@@ -263,7 +278,7 @@ class ModelUtility {
             mt.$stashku.resource = resource;
         }
         if (!mt.$stashku.name) {
-            mt.$stashku.name = Strings.camelify(pluralize.singular(resource), true);
+            mt.$stashku.name = ModelUtility.formatModelName(resource, '');
         }
         if (!mt.$stashku.slug) {
             mt.$stashku.slug = Strings.slugify(mt.$stashku.name, '-', true, true);
