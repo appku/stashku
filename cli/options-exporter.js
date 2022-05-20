@@ -170,10 +170,6 @@ class OptionsExporter {
         }
         //determine type
         output += (output ? '\n' + indentRoot : '') + ` * @type {${definition.type}}`;
-        //determine default
-        if (definition.default) {
-            output += (output ? '\n' + indentRoot : '') + ` * @default ${this.makeJSDefault(definition)}`;
-        }
         return `${output}\n${indentRoot} */`;
     }
 
