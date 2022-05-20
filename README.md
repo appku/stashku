@@ -22,7 +22,7 @@ StashKu can be configured using environmental variables.
 | Property | ENV | Type | Default | Description |
 |-|-|-|-|-|
 | engine | STASHKU_ENGINE | `String` | `"memory"` | Specifies the name of the StashKu engine (or package) to initialize. The built-in options are: `"memory"`. |
-| - | STASHKU_MODEL_NAME_REMOVE | `String` | `["/^dbo\\./i", "/^etl\\./i", "/^rpt\\./i"]` | Allows you to configure one or more regular expressions that are removed from a generated model's class name (derived from a resource name). By default the configured expressions will strip "dbo.", "etl.", and "rpt." prefixes from resource names. The regular expressions must be declared within a JSON array in string format. |
+| - | STASHKU_MODEL_NAME_REMOVE | `String` | `["/^\\[?dbo\\]?\\./i", "/^\\[?etl\\]?\\./i", "/^\\[?rpt\\]?\\./i"]` | Allows you to configure one or more regular expressions that are removed from a generated model's class name (derived from a resource name). By default the configured expressions will strip "dbo.", "etl.", and "rpt." prefixes from resource names. The regular expressions must be declared within a JSON array in string format. |
 
 ## Memory Storage Engine
 StashKu includes a built-in default storage engine for storing in-memory objects. This engine is used when the StashKu configuration has an `engine` with the value `"memory"`, which is the default. Contents stored in this engine are lost if the application runtime stops for any reason. 

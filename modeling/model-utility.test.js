@@ -96,6 +96,12 @@ describe('.formatModelName', () => {
         expect(ModelUtility.formatModelName('etl.Contact_Records')).toBe('ContactRecordModel');
         expect(ModelUtility.formatModelName('etl.ETLLog')).toBe('ETLLogModel');
         expect(ModelUtility.formatModelName('rpt.Rpt.Log')).toBe('RptLogModel');
+        expect(ModelUtility.formatModelName('[dbo].test-yoda')).toBe('TestYodaModel');
+        expect(ModelUtility.formatModelName('[dbo].Contact_Records')).toBe('ContactRecordModel');
+        expect(ModelUtility.formatModelName('[rpt].Contact_Records')).toBe('ContactRecordModel');
+        expect(ModelUtility.formatModelName('[etl].Contact_Records')).toBe('ContactRecordModel');
+        expect(ModelUtility.formatModelName('[etl].ETLLog')).toBe('ETLLogModel');
+        expect(ModelUtility.formatModelName('[rpt].Rpt.Log')).toBe('RptLogModel');
     });
 });
 

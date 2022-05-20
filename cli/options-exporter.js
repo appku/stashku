@@ -159,11 +159,11 @@ class OptionsExporter {
         if (definition.precision) {
             output += (output ? '\n' + indentRoot : '') + ` * The precision (max. amount of numbers) is ${definition.precision}.`;
         }
-        if (typeof definition.scale !== 'undefined' && definition.scale !== null) {
-            output += (output ? '\n' + indentRoot : '') + ` * The number of decimal places is set to ${definition.scale}.`;
+        if (typeof definition.radix !== 'undefined' && definition.radix !== null) {
+            output += (output ? '\n' + indentRoot : '') + ` * The number of decimal places is set to ${definition.radix}.`;
         }
-        if (typeof definition.length !== 'undefined' && definition.length !== null) {
-            output += (output ? '\n' + indentRoot : '') + ` * Maximum length in data storage: ${definition.length}.`;
+        if (typeof definition.charLength !== 'undefined' && definition.charLength !== null) {
+            output += (output ? '\n' + indentRoot : '') + ` * Maximum character length in data storage: ${definition.charLength}.`;
         }
         if (definition.pk === true) {
             output += (output ? '\n' + indentRoot : '') + ' * This is a primary-key property (it helps uniquely identify a model).';

@@ -61,6 +61,9 @@
  * @property {Boolean | Modeling.BooleanByRequestMethod | Modeling.PropertyOmitCallback} [omit=false] - If true, the property is ignored (not included) from processing in a request if the model instance value is null or undefined.
  * @property {Boolean} [pk=false] - Indicates the property is a primary-key identifier for the model.
  * @property {Modeling.PropertyTransformCallback} [transform] - A callback that allows for values to be transformed whenever objects are turned into a model, or the model is "unmodelled" into a regular object.
+ * @property {Number} [precision] - The maximum amount of number places, including decimals that may be used. This property is not used by StashKu directly, but may be leveraged by certain engines.
+ * @property {Number} [radix] - The number of decimal places. This property is not used by StashKu directly, but may be leveraged by certain engines.
+ * @property {Number} [charLength] - The maximum amount of storable characters. This property is not used by StashKu directly, but may be leveraged by certain engines.
  */
 
 /**
