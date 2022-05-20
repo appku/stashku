@@ -11,7 +11,7 @@ export default class BaseProcessor {
         /**
          * @type {StashKu}
          */
-        this.stash = new StashKu();
+        this.stash = null;
     }
 
     /**

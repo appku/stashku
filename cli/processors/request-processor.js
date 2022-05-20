@@ -33,7 +33,9 @@ class RequestProcessor extends BaseProcessor {
         if (this.options.cli.test) {
             this.stash = new StashKu({ engine: 'memory' });
             this.stash.engine.data.set('products', (await fairu.with('./test/memory-storage-engine/data-products.json').format(fairu.Format.json).read())[0].data);
-            this.stash.engine.data.set('themes',  (await fairu.with('./test/memory-storage-engine/data-themes.json').format(fairu.Format.json).read())[0].data);
+            this.stash.engine.data.set('themes', (await fairu.with('./test/memory-storage-engine/data-themes.json').format(fairu.Format.json).read())[0].data);
+        } else {
+            this.stash = new StashKu();
         }
         let reqFile = await fairu.with(this.options.resource)
             .throw(false)
