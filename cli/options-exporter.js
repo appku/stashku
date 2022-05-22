@@ -50,8 +50,9 @@ class OptionsExporter {
                     makePropertyJSDoc: this.makePropertyJSDoc,
                     toJavascriptPropertyDefaultReference: this.toJavascriptPropertyDefaultReference
                 };
-                let baseModelContent = dots['base-model'](blueprint);
-                let extModelContent = dots.model(blueprint);
+                let baseModelContent = dots['base-typed-model'](blueprint);
+                let anyModelContent = dots['model']();
+                let extModelContent = dots['typed-model'](blueprint);
                 mapping.set(mt.$stashku.resource, {
                     base: baseModelContent,
                     extending: extModelContent
@@ -59,12 +60,14 @@ class OptionsExporter {
                 if (outputConfig && outputConfig.dirPath) {
                     await fairu
                         .with(p => p.join(outputConfig.dirPath, 'base/', `base-${blueprint.slug}.js`))
-                        .ensure()
                         .write(baseModelContent);
+                    await fairu
+                        .with(p => p.join(outputConfig.dirPath, 'base/', 'model.js'))
+                        .when((ps) => outputConfig.overwrite || ps.exists === false)
+                        .write(anyModelContent);
                     await fairu
                         .with(p => p.join(outputConfig.dirPath, `${blueprint.slug}.js`))
                         .when((ps) => outputConfig.overwrite || ps.exists === false)
-                        .ensure()
                         .write(extModelContent);
                     await fairu.cp(path.join(__dirname, '../modeling/modeling.d.js'), path.join(outputConfig.dirPath, 'base/', 'modeling.d.js'));
                 }

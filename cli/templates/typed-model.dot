@@ -1,0 +1,15 @@
+import Base{{= it.name}} from './base/base-{{= it.slug}}.js';
+
+/**
+ * The extending class for `{{= it.name}}` instances for the "{{= it.resource}}" storage resource.
+ * This class is generated *once* unless you perform a forced OPTIONS export over it.
+ * You can add customizations to this class to customize the model behavior.
+ */
+class {{= it.name}} extends Base{{= it.name}} {
+    constructor() {
+        super();
+    }
+
+}
+
+export default {{= it.name}};
