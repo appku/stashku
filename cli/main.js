@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 ///<reference path="./cli.d.js" />
 /* eslint-disable no-console */
-import StashKu, { Response, RESTError } from '../stashku.js';
 import { Command, Option } from 'commander/esm.mjs';
 import fairu from '@appku/fairu';
 import dotenv from 'dotenv';

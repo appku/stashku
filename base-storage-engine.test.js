@@ -1,10 +1,14 @@
 import BaseStorageEngine from './base-storage-engine.js';
-import GetRequest from './requests/get-request.js';
-import PostRequest from './requests/post-request.js';
-import PutRequest from './requests/put-request.js';
-import PatchRequest from './requests/patch-request.js';
-import DeleteRequest from './requests/delete-request.js';
-import Filter from './filter.js';
+import {
+    GetRequest,
+    PostRequest,
+    PutRequest,
+    PatchRequest,
+    DeleteRequest,
+    OptionsRequest,
+    Filter,
+    RESTError
+} from '@appku/stashku-rest';
 
 class TestEngine extends BaseStorageEngine {
     constructor(name) { super(name); }

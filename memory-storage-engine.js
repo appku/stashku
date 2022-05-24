@@ -1,17 +1,20 @@
-import BaseStorageEngine from './base-storage-engine.js';
-import GetRequest from './requests/get-request.js';
-import PostRequest from './requests/post-request.js';
-import PutRequest from './requests/put-request.js';
-import PatchRequest from './requests/patch-request.js';
-import DeleteRequest from './requests/delete-request.js';
-import Response from './response.js';
-import Filter from './filter.js';
-import RESTError from './rest-error.js';
-import ModelUtility from './modeling/model-utility.js';
-import OptionsRequest from './requests/options-request.js';
-import Strings from './utilities/strings.js';
+import {
+    GetRequest,
+    PostRequest,
+    PutRequest,
+    PatchRequest,
+    DeleteRequest,
+    OptionsRequest,
+    Response,
+    Filter,
+    Sort,
+    RESTError,
+    ModelUtility
+} from '@appku/stashku-rest';
 import deepEqual from 'deep-is';
 import thenby from 'thenby';
+import BaseStorageEngine from './base-storage-engine.js';
+import ModelGenerator from './modeling/model-generator.js';
 
 /**
  * @typedef MemoryStorageEngineConfiguration
@@ -357,7 +360,7 @@ class MemoryStorageEngine extends BaseStorageEngine {
                 }
             }
             //generate model type and return
-            let mt = ModelUtility.generateModelType(from, properties, { resource: from });
+            let mt = ModelGenerator.generateModelType(from, properties, { resource: from });
             modelTypes.push(mt);
         }
         return new Response(modelTypes, modelTypes.length, 0, modelTypes.length);

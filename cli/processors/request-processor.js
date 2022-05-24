@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 ///<reference path="../cli.d.js" />
+import { GetRequest, OptionsRequest, Filter, Sort, ModelUtility } from '@appku/stashku-rest';
 import BaseProcessor from './base-processor.js';
-import StashKu, { GetRequest, OptionsRequest, Filter, Sort } from '../../stashku.js';
-import ModelUtility from '../../modeling/model-utility.js';
+import StashKu from '../../stashku.js';
 import fairu from '@appku/fairu';
 import OptionsExporter from '../options-exporter.js';
 

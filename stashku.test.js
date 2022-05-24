@@ -1,13 +1,18 @@
 import StashKu, * as index from './stashku.js';
-import GetRequest from './requests/get-request.js';
-import PostRequest from './requests/post-request.js';
-import PutRequest from './requests/put-request.js';
-import PatchRequest from './requests/patch-request.js';
-import DeleteRequest from './requests/delete-request.js';
-import OptionsRequest from './requests/options-request.js';
-import Response from './response.js';
-import Filter from './filter.js';
-import Sort from './sort.js';
+import {
+    GetRequest,
+    PostRequest,
+    PutRequest,
+    PatchRequest,
+    DeleteRequest,
+    OptionsRequest,
+    Response,
+    Filter,
+    Sort,
+    RESTError,
+    Logger,
+    ModelUtility
+} from '@appku/stashku-rest';
 import jest from 'jest-mock';
 import fs from 'fs/promises';
 import ThemeModel from './test/models/theme-model.js';

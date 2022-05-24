@@ -1,12 +1,7 @@
 /* eslint-disable no-console */
-///<reference path="../modeling/modeling.d.js" />
 import dot from 'dot';
-import StashKu from '../stashku.js';
-import OptionsRequest from '../requests/options-request.js';
-import ModelUtility from '../modeling/model-utility.js';
+import { OptionsRequest, Response, ModelUtility, StringUtility } from '@appku/stashku-rest';
 import fairu from '@appku/fairu';
-import Strings from '../utilities/strings.js';
-import Response from '../response.js';
 import path from 'path';
 
 const __dirname = (
@@ -41,7 +36,7 @@ class OptionsExporter {
             for (let mt of optionsResponse.data) {
                 let blueprint = {
                     name: mt.name,
-                    slug: mt?.$stashku?.slug || Strings.slugify(mt.name, '-', true, true),
+                    slug: mt?.$stashku?.slug || StringUtility.slugify(mt.name, '-', true, true),
                     config: mt.$stashku,
                     timestamp: new Date(),
                     resource: mt.$stashku.resource,
@@ -69,7 +64,7 @@ class OptionsExporter {
                         .with(p => p.join(outputConfig.dirPath, `${blueprint.slug}.js`))
                         .when((ps) => outputConfig.overwrite || ps.exists === false)
                         .write(extModelContent);
-                    await fairu.cp(path.join(__dirname, '../modeling/modeling.d.js'), path.join(outputConfig.dirPath, 'base/', 'modeling.d.js'));
+                    await fairu.cp(path.join(__dirname, '../node_modules/@appku/stashku-rest/modeling/modeling.d.js'), path.join(outputConfig.dirPath, 'base/', 'modeling.d.js'));
                 }
             }
         }
@@ -141,7 +136,7 @@ class OptionsExporter {
                     output += 'Buffer.alloc(0)';
                 }
             } else if (valueType === 'function') {
-                output += Strings.indent(value.toString(), 1, null, indentRoot);
+                output += StringUtility.indent(value.toString(), 1, null, indentRoot);
             }
         }
         return output;
