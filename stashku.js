@@ -1,23 +1,19 @@
-import {
-    GetRequest,
-    PostRequest,
-    PutRequest,
-    PatchRequest,
-    DeleteRequest,
-    OptionsRequest,
-    Response,
-    Filter,
-    Sort,
-    RESTError,
-    Logger,
-    ModelUtility,
-    StringUtility
-} from '@appku/stashku-rest';
+import DeleteRequest from './requests/delete-request.js';
+import GetRequest from './requests/get-request.js';
+import OptionsRequest from './requests/options-request.js';
+import PatchRequest from './requests/patch-request.js';
+import PostRequest from './requests/post-request.js';
+import PutRequest from './requests/put-request.js';
+import Response from './response.js';
+import RESTError from './rest-error.js';
+import Filter from './filter.js';
+import Logger from './logger.js';
+import Sort from './sort.js';
 import ModelGenerator from './modeling/model-generator.js';
-import BaseStorageEngine from './base-storage-engine.js';
-import MemoryStorageEngine from './memory-storage-engine.js';
-import fs, { promises as fsAsync } from 'fs';
-import path from 'path';
+import ModelUtility from './modeling/model-utility.js';
+import StringUtility from './utilities/string-utility.js';
+import BaseEngine from './engines/base-engine.js';
+import MemoryEngine from './engines/memory-engine.js';
 
 const SUPPORTED_METHODS = ['all', '*', 'get', 'post', 'put', 'patch', 'delete', 'options'];
 const SUPPORTED_STATES = ['log', 'request', 'response', 'done'];
@@ -203,34 +199,23 @@ class StashKu {
         this.log.debug('Configuring StashKu...');
         //assign defaults
         this.config = Object.assign({
-            engine: process.env.STASHKU_ENGINE ?? 'memory',
+            engine: process?.env?.STASHKU_ENGINE ?? 'memory',
             middleware: []
         }, config);
         this.log.debug('Configuration=', this.config);
         //load engine
-        if (this.config.engine === 'memory') {
-            this.engine = new MemoryStorageEngine();
+        if (this.config.engine === 'memory' || typeof this.config.engine === 'undefined') {
+            this.engine = new MemoryEngine();
             this.engine.configure(this.config.memory, this.log);
-        } else if (typeof this.config.engine === 'string') {
+        } else if (typeof this.config.engine === 'string' && typeof window === 'undefined') {
             let enginePackageName = this.config.engine;
-            //check if the configured engine is the same name as the package in current directory (if any).
-            let localPackageFilePath = path.join(process.cwd(), 'package.json');
-            try {
-                let localPackage = JSON.parse(fs.readFileSync(localPackageFilePath, 'utf8'));
-                if (localPackage.name === this.config.engine) {
-                    if (localPackage.type === 'module') {
-                        enginePackageName = path.join(process.cwd(), localPackage.main);
-                    } else {
-                        enginePackageName = process.cwd();
-                    }
-                }
-            } catch (err) {
-                this.log.debug(`Failed to find package.json in current working directory. Tried "${localPackageFilePath}" but received: ${err?.message}`);
-            }
-            this.engine = import(enginePackageName)
-                .then(m => {
-                    this.engine = new m.default();
-                    this.engine.configure(this.config[this.config.engine], this.log);
+            this.engine = import('./node/package-loader.js')
+                .then((loader) => {
+                    return loader.default(enginePackageName)
+                        .then(m => {
+                            this.engine = new m.default();
+                            this.engine.configure(this.config[this.config.engine], this.log);
+                        });
                 });
         }
         //load middleware
@@ -622,9 +607,12 @@ class StashKu {
      * @returns {Promise.<DeleteRequest | GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest>}
      */
     static async requestFromFile(jsonFile, fsOptions, modelNameResolver) {
-        let f = await fsAsync.readFile(jsonFile, fsOptions);
-        let obj = JSON.parse(f);
-        return StashKu.requestFromObject(obj, modelNameResolver);
+        if (typeof window === 'undefined') {
+            let f = await (await import('fs/promises')).default.readFile(jsonFile, fsOptions);
+            let obj = JSON.parse(f);
+            return StashKu.requestFromObject(obj, modelNameResolver);
+        } 
+        throw new Error('The "requestFromFile" function is not supported on this platform.');
     }
 
     /**
@@ -706,7 +694,7 @@ export {
     PatchRequest,
     DeleteRequest,
     OptionsRequest,
-    BaseStorageEngine,
+    BaseEngine,
     Response,
     RESTError,
     Filter,

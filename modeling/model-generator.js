@@ -1,4 +1,6 @@
-import { RESTError, ModelUtility, StringUtility } from '@appku/stashku-rest';
+import RESTError from '../rest-error.js';
+import ModelUtility from './model-utility.js';
+import StringUtility from '../utilities/string-utility.js';
 
 /**
  * A utility class for working with StashKu-compatible model objects.

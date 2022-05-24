@@ -1,18 +1,16 @@
-import {
-    GetRequest,
-    PostRequest,
-    PutRequest,
-    PatchRequest,
-    DeleteRequest,
-    OptionsRequest,
-    Response,
-    Filter,
-    Sort,
-    RESTError,
-    ModelUtility
-} from '@appku/stashku-rest';
+import DeleteRequest from '../requests/delete-request.js';
+import GetRequest from '../requests/get-request.js';
+import OptionsRequest from '../requests/options-request.js';
+import PatchRequest from '../requests/patch-request.js';
+import PostRequest from '../requests/post-request.js';
+import PutRequest from '../requests/put-request.js';
+import RESTError from '../rest-error.js';
+import Filter from '../filter.js';
+import Sort from '../sort.js';
+import Logger from '../logger.js';
+import Response from '../response.js';
 import fs from 'fs/promises';
-import MemoryStorageEngine from './memory-storage-engine.js';
+import MemoryEngine from './memory-engine.js';
 
 const samples = {
     products: null,
@@ -20,41 +18,41 @@ const samples = {
 };
 
 beforeAll(async () => {
-    samples.products = JSON.parse(await fs.readFile('./test/memory-storage-engine/data-products.json', 'utf8'));
-    samples.themes = JSON.parse(await fs.readFile('./test/memory-storage-engine/data-themes.json', 'utf8'));
+    samples.products = JSON.parse(await fs.readFile('./test/memory-engine/data-products.json', 'utf8'));
+    samples.themes = JSON.parse(await fs.readFile('./test/memory-engine/data-themes.json', 'utf8'));
 });
 
 describe('#constructor', () => {
     it('sets the engine name to "memory".', () => {
-        expect(new MemoryStorageEngine().name).toBe('memory');
+        expect(new MemoryEngine().name).toBe('memory');
     });
 });
 
 describe('#configure', () => {
     it('sets a default limit property value of 0.', () => {
-        let engine = new MemoryStorageEngine();
+        let engine = new MemoryEngine();
         engine.configure();
         expect(engine.config.limit).toBe(0);
     });
     it('sets a default caseSensitive property value to null.', () => {
-        let engine = new MemoryStorageEngine();
+        let engine = new MemoryEngine();
         engine.configure();
         expect(engine.config.caseSensitive).toBeNull();
     });
     it('sets the limit property from an object.', () => {
-        let engine = new MemoryStorageEngine();
+        let engine = new MemoryEngine();
         engine.configure({ limit: 100 });
         expect(engine.config.limit).toBe(100);
     });
     it('sets the limit property from a the environmental variable.', () => {
-        let engine = new MemoryStorageEngine();
+        let engine = new MemoryEngine();
         process.env.STASHKU_MEMORY_LIMIT = 100;
         engine.configure();
         expect(engine.config.limit).toBe(100);
         delete process.env.STASHKU_MEMORY_LIMIT;
     });
     it('sets the caseSensitive property from a the environmental variable.', () => {
-        let engine = new MemoryStorageEngine();
+        let engine = new MemoryEngine();
         process.env.STASHKU_MEMORY_CASE_SENSITIVE = true;
         engine.configure();
         expect(engine.config.caseSensitive).toBe(true);
@@ -64,11 +62,11 @@ describe('#configure', () => {
 
 describe('#resources', () => {
     it('returns an empty array when no resources present.', async () => {
-        let engine = new MemoryStorageEngine();
+        let engine = new MemoryEngine();
         await expect(engine.resources()).resolves.toEqual([]);
     });
     it('returns an array of available resources in case-sensitive state.', async () => {
-        let engine = new MemoryStorageEngine();
+        let engine = new MemoryEngine();
         engine.configure({ caseSensitive: true });
         await engine.post(new PostRequest().to('A').objects({ a: 1 }));
         await engine.post(new PostRequest().to('B').objects({ b: 2 }));
@@ -76,7 +74,7 @@ describe('#resources', () => {
         await expect(engine.resources()).resolves.toEqual(['A', 'B', 'C']);
     });
     it('returns an array of available resources in case-insensitive state (default).', async () => {
-        let engine = new MemoryStorageEngine();
+        let engine = new MemoryEngine();
         await engine.post(new PostRequest().to('A').objects({ a: 1 }));
         await engine.post(new PostRequest().to('B').objects({ b: 2 }));
         await engine.post(new PostRequest().to('C').objects({ c: 3 }));
@@ -86,7 +84,7 @@ describe('#resources', () => {
 
 describe('#resourceOf', () => {
     it('returns all resource names lower-case by default with no headers or configuration.', async () => {
-        let engine = new MemoryStorageEngine();
+        let engine = new MemoryEngine();
         expect(engine.resourceOf(new DeleteRequest().from('Test'))).toBe('test');
         expect(engine.resourceOf(new GetRequest().from('Test'))).toBe('test');
         expect(engine.resourceOf(new PostRequest().to('Test'))).toBe('test');
@@ -94,7 +92,7 @@ describe('#resourceOf', () => {
         expect(engine.resourceOf(new PatchRequest().to('Test'))).toBe('test');
     });
     it('returns all resource names regular-case when the case-sensitive is enabled in configuration.', async () => {
-        let engine = new MemoryStorageEngine();
+        let engine = new MemoryEngine();
         engine.configure({ caseSensitive: true });
         expect(engine.resourceOf(new DeleteRequest().from('Test'))).toBe('Test');
         expect(engine.resourceOf(new GetRequest().from('Test'))).toBe('Test');
@@ -103,7 +101,7 @@ describe('#resourceOf', () => {
         expect(engine.resourceOf(new PatchRequest().to('Test'))).toBe('Test');
     });
     it('returns resource names as lower-case or regular-case depending on request header.', async () => {
-        let engine = new MemoryStorageEngine();
+        let engine = new MemoryEngine();
         expect(engine.resourceOf(new DeleteRequest().from('Test').headers({ caseSensitive: true }))).toBe('Test');
         expect(engine.resourceOf(new GetRequest().from('Test').headers({ caseSensitive: true }))).toBe('Test');
         expect(engine.resourceOf(new PostRequest().to('Test').headers({ caseSensitive: true }))).toBe('Test');
@@ -119,7 +117,7 @@ describe('#resourceOf', () => {
 
 describe('#get', () => {
     //create pre-populated engine
-    let memory = new MemoryStorageEngine();
+    let memory = new MemoryEngine();
     beforeAll(() => {
         for (let p in samples) {
             memory.data.set(p, samples[p]);
@@ -277,7 +275,7 @@ describe('#get', () => {
 
 describe('#post', () => {
     it('throws a 400 error the configured limit would be exceeded.', async () => {
-        let mem = new MemoryStorageEngine();
+        let mem = new MemoryEngine();
         mem.configure({ limit: 1 });
         for (let p in samples) {
             mem.data.set(p, samples[p]);
@@ -295,7 +293,7 @@ describe('#post', () => {
         }
     });
     it('returns an empty response when no objects are specified.', async () => {
-        let mem = new MemoryStorageEngine();
+        let mem = new MemoryEngine();
         let res = await mem.post(new PostRequest().to('test'));
         expect(res.data.length).toBe(0);
         expect(res.total).toBe(0);
@@ -303,7 +301,7 @@ describe('#post', () => {
         expect(res.returned).toBe(0);
     });
     it('adds objects to the underlying storage.', async () => {
-        let mem = new MemoryStorageEngine();
+        let mem = new MemoryEngine();
         let res = await mem.post(new PostRequest()
             .to('test')
             .objects({ hello: 'world' }, { hello: 'mars' }, { hello: 'jupiter' })
@@ -318,7 +316,7 @@ describe('#post', () => {
         expect(res.returned).toBe(3);
     });
     it('adds objects to the underlying storage and dereferences them.', async () => {
-        let mem = new MemoryStorageEngine();
+        let mem = new MemoryEngine();
         let testObj = { hello: 'world' };
         let res = await mem.post(new PostRequest()
             .to('test')
@@ -334,7 +332,7 @@ describe('#post', () => {
         expect(res.returned).toBe(3);
     });
     it('adds objects to the underlying storage but only returns counts when specified.', async () => {
-        let mem = new MemoryStorageEngine();
+        let mem = new MemoryEngine();
         let res = await mem.post(new PostRequest()
             .to('test')
             .objects({ hello: 'world' }, { hello: 'mars' }, { hello: 'jupiter' })
@@ -354,7 +352,7 @@ describe('#post', () => {
         let m = new Theme();
         m.ID = 100;
         m.Name = 'NeverSeeMe';
-        let mem = new MemoryStorageEngine();
+        let mem = new MemoryEngine();
         let res = await mem.post(new PostRequest()
             .model(Theme)
             .objects(m)
@@ -367,7 +365,7 @@ describe('#post', () => {
 
 describe('#put', () => {
     //create pre-populated engine
-    let memory = new MemoryStorageEngine();
+    let memory = new MemoryEngine();
     beforeAll(() => {
         for (let p in samples) {
             memory.data.set(p, samples[p]);
@@ -450,7 +448,7 @@ describe('#put', () => {
 
 describe('#patch', () => {
     //create pre-populated engine
-    let memory = new MemoryStorageEngine();
+    let memory = new MemoryEngine();
     beforeAll(() => {
         for (let p in samples) {
             memory.data.set(p, samples[p]);
@@ -523,7 +521,7 @@ describe('#patch', () => {
 
 describe('#delete', () => {
     //create pre-populated engine
-    let memory = new MemoryStorageEngine();
+    let memory = new MemoryEngine();
     beforeAll(() => {
         for (let p in samples) {
             memory.data.set(p, samples[p]);
@@ -586,7 +584,7 @@ describe('#delete', () => {
 
 describe('#options', () => {
     //create pre-populated engine
-    let memory = new MemoryStorageEngine();
+    let memory = new MemoryEngine();
     beforeAll(() => {
         for (let p in samples) {
             memory.data.set(p, samples[p]);

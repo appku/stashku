@@ -1,6 +1,9 @@
 /* eslint-disable no-console */
 import dot from 'dot';
-import { OptionsRequest, Response, ModelUtility, StringUtility } from '@appku/stashku-rest';
+import OptionsRequest from '../requests/options-request.js';
+import Response from '../response.js';
+import ModelUtility from '../modeling/model-utility.js';
+import StringUtility from '../utilities/string-utility.js';
 import fairu from '@appku/fairu';
 import path from 'path';
 

@@ -1,18 +1,15 @@
 import StashKu, * as index from './stashku.js';
-import {
-    GetRequest,
-    PostRequest,
-    PutRequest,
-    PatchRequest,
-    DeleteRequest,
-    OptionsRequest,
-    Response,
-    Filter,
-    Sort,
-    RESTError,
-    Logger,
-    ModelUtility
-} from '@appku/stashku-rest';
+import DeleteRequest from './requests/delete-request.js';
+import GetRequest from './requests/get-request.js';
+import OptionsRequest from './requests/options-request.js';
+import PatchRequest from './requests/patch-request.js';
+import PostRequest from './requests/post-request.js';
+import PutRequest from './requests/put-request.js';
+import Response from './response.js';
+import RESTError from './rest-error.js';
+import Filter from './filter.js';
+import Sort from './sort.js';
+import Logger from './logger.js';
 import jest from 'jest-mock';
 import fs from 'fs/promises';
 import ThemeModel from './test/models/theme-model.js';
@@ -23,8 +20,8 @@ const samples = {
 };
 
 beforeAll(async () => {
-    samples.products = JSON.parse(await fs.readFile('./test/memory-storage-engine/data-products.json', 'utf8'));
-    samples.themes = JSON.parse(await fs.readFile('./test/memory-storage-engine/data-themes.json', 'utf8'));
+    samples.products = JSON.parse(await fs.readFile('./test/memory-engine/data-products.json', 'utf8'));
+    samples.themes = JSON.parse(await fs.readFile('./test/memory-engine/data-themes.json', 'utf8'));
 });
 
 describe('~exports', () => {
@@ -48,9 +45,9 @@ describe('~exports', () => {
         expect(index.DeleteRequest).not.toBeUndefined();
         expect(index.DeleteRequest.name).toBe('DeleteRequest');
     });
-    it('exports the BaseStorageEngine class', () => {
-        expect(index.BaseStorageEngine).not.toBeUndefined();
-        expect(index.BaseStorageEngine.name).toBe('BaseStorageEngine');
+    it('exports the BaseEngine class', () => {
+        expect(index.BaseEngine).not.toBeUndefined();
+        expect(index.BaseEngine.name).toBe('BaseEngine');
     });
     it('exports the Response class', () => {
         expect(index.Response).not.toBeUndefined();

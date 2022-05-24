@@ -1,36 +1,34 @@
-import {
-    GetRequest,
-    PostRequest,
-    PutRequest,
-    PatchRequest,
-    DeleteRequest,
-    OptionsRequest,
-    Filter,
-    RESTError
-} from '@appku/stashku-rest';
-import Objects from './utilities/objects.js';
+import DeleteRequest from '../requests/delete-request.js';
+import GetRequest from '../requests/get-request.js';
+import OptionsRequest from '../requests/options-request.js';
+import PatchRequest from '../requests/patch-request.js';
+import PostRequest from '../requests/post-request.js';
+import PutRequest from '../requests/put-request.js';
+import RESTError from '../rest-error.js';
+import Filter from '../filter.js';
+import Logger from '../logger.js';
 
 /**
  * @typedef
  */
 
 /**
- * This abstract base class defines the structure of a StashKu-compatible storage engine. All StashKu storage engines
- * must extend this class.    
+ * This abstract base class defines the structure of a StashKu-compatible engine. All StashKu engines must extend this
+ * class.    
  * 
- * The implementing engine should implement it's own `shema`, `get`, `post`, `put`, `patch`, and `delete` functions when
- * supported. If the RESTful function is not supported it should not be overriden so that this base class can throw
- * a 501 "Not supported" error.
+ * The implementing engine should implement it's own `schema`, `get`, `post`, `put`, `patch`, and `delete` functions
+ * when supported. If the RESTful function is not supported it should not be overriden so that this base class can
+ * throw a 501 "Not supported" error.
  * @abstract
  */
-class BaseStorageEngine {
+class BaseEngine {
     /**
-     * Instantiates a new `BaseStorageEngine`.
+     * Instantiates a new `BaseEngine`.
      * @param {String} name - The name of this storage engine. 
      */
     constructor(name) {
-        if (new.target === BaseStorageEngine) {
-            throw new Error('BaseApp is an abstract class and should not be initiated alone.');
+        if (new.target === BaseEngine) {
+            throw new Error('BaseEngine is an abstract class and should not be initiated alone.');
         } else if (!name) {
             throw new Error('The "name" argument is required.');
         } else if (typeof name !== 'string') {
@@ -86,9 +84,7 @@ class BaseStorageEngine {
      * @abstract
      */
     async resources() {
-        if (!Objects.getPrototype(this, BaseStorageEngine) || this.resources === BaseStorageEngine.prototype.resources) {
-            throw new RESTError(501, `The "resources" function is not supported on the StashKu "${this.name}" storage engine.`);
-        }
+        throw new RESTError(501, `The "resources" function is not supported on the StashKu "${this.name}" storage engine.`);
     }
 
     /**
@@ -103,7 +99,7 @@ class BaseStorageEngine {
      * @abstract
      */
     async get(request) {
-        if (!Objects.getPrototype(this, BaseStorageEngine) || this.get === BaseStorageEngine.prototype.get) {
+        if (this.get === BaseEngine.prototype.get) {
             throw new RESTError(501, `The GET action is not supported on the StashKu "${this.name}" storage engine.`);
         } else {
             //perform request validations
@@ -129,7 +125,7 @@ class BaseStorageEngine {
      * @abstract
      */
     async post(request) {
-        if (!Objects.getPrototype(this, BaseStorageEngine) || this.post === BaseStorageEngine.prototype.post) {
+        if (this.post === BaseEngine.prototype.post) {
             throw new RESTError(501, `The POST action is not supported on the StashKu "${this.name}" storage engine.`);
         } else {
             //perform request validations
@@ -158,7 +154,7 @@ class BaseStorageEngine {
      * @abstract
      */
     async put(request) {
-        if (!Objects.getPrototype(this, BaseStorageEngine) || this.put === BaseStorageEngine.prototype.put) {
+        if (this.put === BaseEngine.prototype.put) {
             throw new RESTError(501, `The PUT action is not supported on the StashKu "${this.name}" storage engine.`);
         } else {
             //perform request validations
@@ -190,7 +186,7 @@ class BaseStorageEngine {
      * @abstract
      */
     async patch(request) {
-        if (!Objects.getPrototype(this, BaseStorageEngine) || this.patch === BaseStorageEngine.prototype.patch) {
+        if (this.patch === BaseEngine.prototype.patch) {
             throw new RESTError(501, `The PATCH action is not supported on the StashKu "${this.name}" storage engine.`);
         } else {
             //perform request validations
@@ -222,7 +218,7 @@ class BaseStorageEngine {
      * @abstract
      */
     async delete(request) {
-        if (!Objects.getPrototype(this, BaseStorageEngine) || this.delete === BaseStorageEngine.prototype.delete) {
+        if (this.delete === BaseEngine.prototype.delete) {
             throw new RESTError(501, `The DELETE action is not supported on the StashKu "${this.name}" storage engine.`);
         } else {
             //perform request validations
@@ -253,7 +249,7 @@ class BaseStorageEngine {
      * @abstract
      */
     async options(request) {
-        if (!Objects.getPrototype(this, BaseStorageEngine) || this.options === BaseStorageEngine.prototype.options) {
+        if (this.options === BaseEngine.prototype.options) {
             throw new RESTError(501, `The OPTIONS action is not supported on the StashKu "${this.name}" storage engine.`);
         } else {
             //perform request validations
@@ -269,4 +265,4 @@ class BaseStorageEngine {
 
 }
 
-export default BaseStorageEngine;
+export default BaseEngine;

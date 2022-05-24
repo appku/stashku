@@ -1,5 +1,5 @@
 import OptionsExporter from './options-exporter.js';
-import { StringUtility } from '@appku/stashku-rest';
+import StringUtility from '../utilities/string-utility.js';
 
 function TestFunc(a, b, c) {
     if (c === 5) return a + b;

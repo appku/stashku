@@ -1,20 +1,18 @@
-import BaseStorageEngine from './base-storage-engine.js';
-import {
-    GetRequest,
-    PostRequest,
-    PutRequest,
-    PatchRequest,
-    DeleteRequest,
-    OptionsRequest,
-    Filter,
-    RESTError
-} from '@appku/stashku-rest';
+import BaseEngine from './base-engine.js';
+import DeleteRequest from '../requests/delete-request.js';
+import GetRequest from '../requests/get-request.js';
+import OptionsRequest from '../requests/options-request.js';
+import PatchRequest from '../requests/patch-request.js';
+import PostRequest from '../requests/post-request.js';
+import PutRequest from '../requests/put-request.js';
+import RESTError from '../rest-error.js';
+import Filter from '../filter.js';
 
-class TestEngine extends BaseStorageEngine {
+class TestEngine extends BaseEngine {
     constructor(name) { super(name); }
 }
 
-class OverridingTestEngine extends BaseStorageEngine {
+class OverridingTestEngine extends BaseEngine {
     constructor(name) { super(name); }
     async extract(resource) { await super.extract(resource); }
     async get(request) { await super.get(request); }
@@ -26,7 +24,7 @@ class OverridingTestEngine extends BaseStorageEngine {
 
 describe('#constructor', () => {
     it('throws on direct construction (abstract enforcement).', () => {
-        expect(() => { new BaseStorageEngine(); }).toThrow(/abstract/);
+        expect(() => { new BaseEngine(); }).toThrow(/abstract/);
     });
     it('throws when the "name" argument is not specified.', () => {
         expect(() => { new TestEngine(); }).toThrow(/name.+required/);

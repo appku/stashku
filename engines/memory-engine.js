@@ -1,20 +1,33 @@
-import {
-    GetRequest,
-    PostRequest,
-    PutRequest,
-    PatchRequest,
-    DeleteRequest,
-    OptionsRequest,
-    Response,
-    Filter,
-    Sort,
-    RESTError,
-    ModelUtility
-} from '@appku/stashku-rest';
-import deepEqual from 'deep-is';
-import thenby from 'thenby';
-import BaseStorageEngine from './base-storage-engine.js';
-import ModelGenerator from './modeling/model-generator.js';
+import DeleteRequest from '../requests/delete-request.js';
+import GetRequest from '../requests/get-request.js';
+import OptionsRequest from '../requests/options-request.js';
+import PatchRequest from '../requests/patch-request.js';
+import PostRequest from '../requests/post-request.js';
+import PutRequest from '../requests/put-request.js';
+import Response from '../response.js';
+import RESTError from '../rest-error.js';
+import Filter from '../filter.js';
+import Logger from '../logger.js';
+import ModelGenerator from '../modeling/model-generator.js';
+import BaseEngine from './base-engine.js';
+import Sort from '../sort.js';
+
+/**
+ * Compares two objects.
+ * @param {*} source - Object to compare.
+ * @param {*} target - Another object to compare.
+ * @returns {Boolean}
+ * @ignore
+ */
+const objectEqual = (source, target) => {
+    if (source === target) {
+        return true;
+    }
+    for (let key in source) {
+        if (source[key] !== target[key]) return false;
+    }
+    return true;
+};
 
 /**
  * @typedef MemoryStorageEngineConfiguration
@@ -37,7 +50,7 @@ import ModelGenerator from './modeling/model-generator.js';
  * This StashKu engine is built-in and provides an in-memory data store with support for all StashKu RESTful actions
  * and operations. 
  */
-class MemoryStorageEngine extends BaseStorageEngine {
+class MemoryStorageEngine extends BaseEngine {
     /**
      * Creates a new `MemoryStorageEngine` instance.
      */
@@ -130,7 +143,7 @@ class MemoryStorageEngine extends BaseStorageEngine {
         //apply distinct
         if (meta.distinct) {
             matches = matches.reduce((pv, cu, i, arr) => {
-                let exists = pv.some((v) => deepEqual(cu, v));
+                let exists = pv.some((v) => objectEqual(cu, v));
                 if (!exists) {
                     pv.push(cu);
                 }
@@ -139,15 +152,14 @@ class MemoryStorageEngine extends BaseStorageEngine {
         }
         //perform sorts (no need to run if just counting)
         if (!meta.count && meta.sorts && meta.sorts.length) {
-            let sortFunc = null;
-            for (let s of meta.sorts) {
-                if (sortFunc === null) {
-                    sortFunc = thenby.firstBy(s.property, { ignoreCase: true, direction: s.dir });
-                } else {
-                    sortFunc.thenBy(s.property, { ignoreCase: true, direction: s.dir });
+            const fieldSorter = (sorts) => (a, b) => sorts.map(s => {
+                let dir = 1;
+                if (s.dir === Sort.DIR.DESC) {
+                    dir = -1;
                 }
-            }
-            matches.sort(sortFunc);
+                return a[s.property] > b[s.property] ? dir : a[s.property] < b[s.property] ? -(dir) : 0;
+            }).reduce((p, n) => p ? p : n, 0);
+            matches.sort(fieldSorter(meta.sorts));
         }
         //apply paging
         let total = matches.length; //save the total before reducing
