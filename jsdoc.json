@@ -12,13 +12,12 @@
             "package.json"
         ],
         "exclude": [
-            "./node_modules",
             "./old",
             "./assets",
             "./test"
         ],
         "includePattern": ".+\\.js(doc|x)?$",
-        "excludePattern": "(^|\\/|\\\\)(_|.+\\.test\\.+)"
+        "excludePattern": "(^|\\/|\\\\)(node_modules(?!\\/@appku\\/stashku-rest)|_|.+\\.test\\.+)"
     },
     "typescript": {
         "moduleRoot": "./"
