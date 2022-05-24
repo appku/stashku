@@ -405,7 +405,9 @@ class ModelUtility {
                 if (model instanceof modelType) {
                     let record = {};
                     for (let [k, v] of mapping) {
-                        record[v.target] = model[k];
+                        if (typeof model[k] !== 'undefined') { //only set a value if the property value is defined.
+                            record[v.target] = model[k]; 
+                        }
                         if (v && v.transform) { //run a transform if present.
                             record[v.target] = v.transform.call(modelType, v.target, record[v.target], model, method, 'unmodel');
                         }
