@@ -85,32 +85,40 @@ class ModelUtility {
     static map(modelType) {
         let propMap = new Map();
         if (ModelUtility.isValidType(modelType)) {
-            let descriptors = Object.getOwnPropertyDescriptors(modelType);
-            //get static "get" property names that are readable and writable or plain values.
-            for (let prop in descriptors) {
-                if (prop !== '$stashku' && prop !== 'prototype' && prop != '__proto') {
-                    let desc = descriptors[prop];
-                    if (desc.enumerable || desc.get) {
-                        let propDefinition = null;
-                        let input = modelType[prop];
-                        let inputType = typeof input;
-                        if (inputType === 'function') {
-                            input = input(modelType, prop);
-                            inputType = typeof input;
-                        }
-                        if (inputType === 'string') {
-                            propDefinition = { target: input };
-                        } else if (inputType === 'object') {
-                            propDefinition = input;
-                            if (!propDefinition.target) {
-                                //ensure a name is set on the definition object
-                                propDefinition.target = prop;
+            while (modelType) {
+                let descriptors = Object.getOwnPropertyDescriptors(modelType);
+                //get static "get" property names that are readable and writable or plain values.
+                for (let prop in descriptors) {
+                    if (prop !== '$stashku' && prop !== 'prototype' && prop != '__proto') {
+                        let desc = descriptors[prop];
+                        if (desc.enumerable || desc.get) {
+                            let propDefinition = null;
+                            let input = modelType[prop];
+                            let inputType = typeof input;
+                            if (inputType === 'function') {
+                                input = input(modelType, prop);
+                                inputType = typeof input;
+                            }
+                            if (inputType === 'string') {
+                                propDefinition = { target: input };
+                            } else if (inputType === 'object') {
+                                propDefinition = input;
+                                if (!propDefinition.target) {
+                                    //ensure a name is set on the definition object
+                                    propDefinition.target = prop;
+                                }
+                            }
+                            if (propDefinition && propMap.has(prop) === false) {
+                                propMap.set(prop, propDefinition);
                             }
                         }
-                        if (propDefinition) {
-                            propMap.set(prop, propDefinition);
-                        }
                     }
+                }
+                let proto = Object.getPrototypeOf(modelType);
+                if (proto && proto.name && proto.prototype !== undefined) {
+                    modelType = proto;
+                } else {
+                    modelType = null;
                 }
             }
         }

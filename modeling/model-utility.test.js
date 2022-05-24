@@ -130,6 +130,19 @@ describe('.map', () => {
         expect(Array.from(mapping.keys())).toEqual(['f', 'i', 'j']);
         expect(Array.from(mapping.values())).toEqual([{ target: '5' }, { target: 'i' }, { target: 'neat:j' }]);
     });
+    it('returns a map of a class type that extends another.', () => {
+        class BaseModelTest {
+            static get a() { return 'aaa'; }
+            static get b() { return 'bbb'; }
+            static get c() { return 'ccc'; }
+        }
+        class ModelTest extends BaseModelTest {
+            constructor() { super(); }
+        }
+        let mapping = ModelUtility.map(ModelTest);
+        expect(Array.from(mapping.keys())).toEqual(['a', 'b', 'c']);
+        expect(Array.from(mapping.values())).toEqual([{ target: 'aaa' }, { target: 'bbb' }, { target: 'ccc' }]);
+    });
 });
 
 describe('.schema', () => {
@@ -564,8 +577,8 @@ describe('.unmodel', () => {
             TestModel[`om_${omits[i]}`] = { target: `om_${omits[i]}`, omit: omit };
         }
         let test = new TestModel();
-        test.a= 'hello';
-        test.om_any ='yoyo';
+        test.a = 'hello';
+        test.om_any = 'yoyo';
         for (let i = 0; i < omits.length; i++) {
             test[`om_${omits[i]}`] = `hello ${i}`;
         }
