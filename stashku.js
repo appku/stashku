@@ -10,8 +10,10 @@ import {
     Sort,
     RESTError,
     Logger,
-    ModelUtility
+    ModelUtility,
+    StringUtility
 } from '@appku/stashku-rest';
+import ModelGenerator from './modeling/model-generator.js';
 import BaseStorageEngine from './base-storage-engine.js';
 import MemoryStorageEngine from './memory-storage-engine.js';
 import fs, { promises as fsAsync } from 'fs';
@@ -709,5 +711,7 @@ export {
     RESTError,
     Filter,
     Sort,
-    ModelUtility
+    ModelGenerator,
+    ModelUtility,
+    StringUtility
 };
