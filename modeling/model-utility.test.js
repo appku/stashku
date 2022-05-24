@@ -131,10 +131,13 @@ describe('.map', () => {
         expect(Array.from(mapping.values())).toEqual([{ target: '5' }, { target: 'i' }, { target: 'neat:j' }]);
     });
     it('returns a map of a class type that extends another.', () => {
-        class BaseModelTest {
+        class SuperBaseModelTest {
+            static get c() { return 'ccc'; }
+        }
+        class BaseModelTest extends SuperBaseModelTest {
+            constructor() { super(); }
             static get a() { return 'aaa'; }
             static get b() { return 'bbb'; }
-            static get c() { return 'ccc'; }
         }
         class ModelTest extends BaseModelTest {
             constructor() { super(); }
