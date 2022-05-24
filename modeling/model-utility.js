@@ -351,11 +351,15 @@ class ModelUtility {
                             let omitted = (v.omit === true);
                             if (typeof v.omit === 'function') {
                                 omitted = v.omit.call(modelType, k, model[k], obj, method, 'model');
+                            } else if (v.omit === null && model[k] === null) {
+                                omitted = true;
                             } else if (typeof v.omit === 'object') {
                                 if (v.omit[method] === true) {
                                     omitted = true;
                                 } else if (typeof v.omit[method] === 'function') {
                                     omitted = v.omit[method].call(modelType, k, model[k], obj, method, 'model');
+                                } else if (v.omit[method] === null && model[k] === null) {
+                                    omitted = true;
                                 } else if (v.omit.all === true && v.omit[method] !== false) {
                                     omitted = true;
                                 }
@@ -409,11 +413,15 @@ class ModelUtility {
                             let omitted = (v.omit === true);
                             if (typeof v.omit === 'function') {
                                 omitted = v.omit.call(modelType, k, model[k], model, method, 'model');
+                            } else if (v.omit === null && model[k] === null) {
+                                omitted = true;
                             } else if (typeof v.omit === 'object') {
                                 if (v.omit[method] === true) {
                                     omitted = true;
                                 } else if (typeof v.omit[method] === 'function') {
                                     omitted = v.omit[method].call(modelType, k, model[k], model, method, 'model');
+                                } else if (v.omit[method] === null && model[k] === null) {
+                                    omitted = true;
                                 } else if (v.omit.all === true && v.omit[method] !== false) {
                                     omitted = true;
                                 }

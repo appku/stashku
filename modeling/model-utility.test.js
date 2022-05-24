@@ -441,7 +441,7 @@ describe('.model', () => {
         expect(iterator.next().value).toEqual({ A: 'yoyo', B: 'b' });
         expect(iterator.next().value).toEqual({ A: 'abc' });
     });
-    it('correctly omits properties that are marked so.', () => {
+    it('correctly omits properties that are marked by boolean to do so.', () => {
         class TestModel {
             constructor() {
             }
