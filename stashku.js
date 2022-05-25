@@ -17,6 +17,7 @@ import MemoryEngine from './engines/memory-engine.js';
 
 const SUPPORTED_METHODS = ['all', '*', 'get', 'post', 'put', 'patch', 'delete', 'options'];
 const SUPPORTED_STATES = ['log', 'request', 'response', 'done'];
+const IS_BROWSER = (typeof window !== 'undefined');
 
 /**
  * @callback StashKuMiddlewareCallback
@@ -198,8 +199,12 @@ class StashKu {
         }
         this.log.debug('Configuring StashKu...');
         //assign defaults
+        let engineDefault = 'memory';
+        if (IS_BROWSER === false) {
+            engineDefault = process.env.STASHKU_ENGINE ?? 'memory';
+        }
         this.config = Object.assign({
-            engine: process?.env?.STASHKU_ENGINE ?? 'memory',
+            engine: engineDefault,
             middleware: []
         }, config);
         this.log.debug('Configuration=', this.config);
@@ -207,9 +212,9 @@ class StashKu {
         if (this.config.engine === 'memory' || typeof this.config.engine === 'undefined') {
             this.engine = new MemoryEngine();
             this.engine.configure(this.config.memory, this.log);
-        } else if (typeof this.config.engine === 'string' && typeof window === 'undefined') {
+        } else if (typeof this.config.engine === 'string' && IS_BROWSER === false) {
             let enginePackageName = this.config.engine;
-            this.engine = import('./node/package-loader.js')
+            this.engine = import(/* webpackIgnore: true */'./node/package-loader.js')
                 .then((loader) => {
                     return loader.default(enginePackageName)
                         .then(m => {
@@ -607,8 +612,8 @@ class StashKu {
      * @returns {Promise.<DeleteRequest | GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest>}
      */
     static async requestFromFile(jsonFile, fsOptions, modelNameResolver) {
-        if (typeof window === 'undefined') {
-            let f = await (await import('fs/promises')).default.readFile(jsonFile, fsOptions);
+        if (IS_BROWSER === false) {
+            let f = await (await import(/* webpackIgnore: true */'fs/promises')).default.readFile(jsonFile, fsOptions);
             let obj = JSON.parse(f);
             return StashKu.requestFromObject(obj, modelNameResolver);
         } 

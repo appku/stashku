@@ -1,0 +1,21 @@
+{
+    "name": "browser",
+    "version": "1.0.0",
+    "description": "",
+    "private": true,
+    "main": "index.js",
+    "scripts": {
+        "start": "npx webpack-dev-server",
+        "build": "npx webpack"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "webpack": "^5.72.1",
+        "webpack-cli": "^4.9.2"
+    },
+    "dependencies": {
+        "file-loader": "^6.2.0",
+        "webpack-dev-server": "^4.9.0"
+    }
+}

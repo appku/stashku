@@ -12,6 +12,8 @@ import ModelGenerator from '../modeling/model-generator.js';
 import BaseEngine from './base-engine.js';
 import Sort from '../sort.js';
 
+const IS_BROWSER = (typeof window !== 'undefined');
+
 /**
  * Compares two objects.
  * @param {*} source - Object to compare.
@@ -30,7 +32,7 @@ const objectEqual = (source, target) => {
 };
 
 /**
- * @typedef MemoryStorageEngineConfiguration
+ * @typedef MemoryEngineConfiguration
  * @property {Boolean} caseSensitive - Controls whether all resource names are stored in lower-case, and tracked
  * case-insensitively or not. By default this is unset in the configuration which will default to `false` internally
  * and allow it to be overridden by request headers. If set explicitly, the request header's `caseSensitive` flag 
@@ -40,7 +42,7 @@ const objectEqual = (source, target) => {
  */
 
 /**
- * @typedef MemoryStorageRequestHeader
+ * @typedef MemoryRequestHeader
  * @property {Boolean} caseSensitive - Instructs the memory storage engine to search for a resource by its lower-case
  * name (`false`) or regular-case (`true`). This will be ignored if the same flag (`caseSensitive`) is set on the 
  * memory storage configuration.
@@ -50,9 +52,9 @@ const objectEqual = (source, target) => {
  * This StashKu engine is built-in and provides an in-memory data store with support for all StashKu RESTful actions
  * and operations. 
  */
-class MemoryStorageEngine extends BaseEngine {
+class MemoryEngine extends BaseEngine {
     /**
-     * Creates a new `MemoryStorageEngine` instance.
+     * Creates a new `MemoryEngine` instance.
      */
     constructor() {
         super('memory');
@@ -63,7 +65,7 @@ class MemoryStorageEngine extends BaseEngine {
         this.data = new Map();
 
         /**
-         * @type {MemoryStorageEngineConfiguration}
+         * @type {MemoryEngineConfiguration}
          */
         this.config = {
             caseSensitive: null,
@@ -73,21 +75,24 @@ class MemoryStorageEngine extends BaseEngine {
 
     /**
      * @inheritdoc
-     * @param {MemoryStorageEngineConfiguration} config - The configuration object for the storage engine.
+     * @param {MemoryEngineConfiguration} config - The configuration object for the storage engine.
      */
     configure(config) {
         super.configure(config);
-        this.config = Object.assign({
+        let defaults = {
             caseSensitive: null,
             limit: 0
-        }, config);
-        let limit = parseInt(process.env.STASHKU_MEMORY_LIMIT);
-        if (limit) {
-            this.config.limit = limit;
+        };
+        if (IS_BROWSER === false) {
+            let limit = parseInt(process.env.STASHKU_MEMORY_LIMIT);
+            if (limit) {
+                defaults.limit = limit;
+            }
+            if (typeof process.env.STASHKU_MEMORY_CASE_SENSITIVE === 'string') {
+                defaults.caseSensitive = !!process.env.STASHKU_MEMORY_CASE_SENSITIVE.match(/^[tTyY1]/);
+            }
         }
-        if (process.env.STASHKU_MEMORY_CASE_SENSITIVE) {
-            this.config.caseSensitive = !!process.env.STASHKU_MEMORY_CASE_SENSITIVE.match(/^[tTyY1]/);
-        }
+        this.config = Object.assign(defaults, config);
     }
 
     /**
@@ -380,4 +385,4 @@ class MemoryStorageEngine extends BaseEngine {
 
 }
 
-export default MemoryStorageEngine;
+export default MemoryEngine;

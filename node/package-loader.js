@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import BaseEngine from '../engines/base-engine.js';
 
 /**
  * Attempts to load a node package by name which should be a StashKu engine.
