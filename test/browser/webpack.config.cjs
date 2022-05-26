@@ -23,6 +23,15 @@ module.exports = {
         ]
     },
     devServer: {
-        watchFiles: ['./*']
+        watchFiles: ['./*'],
+        onListening: async (devServer) => {
+            if (devServer) {
+                let m = await import('./server.js');
+                await m.default(devServer.app, {
+                    host: process.env.HOST,
+                    port: process.env.PORT || 8080
+                });
+            }
+        }
     }
 };
