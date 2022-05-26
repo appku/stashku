@@ -276,7 +276,7 @@ describe('#_fetch', () => {
         });
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/');
-        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'get', cache: 'no-cache' });
+        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'GET', cache: 'no-cache' });
     });
     it('overrides default fetch settings with configured.', async () => {
         let e = new FetchEngine();
@@ -289,7 +289,7 @@ describe('#_fetch', () => {
         await e._fetch('', null, null);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/');
-        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'get', cache: 'default', mode: 'cors' });
+        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'GET', cache: 'default', mode: 'cors' });
     });
     it('parameterizes data when method is GET.', async () => {
         let e = new FetchEngine();
@@ -297,7 +297,7 @@ describe('#_fetch', () => {
         await e._fetch('', { abc: 123, hello: 'world' }, null);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/?abc=123&hello=world');
-        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'get', cache: 'no-cache' });
+        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'GET', cache: 'no-cache' });
     });
     describe('uses body with JSON for data when...', () => {
         let e = new FetchEngine();
@@ -330,7 +330,7 @@ describe('#resources', () => {
         expect(await e.resources('', null, null)).toEqual(['themes', 'products']);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/resources');
-        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'get', cache: 'no-cache' });
+        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'GET', cache: 'no-cache' });
     });
 });
 
@@ -343,13 +343,14 @@ describe('#get', () => {
         let e = new FetchEngine();
         e.configure();
         let res = await e.get(new GetRequest().from('themes'));
+        expect(res).toBeInstanceOf(Response);
         expect(res.data).toEqual([{ hello: 'world' }, { hello: 'mars' }]);
         expect(res.total).toBe(2);
         expect(res.affected).toBe(0);
         expect(res.returned).toBe(2);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
-        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'get', cache: 'no-cache' });
+        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'GET', cache: 'no-cache' });
     });
 });
 
@@ -362,6 +363,7 @@ describe('#post', () => {
         let e = new FetchEngine();
         e.configure();
         let res = await e.post(new PostRequest().to('themes').objects({ id: 1, hello: 'world' }, { id: 2, hello: 'mars' }));
+        expect(res).toBeInstanceOf(Response);
         expect(res.data).toEqual([{ id: 1, hello: 'world' }, { id: 2, hello: 'mars' }]);
         expect(res.total).toBe(2);
         expect(res.affected).toBe(2);
@@ -369,7 +371,7 @@ describe('#post', () => {
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
         expect(fetchMock.mock.calls[0][1]).toEqual({
-            method: 'post',
+            method: 'POST',
             cache: 'no-cache',
             body: '{"to":"themes","objects":[{"id":1,"hello":"world"},{"id":2,"hello":"mars"}]}',
             headers: {
@@ -392,6 +394,7 @@ describe('#put', () => {
             .pk('id')
             .objects({ id: 1, hello: 'world' }, { id: 2, hello: 'mars' })
         );
+        expect(res).toBeInstanceOf(Response);
         expect(res.data).toEqual([{ id: 1, hello: 'world' }, { id: 2, hello: 'mars' }]);
         expect(res.total).toBe(2);
         expect(res.affected).toBe(2);
@@ -399,7 +402,7 @@ describe('#put', () => {
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
         expect(fetchMock.mock.calls[0][1]).toEqual({
-            method: 'put',
+            method: 'PUT',
             cache: 'no-cache',
             body: '{"to":"themes","objects":[{"id":1,"hello":"world"},{"id":2,"hello":"mars"}],"pk":["id"]}',
             headers: {
@@ -422,6 +425,7 @@ describe('#patch', () => {
             .template({ hello: 'zoo' })
             .where(f => f.and('id', f.OP.EQUALS, 1))
         );
+        expect(res).toBeInstanceOf(Response);
         expect(res.data).toEqual([{ id: 1, hello: 'zoo' }]);
         expect(res.total).toBe(1);
         expect(res.affected).toBe(1);
@@ -429,7 +433,7 @@ describe('#patch', () => {
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
         expect(fetchMock.mock.calls[0][1]).toEqual({
-            method: 'patch',
+            method: 'PATCH',
             cache: 'no-cache',
             body: '{"to":"themes","template":{"hello":"zoo"},"where":{"logic":"and","filters":[{"property":"id","op":"eq","value":1}]}}',
             headers: {
@@ -453,6 +457,7 @@ describe('#delete', () => {
             .headers({ hello: 'world' })
             .count()
         );
+        expect(res).toBeInstanceOf(Response);
         expect(res.data).toEqual([{ id: 1, hello: 'zoo' }]);
         expect(res.total).toBe(1);
         expect(res.affected).toBe(1);
@@ -460,38 +465,7 @@ describe('#delete', () => {
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
         expect(fetchMock.mock.calls[0][1]).toEqual({
-            method: 'delete',
-            cache: 'no-cache',
-            body: '{"from":"themes","headers":{"hello":"world"},"count":true,"where":{"logic":"and","filters":[{"property":"id","op":"eq","value":1}]}}',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-    });
-});
-
-describe('#delete', () => {
-    beforeEach(() => {
-        fetchMock.resetMocks();
-    });
-    it('makes a fetch for the resource specified in the DeleteRequest and returns the response object from json.', async () => {
-        fetchMock.mockResponseOnce(JSON.stringify({ data: [{ id: 1, hello: 'zoo' }], total: 1, affected: 1, returned: 1 }));
-        let e = new FetchEngine();
-        e.configure();
-        let res = await e.delete(new DeleteRequest()
-            .from('themes')
-            .where(f => f.and('id', f.OP.EQUALS, 1))
-            .headers({ hello: 'world' })
-            .count()
-        );
-        expect(res.data).toEqual([{ id: 1, hello: 'zoo' }]);
-        expect(res.total).toBe(1);
-        expect(res.affected).toBe(1);
-        expect(res.returned).toBe(1);
-        expect(fetchMock.mock.calls.length).toEqual(1);
-        expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
-        expect(fetchMock.mock.calls[0][1]).toEqual({
-            method: 'delete',
+            method: 'DELETE',
             cache: 'no-cache',
             body: '{"from":"themes","headers":{"hello":"world"},"count":true,"where":{"logic":"and","filters":[{"property":"id","op":"eq","value":1}]}}',
             headers: {
@@ -510,6 +484,7 @@ describe('#options', () => {
         let e = new FetchEngine();
         e.configure();
         let res = await e.options(new OptionsRequest().from('themes'));
+        expect(res).toBeInstanceOf(Response);
         expect(res.data).toEqual([{ id: 1, hello: 'zoo' }]);
         expect(res.total).toBe(1);
         expect(res.affected).toBe(1);
@@ -517,7 +492,7 @@ describe('#options', () => {
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
         expect(fetchMock.mock.calls[0][1]).toEqual({
-            method: 'options',
+            method: 'OPTIONS',
             cache: 'no-cache',
             body: '{"from":"themes"}',
             headers: {

@@ -19,6 +19,7 @@ import FetchEngine from './engines/fetch-engine.js';
 const SUPPORTED_METHODS = ['all', '*', 'get', 'post', 'put', 'patch', 'delete', 'options'];
 const SUPPORTED_STATES = ['log', 'request', 'response', 'done'];
 const IS_BROWSER = (typeof window !== 'undefined');
+let HttpRequestLoader = null; //see .requestFromObject
 
 /**
  * @callback StashKuMiddlewareCallback
@@ -58,6 +59,8 @@ const IS_BROWSER = (typeof window !== 'undefined');
  * @typedef StashKuConfiguration
  * @property {String|BaseStorageEngine} engine - The name or instance of the StashKu engine to use.
  * @property {Array.<StashKuMiddleware|StashKuMiddlewareCallback|StashKuMiddlewareLogCallback>} middleware
+ * @property {Array.<String>} resources - Optional array of resource names that are allowed through this instance of
+ * StashKu. Any request asking for a resource not found in this array will throw an error.
  */
 
 /**
@@ -124,6 +127,7 @@ class StashKu {
             this.engine = config.proxy.parent.engine;
             this.middleware = config.proxy.parent.middleware;
             this.stats = config.proxy.parent.stats;
+            this.resources = config.proxy.parent.resources;
             //shallow-clone configuration, set proxy
             this.config = Object.assign({}, config.proxy.parent.config, { proxy: config.proxy });
         } else {
@@ -208,7 +212,8 @@ class StashKu {
         }
         this.config = Object.assign({
             engine: engineDefault,
-            middleware: []
+            middleware: [],
+            resources: []
         }, config);
         this.log.debug('Configuration=', this.config);
         //load engine
@@ -309,6 +314,10 @@ class StashKu {
         if (!requestType) {
             throw new Error('A "requestType" parameter argument is required.');
         }
+        //handle http.IncomingMessageg
+        if (IS_BROWSER === false && request.url && request.httpVersion) {
+            request = await StashKu.requestFromObject(request);
+        }
         //build request
         let reqModel = this.config?.proxy?.model;
         if (typeof request === 'function') {
@@ -327,6 +336,13 @@ class StashKu {
             throw new Error('A StashKu storage engine has not been loaded. An engine must be configured before operations are allowed.');
         } else if (reqModel) {
             request.model(reqModel);
+        }
+        //access restrictions
+        if (this.config.resources && this.config.resources.length) {
+            let resource = request.metadata.from || request.metadata.to;
+            if (this.config.resources.indexOf(resource) < 0) {
+                throw new RESTError(403, 'Forbidden.');
+            }
         }
         //pre-process request
         let response = null;
@@ -456,7 +472,7 @@ class StashKu {
      * 
      * @throws Error if the storage engine fails to return a response.
      * @throws Error if the storage engine returns an invalid response object.
-     * @param {GetRequest | GetRequestCallback} [request] - The GET request to send to the storage engine.
+     * @param {GetRequest | GetRequestCallback | Request} [request] - The GET request to send to the storage engine.
      * @returns {Promise.<Response.<I>>} Returns the data objects from storage matching request criteria.
      */
     async get(request) {
@@ -627,7 +643,7 @@ class StashKu {
     }
 
     /**
-     * Converts an untyped object representing a StashKu request into an instance of the appropriate request. This
+     * Converts a StashKu request-like object into an instance of the appropriate StashKu request. This
      * can be used in conjunction with `JSON.stringify(...)` and subsequently a `JSON.parse(...)` of a request.
      * 
      * If the object is `null` or `undefined`, a `null` value is returned.
@@ -635,13 +651,21 @@ class StashKu {
      * @throws Error if the method property value is invalid.
      * @param {*} reqObj - The untyped request object.
      * @param {ModelNameResolveCallback} [modelNameResolver] - Callback function that resolves a model name into a model type (constructor/class).
-     * @returns {DeleteRequest | GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest} 
+     * @returns {Promise.<DeleteRequest | GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest>} 
      */
-    static requestFromObject(reqObj, modelNameResolver) {
+    static async requestFromObject(reqObj, modelNameResolver) {
         if (reqObj) {
+            //handle http.IncomingMessageg
+            if (IS_BROWSER === false && reqObj.url && reqObj.httpVersion) {
+                if (!HttpRequestLoader) {
+                    HttpRequestLoader = (await import(/* webpackIgnore: true */'./node/http-request-loader.js')).default;
+                }
+                return await HttpRequestLoader(reqObj);
+            }
             if (!reqObj.method || /^delete|get|patch|post|put|options$/i.test(reqObj.method) === false) {
                 throw new Error('The method property value of the object is missing or invalid. Expected a valid request method.');
             }
+            //construct
             let mt = null;
             if (modelNameResolver && reqObj.model) {
                 mt = modelNameResolver(reqObj.model);

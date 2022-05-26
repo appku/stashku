@@ -154,6 +154,8 @@ class GetRequest {
             return this;
         } else if (conditions instanceof Filter) {
             this.metadata.where = conditions;
+        } else if (typeof conditions === 'string') {
+            this.metadata.where = Filter.parse(conditions);
         } else if (typeof conditions === 'function') {
             this.metadata.where = new Filter();
             conditions(this.metadata.where);
@@ -185,7 +187,11 @@ class GetRequest {
                 if (s !== null && stype !== 'undefined') {
                     if ((s instanceof Sort) === false) {
                         if (stype === 'string') {
-                            s = Sort.asc(s);
+                            if (s.match(/{.+}/)) {
+                                s = Sort.parse(s);
+                            } else {
+                                s = Sort.asc(s);
+                            }
                         } else if (s.property) {
                             s = new Sort(s.property, s.dir);
                         } else if (s.field) {
@@ -358,7 +364,7 @@ class GetRequest {
             metaClone.sorts = this.metadata.sorts;
         }
         if (this.metadata.where && Filter.isEmpty(this.metadata.where) === false) {
-            metaClone.where = this.metadata.where.toJSON();
+            metaClone.where = JSON.stringify(this.metadata.where.toJSON());
         }
         return metaClone;
     }

@@ -185,12 +185,13 @@ class FetchEngine extends BaseEngine {
      */
     async _fetch(resource, data, settings) {
         settings = Object.assign({
-            method: 'get',
+            method: 'GET',
             cache: 'no-cache'
         }, this.config.fetch, settings);
         let targetURI = this._uri(resource);
+        settings.method = settings.method.toUpperCase(); //always upper
         if (data) {
-            if (settings.method === 'get') {
+            if (settings.method === 'GET') {
                 let params = this._paramSerialize(data);
                 if (params) {
                     targetURI += '?' + this._paramSerialize(data);
@@ -235,7 +236,8 @@ class FetchEngine extends BaseEngine {
             throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
         }
         try {
-            return await res.json();
+            let payload = await res.json();
+            return new Response(payload.data, payload.total, payload.affected, payload.returned, res.status);
         } catch (err) {
             throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${err.message}`, err);
         }
@@ -257,7 +259,8 @@ class FetchEngine extends BaseEngine {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
             }
             try {
-                return await res.json();
+                let payload = await res.json();
+                return new Response(payload.data, payload.total, payload.affected, payload.returned, res.status);
             } catch (err) {
                 throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${err.message}`, err);
             }
@@ -283,7 +286,8 @@ class FetchEngine extends BaseEngine {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
             }
             try {
-                return await res.json();
+                let payload = await res.json();
+                return new Response(payload.data, payload.total, payload.affected, payload.returned, res.status);
             } catch (err) {
                 throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${err.message}`, err);
             }
@@ -307,7 +311,8 @@ class FetchEngine extends BaseEngine {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
             }
             try {
-                return await res.json();
+                let payload = await res.json();
+                return new Response(payload.data, payload.total, payload.affected, payload.returned, res.status);
             } catch (err) {
                 throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${err.message}`, err);
             }
@@ -331,7 +336,8 @@ class FetchEngine extends BaseEngine {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
             }
             try {
-                return await res.json();
+                let payload = await res.json();
+                return new Response(payload.data, payload.total, payload.affected, payload.returned, res.status);
             } catch (err) {
                 throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${err.message}`, err);
             }
@@ -354,7 +360,8 @@ class FetchEngine extends BaseEngine {
             throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
         }
         try {
-            return await res.json();
+            let payload = await res.json();
+            return new Response(payload.data, payload.total, payload.affected, payload.returned, res.status);
         } catch (err) {
             throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${err.message}`, err);
         }

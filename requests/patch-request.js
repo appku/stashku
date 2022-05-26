@@ -143,6 +143,8 @@ class PatchRequest {
             return this;
         } else if (conditions instanceof Filter) {
             this.metadata.where = conditions;
+        } else if (typeof conditions === 'string') {
+            this.metadata.where = Filter.parse(conditions);
         } else if (typeof conditions === 'function') {
             this.metadata.where = new Filter();
             conditions(this.metadata.where);

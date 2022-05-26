@@ -30,7 +30,7 @@ class ModelUtility {
                 let descriptors = Object.getOwnPropertyDescriptors(modelType);
                 //get static "get" property names that are readable and writable or plain values.
                 for (let prop in descriptors) {
-                    if (prop !== '$stashku' && prop !== 'prototype' && prop != '__proto') {
+                    if (prop !== '$stashku' && prop !== 'prototype' && prop != '__proto' && prop != 'toJSON') {
                         let desc = descriptors[prop];
                         if (desc.enumerable || desc.get) {
                             let propDefinition = null;

@@ -230,6 +230,17 @@ describe('#sort', () => {
         expect(r.sort(null)).toBe(r);
         expect(r.sort('test', 'abc', Sort.asc('yolo'))).toBe(r);
     });
+    it('accepts tokenized sort strings.', () => {
+        let r = new GetRequest();
+        expect(r.sort('{ID} desc', '{Horse} asc')).toBe(r);
+        expect(r.metadata.sorts.length).toBe(2);
+        expect(r.metadata.sorts[0]).toBeInstanceOf(Sort);
+        expect(r.metadata.sorts[0].property).toBe('ID');
+        expect(r.metadata.sorts[0].dir).toBe('desc');
+        expect(r.metadata.sorts[1]).toBeInstanceOf(Sort);
+        expect(r.metadata.sorts[1].property).toBe('Horse');
+        expect(r.metadata.sorts[1].dir).toBe('asc');
+    });
     it('accepts a Sort-like array of objects.', () => {
         let r = new GetRequest();
         expect(r.sort([{ property: 'ID', dir: 'asc' }])).toBe(r);
@@ -503,7 +514,7 @@ describe('#toJSON', () => {
         expect(parsed.count).toBeUndefined();
         expect(parsed.distinct).toBeUndefined();
         expect(parsed.sorts).toEqual([new Sort('FirstName', Sort.DIR.DESC)]);
-        expect(parsed.where).toEqual(JSON.parse(JSON.stringify(r.metadata.where)));
+        expect(parsed.where).toEqual(JSON.stringify(r.metadata.where));
         expect(parsed.headers).toEqual({ hello: 'world' });
     });
 });

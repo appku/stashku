@@ -94,6 +94,11 @@ class ModelGenerator {
             className = ModelGenerator.formatModelName(resource);
         }
         Object.defineProperty(mt, 'name', { value: className });
+        //add json stringification support
+        let toSchema = ModelUtility.schema;
+        mt.toJSON = (function() {
+            return toSchema(this);
+        }).bind(mt);
         //add static properties
         for (let [k, v] of sortedProperties) {
             if (v === null || typeof v === 'undefined') {

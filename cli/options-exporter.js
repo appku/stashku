@@ -67,7 +67,7 @@ class OptionsExporter {
                         .with(p => p.join(outputConfig.dirPath, `${blueprint.slug}.js`))
                         .when((ps) => outputConfig.overwrite || ps.exists === false)
                         .write(extModelContent);
-                    await fairu.cp(path.join(__dirname, '../node_modules/@appku/stashku-rest/modeling/modeling.d.js'), path.join(outputConfig.dirPath, 'base/', 'modeling.d.js'));
+                    await fairu.cp(path.join(__dirname, '../modeling/modeling.d.js'), path.join(outputConfig.dirPath, 'base/', 'modeling.d.js'));
                 }
             }
         }

@@ -112,6 +112,7 @@ class BaseProductModel extends Model {
     static get ID() {
         return {
             target: 'ID',
+            pk: true,
             type: 'Number'
         };
     }
