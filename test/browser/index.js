@@ -1,3 +1,4 @@
+/* eslint-disable */
 import StashKu from '@appku/stashku';
 import './index.html';
 

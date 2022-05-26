@@ -482,41 +482,6 @@ describe('#headers', () => {
     });
 });
 
-describe('#meta', () => {
-    it('removes all non-standard metadata on a null value.', () => {
-        let r = new GetRequest()
-            .properties('a', 'b', 'c')
-            .from('somewhere');
-        r.metadata.abc = 'whattttt';
-        r.metadata.nonstandard = 123;
-        r.meta(null);
-        expect(r.metadata.properties).toEqual(['a', 'b', 'c']);
-        expect(r.metadata.from).toBe('somewhere');
-        expect(r.metadata.abc).toBeUndefined();
-        expect(r.metadata.nonstandard).toBeUndefined();
-    });
-    it('throws on standard metadata property name.', () => {
-        let r = new GetRequest()
-            .properties('a', 'b', 'c')
-            .from('somewhere');
-        for (let p of ['properties', 'where', 'sorts', 'from', 'skip', 'take']) {
-            let obj = {};
-            obj[p] = 123;
-            expect(() => r.meta(obj)).toThrow();
-        }
-    });
-    it('add new metadata on a request.', () => {
-        let r = new GetRequest()
-            .properties('a', 'b', 'c')
-            .from('somewhere');
-        r.meta({ abc: 'ok', extra: 123 });
-        expect(r.metadata.properties).toEqual(['a', 'b', 'c']);
-        expect(r.metadata.from).toBe('somewhere');
-        expect(r.metadata.abc).toBe('ok');
-        expect(r.metadata.extra).toBe(123);
-    });
-});
-
 describe('#toJSON', () => {
     it('returns the metadata to utilize for JSON stringifying.', () => {
         let r = new GetRequest()
@@ -535,11 +500,10 @@ describe('#toJSON', () => {
         expect(parsed.from).toEqual(r.metadata.from);
         expect(parsed.skip).toEqual(r.metadata.skip);
         expect(parsed.take).toEqual(r.metadata.take);
-        expect(parsed.count).toEqual(r.metadata.count);
-        expect(parsed.distinct).toEqual(r.metadata.distinct);
+        expect(parsed.count).toBeUndefined();
+        expect(parsed.distinct).toBeUndefined();
         expect(parsed.sorts).toEqual([new Sort('FirstName', Sort.DIR.DESC)]);
         expect(parsed.where).toEqual(JSON.parse(JSON.stringify(r.metadata.where)));
         expect(parsed.headers).toEqual({ hello: 'world' });
-        expect(parsed.method).toBe('get');
     });
 });

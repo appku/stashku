@@ -260,39 +260,6 @@ describe('#headers', () => {
     });
 });
 
-describe('#meta', () => {
-    it('removes all non-standard metadata on a null value.', () => {
-        let r = new DeleteRequest()
-            .from('somewhere')
-            .where(f => f.and('a', Filter.OP.CONTAINS, 'z'));
-        r.metadata.abc = 'whattttt';
-        r.metadata.nonstandard = 123;
-        r.meta(null);
-        expect(r.metadata.from).toBe('somewhere');
-        expect(r.metadata.abc).toBeUndefined();
-        expect(r.metadata.nonstandard).toBeUndefined();
-    });
-    it('throws on standard metadata property name.', () => {
-        let r = new DeleteRequest()
-            .from('somewhere')
-            .where(f => f.and('a', Filter.OP.CONTAINS, 'z'));
-        for (let p of ['all', 'where', 'from']) {
-            let obj = {};
-            obj[p] = 123;
-            expect(() => r.meta(obj)).toThrow();
-        }
-    });
-    it('add new metadata on a request.', () => {
-        let r = new DeleteRequest()
-            .from('somewhere')
-            .where(f => f.and('a', Filter.OP.CONTAINS, 'z'));
-        r.meta({ abc: 'ok', extra: 123 });
-        expect(r.metadata.from).toBe('somewhere');
-        expect(r.metadata.abc).toBe('ok');
-        expect(r.metadata.extra).toBe(123);
-    });
-});
-
 describe('#toJSON', () => {
     it('returns the metadata to utilize for JSON stringifying.', () => {
         let dr = new DeleteRequest()

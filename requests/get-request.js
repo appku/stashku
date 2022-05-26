@@ -330,44 +330,35 @@ class GetRequest {
     }
 
     /**
-     * Merges custom engine-specific request settings into the request metadata. Setting a `null` will remove all
-     * non-standard metadata properties. You may not set standard metadata with this method, use the appropriate method calls.
-     * @throws Error when a standardized request metadata property name is specified.
-     * @param {*} metadata - An object with properties and values to set as request metadata for engine-specific functionality.
-     * @returns {GetRequest}
-     * @deprecated Use new `headers` function for engine-specific options per-request.
-     * 
-     * *This function will be removed in a future release.*
-     */
-    meta(metadata) {
-        if (metadata === null) {
-            //clear non-standard metadata
-            for (let k of Object.keys(this.metadata)) {
-                if (STANDARD_METADATA.indexOf(k) < 0) {
-                    delete this.metadata[k];
-                }
-            }
-        } else {
-            for (let k of Object.keys(metadata)) {
-                if (STANDARD_METADATA.indexOf(k) >= 0) {
-                    throw new Error(`The metadata property "${k}" is in use by a standard request method. Use the method to set this metadata should be used instead.`);
-                }
-            }
-            this.metadata = Object.assign(this.metadata, metadata);
-        }
-        return this;
-    }
-
-    /**
      * Returns the metadata object to be utilized for stringifying into JSON.
      * @returns {*}
      */
     toJSON() {
-        let metaClone = Object.assign({}, this.metadata);
+        let metaClone = { from: this.metadata.from };
         if (this.metadata.headers) {
             metaClone.headers = Object.fromEntries(this.metadata.headers);
         }
-        metaClone.method = this.method;
+        if (this.metadata.count) {
+            metaClone.count = this.metadata.count;
+        }
+        if (this.metadata.skip) {
+            metaClone.skip = this.metadata.skip;
+        }
+        if (this.metadata.take) {
+            metaClone.take = this.metadata.take;
+        }
+        if (this.metadata.distinct) {
+            metaClone.distinct = this.metadata.distinct;
+        }
+        if (this.metadata.properties && this.metadata.properties.length) {
+            metaClone.properties = this.metadata.properties;
+        }
+        if (this.metadata.sorts && this.metadata.sorts.length) {
+            metaClone.sorts = this.metadata.sorts;
+        }
+        if (this.metadata.where && Filter.isEmpty(this.metadata.where) === false) {
+            metaClone.where = this.metadata.where.toJSON();
+        }
         return metaClone;
     }
 

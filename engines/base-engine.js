@@ -80,7 +80,7 @@ class BaseEngine {
 
     /**
      * Returns an array of strings naming the resources available in the storage medium accessible by the engine.
-     * @returns {Array.<String>}
+     * @returns {Promise.<Array.<String>>}
      * @abstract
      */
     async resources() {

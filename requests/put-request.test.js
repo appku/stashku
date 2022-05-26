@@ -325,39 +325,6 @@ describe('#headers', () => {
     });
 });
 
-describe('#meta', () => {
-    it('removes all non-standard metadata on a null value.', () => {
-        let r = new PutRequest()
-            .objects({}, {}, {})
-            .to('somewhere');
-        r.metadata.abc = 'whattttt';
-        r.metadata.nonstandard = 123;
-        r.meta(null);
-        expect(r.metadata.to).toBe('somewhere');
-        expect(r.metadata.abc).toBeUndefined();
-        expect(r.metadata.nonstandard).toBeUndefined();
-    });
-    it('throws on standard metadata property name.', () => {
-        let r = new PutRequest()
-            .objects({}, {}, {})
-            .to('somewhere');
-        for (let p of ['pk', 'objects', 'to', 'count', 'model']) {
-            let obj = {};
-            obj[p] = 123;
-            expect(() => r.meta(obj)).toThrow();
-        }
-    });
-    it('add new metadata on a request.', () => {
-        let r = new PutRequest()
-            .objects({}, {}, {})
-            .to('somewhere');
-        r.meta({ abc: 'ok', extra: 123 });
-        expect(r.metadata.to).toBe('somewhere');
-        expect(r.metadata.abc).toBe('ok');
-        expect(r.metadata.extra).toBe(123);
-    });
-});
-
 describe('#toJSON', () => {
     it('returns the metadata to utilize for JSON stringifying.', () => {
         let r = new PutRequest()
@@ -367,10 +334,9 @@ describe('#toJSON', () => {
             .pk('ID');
         let parsed = JSON.parse(JSON.stringify(r));
         expect(parsed.to).toEqual(r.metadata.to);
-        expect(parsed.count).toEqual(r.metadata.count);
+        expect(parsed.count).toBeUndefined();
         expect(parsed.objects).toEqual([{ Bob: 'Sue', Hi: 12345 }, { Hi: true }]);
         expect(parsed.pk).toEqual(['ID']);
         expect(parsed.headers).toEqual({ hello: 'world' });
-        expect(parsed.method).toBe('put');
     });
 });

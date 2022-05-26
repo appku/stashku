@@ -186,35 +186,6 @@ class DeleteRequest {
     }
 
     /**
-     * Merges custom engine-specific request settings into the request metadata. Setting a `null` will remove all
-     * non-standard metadata properties. You may not set standard metadata with this method, use the appropriate method calls.
-     * @throws Error when a standardized request metadata property name is specified.
-     * @param {*} metadata - An object with properties and values to set as request metadata for engine-specific functionality.
-     * @returns {DeleteRequest}
-     * @deprecated Use new `headers` function for engine-specific options per-request.
-     * 
-     * *This function will be removed in a future release.*
-     */
-    meta(metadata) {
-        if (metadata === null) {
-            //clear non-standard metadata
-            for (let k of Object.keys(this.metadata)) {
-                if (STANDARD_METADATA.indexOf(k) < 0) {
-                    delete this.metadata[k];
-                }
-            }
-        } else {
-            for (let k of Object.keys(metadata)) {
-                if (STANDARD_METADATA.indexOf(k) >= 0) {
-                    throw new Error(`The metadata property "${k}" is in use by a standard request method. Use the method to set this metadata should be used instead.`);
-                }
-            }
-            this.metadata = Object.assign(this.metadata, metadata);
-        }
-        return this;
-    }
-
-    /**
      * Returns the metadata object to be utilized for stringifying into JSON.
      * @returns {*}
      */

@@ -97,7 +97,7 @@ class MemoryEngine extends BaseEngine {
 
     /**
      * @inheritdoc
-     * @returns {Array.<String>}
+     * @returns {Promise.<Array.<String>>}
      */
     async resources() {
         return Array.from(this.data.keys());

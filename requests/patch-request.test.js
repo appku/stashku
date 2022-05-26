@@ -280,39 +280,6 @@ describe('#headers', () => {
     });
 });
 
-describe('#meta', () => {
-    it('removes all non-standard metadata on a null value.', () => {
-        let r = new PatchRequest()
-            .to('somewhere')
-            .where(f => f.and('a', Filter.OP.CONTAINS, 'z'));
-        r.metadata.abc = 'whattttt';
-        r.metadata.nonstandard = 123;
-        r.meta(null);
-        expect(r.metadata.to).toBe('somewhere');
-        expect(r.metadata.abc).toBeUndefined();
-        expect(r.metadata.nonstandard).toBeUndefined();
-    });
-    it('throws on standard metadata property name.', () => {
-        let r = new PatchRequest()
-            .to('somewhere')
-            .where(f => f.and('a', Filter.OP.CONTAINS, 'z'));
-        for (let p of ['template', 'where', 'to']) {
-            let obj = {};
-            obj[p] = 123;
-            expect(() => r.meta(obj)).toThrow();
-        }
-    });
-    it('add new metadata on a request.', () => {
-        let r = new PatchRequest()
-            .to('somewhere')
-            .where(f => f.and('a', Filter.OP.CONTAINS, 'z'));
-        r.meta({ abc: 'ok', extra: 123 });
-        expect(r.metadata.to).toBe('somewhere');
-        expect(r.metadata.abc).toBe('ok');
-        expect(r.metadata.extra).toBe(123);
-    });
-});
-
 describe('#toJSON', () => {
     it('returns the metadata to utilize for JSON stringifying.', () => {
         let r = new PatchRequest()
@@ -322,9 +289,9 @@ describe('#toJSON', () => {
             .count();
         let parsed = JSON.parse(JSON.stringify(r));
         expect(parsed.to).toEqual(r.metadata.to);
-        expect(parsed.count).toEqual(r.metadata.count);
+        expect(parsed.all).toBeUndefined();
+        expect(parsed.count).toBe(true);
         expect(parsed.template).toEqual({ Bob: 'Sue', Hi: 12345 });
         expect(parsed.headers).toEqual({ hello: 'world' });
-        expect(parsed.method).toBe('patch');
     });
 });

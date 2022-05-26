@@ -14,10 +14,13 @@ import Sort from '../sort.js';
 
 const IS_BROWSER = (typeof window !== 'undefined');
 let globalFetch = null;
+/* istanbul ignore next */
 const lazyLoadGlobalFetch = async () => {
-    if (globalFetch) {
+    if (!globalFetch) {
         if (IS_BROWSER) {
-            globalFetch = window.fetch;
+            globalFetch = window.fetch; // eslint-disable-line no-undef
+        } else if (fetch) { // eslint-disable-line no-undef
+            globalFetch = fetch; // eslint-disable-line no-undef
         } else {
             globalFetch = await import('node-fetch').default;
         }
@@ -32,6 +35,7 @@ const lazyLoadGlobalFetch = async () => {
  * @property {String} [modelResourceTarget="plural.slug"] - Optional configuration that instructs the engine which model
  * `$stashku` property to use for the resource name. Can be `"name"`, `"slug"`, `"plural.name"`, or `"plural.slug"`
  * (default).
+ * @property {Boolean} [trailingSlash=false] - Sets whether a slash will be added at the end of the generated URI.
  * @property {RequestInit} [fetch] - Optional fetch defaults to apply before request-specific configuration is set.
  */
 
@@ -60,8 +64,9 @@ class FetchEngine extends BaseEngine {
          */
         this.config = {
             root: null,
-            path: '/api',
-            modelResourceTarget: 'plural.slug'
+            path: null,
+            modelResourceTarget: 'plural.slug',
+            trailingSlash: false
         };
     }
 
@@ -73,8 +78,9 @@ class FetchEngine extends BaseEngine {
         super.configure(config);
         let defaults = {
             root: null,
-            path: '/api',
-            modelResourceTarget: 'plural.slug'
+            path: null,
+            modelResourceTarget: 'plural.slug',
+            trailingSlash: false
         };
         if (IS_BROWSER === false) {
             if (typeof process.env.STASHKU_FETCH_ROOT === 'string') {
@@ -86,8 +92,15 @@ class FetchEngine extends BaseEngine {
             if (typeof process.env.STASHKU_FETCH_MODEL_RESOURCE_TARGET === 'string') {
                 defaults.modelResourceTarget = process.env.STASHKU_FETCH_MODEL_RESOURCE_TARGET;
             }
+            if (typeof process.env.STASHKU_FETCH_TRAILING_SLASH === 'string') {
+                defaults.trailingSlash = !!process.env.STASHKU_FETCH_TRAILING_SLASH.match(/^[tTyY1]/);
+            }
         }
-        this.config = Object.assign(defaults, config);
+        defaults = Object.assign(defaults, config);
+        if (defaults.modelResourceTarget && ['name', 'slug', 'plural.name', 'plural.slug'].indexOf(defaults.modelResourceTarget) < 0) {
+            throw new Error('Invalid "modelResourceTarget" configuration value. The value must be "name", "slug", "plural.name", or "plural.slug".');
+        }
+        this.config = defaults;
     }
 
     /**
@@ -102,25 +115,34 @@ class FetchEngine extends BaseEngine {
      * @private
      */
     _uri(resource) {
-        if (resource !== null && typeof resource !== 'undefined') {
-            if (resource.$stashku) {
-                switch (this.config.modelResourceTarget) {
-                    case 'name': resource = resource.$stashku.name; break;
-                    case 'slug': resource = resource.$stashku.slug; break;
-                    case 'plural.name': resource = resource.$stashku?.plural?.slug; break;
-                    default:
-                        resource = resource.$stashku?.plural?.slug;
-                        break;
-                }
-                if (resource === null || typeof resource !== 'undefined') {
-                    throw new Error(`The model did not define a resource value under "$stashku.${this.config.modelResourceTarget}.`);
-                }
-            }
-            return [this.config.root, this.config.path, resource].map(function (i) {
-                return i.replace(/(^\/|\/$)/, '');
-            }).join('/');
+        if (resource === null || typeof resource === 'undefined') {
+            resource = '';
         }
-        throw new Error('The "resource" argument is required.');
+        if (resource.$stashku) {
+            switch (this.config.modelResourceTarget) {
+                case 'name': resource = resource.$stashku.name; break;
+                case 'slug': resource = resource.$stashku.slug; break;
+                case 'plural.name': resource = resource.$stashku?.plural?.name; break;
+                default:
+                    resource = resource.$stashku?.plural?.slug;
+                    break;
+            }
+            if (resource === null || typeof resource === 'undefined') {
+                throw new Error(`The model did not define a resource value under "$stashku.${this.config.modelResourceTarget}.`);
+            }
+        }
+        let uri = [this.config.root, this.config.path, resource].filter(v => typeof v === 'string').map(function (i) {
+            return i.replace(/(^\/|\/$)/g, '');
+        }).join('/');
+        if (this.config.trailingSlash && uri.endsWith('/') === false && uri.indexOf('?') < 0) {
+            uri += '/';
+        } else if (this.config.trailingSlash !== true && uri.endsWith('/')) {
+            uri = uri.substring(0, uri.length - 1);
+        }
+        if (uri.startsWith('/') === false && !this.config.root && !uri.match(/^.+\/\/+/)) {
+            uri = '/' + uri;
+        }
+        return uri;
     }
 
     /**
@@ -147,6 +169,9 @@ class FetchEngine extends BaseEngine {
                 }
             }
         }
+        if (!str || str.length === 0) {
+            return null;
+        }
         return str.join('&');
     }
 
@@ -160,14 +185,20 @@ class FetchEngine extends BaseEngine {
      */
     async _fetch(resource, data, settings) {
         settings = Object.assign({
-            method: 'GET',
+            method: 'get',
             cache: 'no-cache'
         }, this.config.fetch, settings);
         let targetURI = this._uri(resource);
         if (data) {
-            if (settings.method === 'GET') {
-                targetURI += '?' + this._paramSerialize(data);
+            if (settings.method === 'get') {
+                let params = this._paramSerialize(data);
+                if (params) {
+                    targetURI += '?' + this._paramSerialize(data);
+                }
             } else {
+                if (!settings.headers) {
+                    settings.headers = {};
+                }
                 settings.headers['Content-Type'] = 'application/json';
                 settings.body = JSON.stringify(data);
             }
@@ -178,10 +209,12 @@ class FetchEngine extends BaseEngine {
 
     /**
      * @inheritdoc
-     * @returns {Array.<String>}
+     * @returns {Promise.<Array.<String>>}
      */
     async resources() {
-        return this._fetch('resources');
+        let res = await this._fetch('resources');
+        let results = await res.json();
+        return results.data;
     }
 
     /**
@@ -193,12 +226,20 @@ class FetchEngine extends BaseEngine {
     async get(request) {
         //validate
         await super.get(request);
-        let meta = request.metadata;
-        let from = this.resourceOf(request);
-        if (this.data.has(from) === false) {
-            throw new RESTError(404, `The requested resource "${meta.from}" was not found.`);
+        //make the request, wrap errors in RESTError
+        try {
+            let payload = request.toJSON();
+            if (request.metadata.from === payload.from) { //when the request from and the uri resource are the same, there's no need to send the from parameter.
+                delete payload.from;
+            }
+            let res = await this._fetch(request.metadata.from, payload);
+            if (res.ok === false) {
+                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
+            }
+            return await res.json();
+        } catch (err) {
+            throw new RESTError(500, err.message, err);
         }
-        //todo
     }
 
     /**
@@ -214,8 +255,16 @@ class FetchEngine extends BaseEngine {
         //process
         let meta = request.metadata;
         if (meta.objects && meta.objects.length) {
-            let to = this.resourceOf(request);
-            //todo
+            //make the request, wrap errors in RESTError
+            try {
+                let res = await this._fetch(request.metadata.to, request, { method: request.method });
+                if (res.ok === false) {
+                    throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
+                }
+                return await res.json();
+            } catch (err) {
+                throw new RESTError(500, err.message, err);
+            }
         }
         return Response.empty();
     }
@@ -231,14 +280,19 @@ class FetchEngine extends BaseEngine {
     async put(request) {
         //validate
         await super.put(request);
-        let meta = request.metadata;
-        let to = this.resourceOf(request);
-        if (this.data.has(to) === false) {
-            throw new RESTError(404, `The requested resource "${meta.to}" was not found.`);
-        }
         //process
+        let meta = request.metadata;
         if (meta.objects && meta.objects.length) {
-            //todo
+            //make the request, wrap errors in RESTError
+            try {
+                let res = await this._fetch(request.metadata.to, request, { method: request.method });
+                if (res.ok === false) {
+                    throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
+                }
+                return await res.json();
+            } catch (err) {
+                throw new RESTError(500, `Critical error attempting to process fetch for resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${err.message}`, err);
+            }
         }
         return Response.empty();
     }
@@ -252,12 +306,21 @@ class FetchEngine extends BaseEngine {
     async patch(request) {
         //validate
         await super.patch(request);
+        //process
         let meta = request.metadata;
-        let to = this.resourceOf(request);
-        if (this.data.has(to) === false) {
-            throw new RESTError(404, `The requested resource "${meta.to}" was not found.`);
+        if (meta.template) {
+            //make the request, wrap errors in RESTError
+            try {
+                let res = await this._fetch(request.metadata.to, request, { method: request.method });
+                if (res.ok === false) {
+                    throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
+                }
+                return await res.json();
+            } catch (err) {
+                throw new RESTError(500, err.message, err);
+            }
         }
-        //todo
+        return Response.empty();
     }
 
     /**
@@ -270,13 +333,23 @@ class FetchEngine extends BaseEngine {
      * @returns {Promise.<Response>} Returns the data objects from storage that were deleted with the request criteria.
      */
     async delete(request) {
-        await super.delete(request); //validate
+        //validate
+        await super.delete(request);
+        //process
         let meta = request.metadata;
-        let from = this.resourceOf(request);
-        if (this.data.has(from) === false) {
-            throw new RESTError(404, `The requested resource "${meta.from}" was not found.`);
+        if (meta.all || (meta.where && Filter.isEmpty(meta.where) === false)) {
+            //make the request, wrap errors in RESTError
+            try {
+                let res = await this._fetch(request.metadata.to, request, { method: request.method });
+                if (res.ok === false) {
+                    throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
+                }
+                return await res.json();
+            } catch (err) {
+                throw new RESTError(500, err.message, err);
+            }
         }
-        //todo
+        return Response.empty();
     }
 
     /**
@@ -288,8 +361,21 @@ class FetchEngine extends BaseEngine {
     async options(request) {
         //validate
         await super.options(request);
+        //process
         let meta = request.metadata;
-        //todo
+        if (meta.objects && meta.objects.length) {
+            //make the request, wrap errors in RESTError
+            try {
+                let res = await this._fetch(request.metadata.to, request, { method: request.method });
+                if (res.ok === false) {
+                    throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
+                }
+                return await res.json();
+            } catch (err) {
+                throw new RESTError(500, err.message, err);
+            }
+        }
+        return Response.empty();
     }
 
 }
