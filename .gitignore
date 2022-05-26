@@ -14,8 +14,6 @@ coverage/
 *.ignore.*
 coverage/
 coverage/**/*
-docs/
-docs/**/*
 deploy/
 deploy/**/*
 dist/

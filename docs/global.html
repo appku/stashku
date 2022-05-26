@@ -1,0 +1,4889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    
+    <title>@AppKu/StashKu: Global</title>
+    
+    
+      <link type="text/css" rel="stylesheet" href="styles/vendor/prism-tomorrow-night.css">
+    
+    <link type="image/x-icon" rel="icon" href="favicon.ico">
+    <link type="image/x-icon" rel="shortcut icon" href="favicon.ico">
+    <link type="text/css" rel="stylesheet" href="styles/styles.css">
+    
+</head>
+<body>
+
+<header class="layout-header">
+  
+    <a href="./">
+      <img
+        src="https://avatars.githubusercontent.com/u/76977527?s=400"
+        alt="@AppKu/StashKu"
+      >
+    </a>
+  
+  <h1><a href="./index.html">@AppKu/StashKu</a></h1>
+  
+  <h2>v1.0.0</h2>
+  
+  
+  <ul class="meta-links">
+    
+    <li><a href="https://appku.com"><i class="bi bi-globe"></i></a></li>
+    
+    <li><a href="https://github.com/appku/stashku"><i class="bi bi-github"></i></a></li>
+    
+  </ul>
+  
+  <nav class="layout-nav">
+    <ul class="nav-introduction">
+      <li class="nav-item"><a href="./index.html">Introduction</a></li>
+    </ul>
+    <ul><li class="nav-heading">Tutorials</li><li class="nav-item"><a href="tutorial-Going Next-Level with Models.html">Going Next-Level with Models</a></li><li class="nav-item"><a href="tutorial-Requests_ DELETE.html">Requests: DELETE</a></li><li class="nav-item"><a href="tutorial-Requests_ GET.html">Requests: GET</a></li><li class="nav-item"><a href="tutorial-Requests_ OPTIONS.html">Requests: OPTIONS</a></li><li class="nav-item"><a href="tutorial-Requests_ PATCH.html">Requests: PATCH</a></li><li class="nav-item"><a href="tutorial-Requests_ POST.html">Requests: POST</a></li><li class="nav-item"><a href="tutorial-Requests_ PUT.html">Requests: PUT</a></li><li class="nav-item"><a href="tutorial-Using the CLI.html">Using the CLI</a></li><li class="nav-item"><a href="tutorial-Using the Fetch Engine.html">Using the Fetch Engine</a></li><li class="nav-item"><a href="tutorial-Using the Memory Engine.html">Using the Memory Engine</a></li></ul><ul><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="BaseEngine.html">BaseEngine</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="BaseEngine.html#config">config</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="BaseEngine.html#log">log</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="BaseEngine.html#name">name</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#configure">configure</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#delete">delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#destroy">destroy</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#get">get</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#options">options</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#patch">patch</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#post">post</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#put">put</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#resources">resources</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="DeleteRequest.html">DeleteRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="DeleteRequest.html#method">method</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#all">all</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#clear">clear</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#count">count</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#from">from</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#headers">headers</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#toJSON">toJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#where">where</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="FetchEngine.html">FetchEngine</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="FetchEngine.html#config">config</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="FetchEngine.html#data">data</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#configure">configure</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#delete">delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#get">get</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#options">options</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#patch">patch</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#post">post</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#put">put</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#resources">resources</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="Filter.html">Filter</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Filter.html#.LOGIC">LOGIC</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Filter.html#.LOGIC_KEYS">LOGIC_KEYS</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Filter.html#.OP">OP</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Filter.html#.OP_KEYS">OP_KEYS</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Filter.html#dot">dot</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Filter.html#tree">tree</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#.and">and</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#.fromObject">fromObject</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#.isEmpty">isEmpty</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#.or">or</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#.parse">parse</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#add">add</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#and">and</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#clone">clone</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#or">or</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#test">test</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#toJSON">toJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#toString">toString</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="GetRequest.html">GetRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="GetRequest.html#method">method</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#clear">clear</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#count">count</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#distinct">distinct</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#from">from</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#headers">headers</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#one">one</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#properties">properties</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#skip">skip</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#sort">sort</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#take">take</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#toJSON">toJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#where">where</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="Logger.html">Logger</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Logger.html#callback">callback</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Logger.html#debug">debug</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Logger.html#error">error</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Logger.html#info">info</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Logger.html#warn">warn</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="Main.html">Main</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Main.html#cmd">cmd</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Main.html#state">state</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Main.html#configure">configure</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Main.html#process">process</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Main.html#request">request</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="MemoryEngine.html">MemoryEngine</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="MemoryEngine.html#config">config</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="MemoryEngine.html#data">data</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#configure">configure</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#delete">delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#get">get</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#options">options</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#patch">patch</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#post">post</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#put">put</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#resourceOf">resourceOf</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#resources">resources</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="ModelGenerator.html">ModelGenerator</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelGenerator.html#.formatModelName">formatModelName</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelGenerator.html#.formatPropName">formatPropName</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelGenerator.html#.generateModelType">generateModelType</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="ModelUtility.html">ModelUtility</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.isValidType">isValidType</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.map">map</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.model">model</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.pk">pk</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.resource">resource</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.schema">schema</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.unmodel">unmodel</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="OptionsExporter.html">OptionsExporter</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsExporter.html#export">export</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsExporter.html#makePropertyJSDoc">makePropertyJSDoc</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsExporter.html#toJavascriptPropertyDefaultReference">toJavascriptPropertyDefaultReference</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsExporter.html#toJavaScriptString">toJavaScriptString</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="OptionsRequest.html">OptionsRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="OptionsRequest.html#method">method</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsRequest.html#all">all</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsRequest.html#clear">clear</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsRequest.html#from">from</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsRequest.html#headers">headers</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsRequest.html#toJSON">toJSON</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="PatchRequest.html">PatchRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="PatchRequest.html#method">method</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#all">all</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#clear">clear</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#count">count</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#headers">headers</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#template">template</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#to">to</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#toJSON">toJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#where">where</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="PostRequest.html">PostRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="PostRequest.html#method">method</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PostRequest.html#clear">clear</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PostRequest.html#count">count</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PostRequest.html#headers">headers</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PostRequest.html#objects">objects</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PostRequest.html#to">to</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PostRequest.html#toJSON">toJSON</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="PutRequest.html">PutRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="PutRequest.html#method">method</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#clear">clear</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#count">count</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#headers">headers</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#objects">objects</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#pk">pk</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#to">to</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#toJSON">toJSON</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="RequestProcessor.html">RequestProcessor</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="RequestProcessor.html#options">options</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="RequestProcessor.html#buildGet">buildGet</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="RequestProcessor.html#buildOptions">buildOptions</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="RequestProcessor.html#start">start</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="Response.html">Response</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Response.html#affected">affected</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Response.html#code">code</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Response.html#data">data</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Response.html#returned">returned</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Response.html#total">total</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Response.html#.empty">empty</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="RESTError.html">RESTError</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="RESTError.html#code">code</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="Sort.html">Sort</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Sort.html#dir">dir</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Sort.html#property">property</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Sort.html#.asc">asc</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Sort.html#.desc">desc</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Sort.html#.parse">parse</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Sort.html#toString">toString</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="StashKu.html">StashKu</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="StashKu.html#config">config</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="StashKu.html#engine">engine</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="StashKu.html#log">log</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="StashKu.html#middleware">middleware</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="StashKu.html#stats">stats</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#.requestFromFile">requestFromFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#.requestFromObject">requestFromObject</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#configure">configure</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#delete">delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#destroy">destroy</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#get">get</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#middlerun">middlerun</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#model">model</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#options">options</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#patch">patch</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#post">post</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#put">put</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#use">use</a></span></li></ul><ul><li class="nav-heading">Modules</li><li class="nav-heading"><span class="nav-item-type type-module" title="module">M</span><span class="nav-item-name is-module"><a href="module-StringUtility.html">StringUtility</a></span></li></ul><ul><li class="nav-heading">Namespaces</li><li class="nav-heading"><span class="nav-item-type type-namespace" title="namespace">N</span><span class="nav-item-name is-namespace"><a href="CLI.html">CLI</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace" title="namespace">N</span><span class="nav-item-name is-namespace"><a href="Modeling.html">Modeling</a></span></li></ul><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#ConditionCallback">ConditionCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#Constructor">Constructor</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#DeleteRequestCallback">DeleteRequestCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#FetchEngineConfiguration">FetchEngineConfiguration</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#FetchRequestHeader">FetchRequestHeader</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#FilterCondition">FilterCondition</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#FilterLogicalGroup">FilterLogicalGroup</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#GetRequestCallback">GetRequestCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="global.html#HttpRequestLoader">HttpRequestLoader</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="global.html#ISO8601Date">ISO8601Date</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#LoggerCallback">LoggerCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#MainState">MainState</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#MemoryEngineConfiguration">MemoryEngineConfiguration</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#MemoryRequestHeader">MemoryRequestHeader</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#ModelNameResolveCallback">ModelNameResolveCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#OptionsRequestCallback">OptionsRequestCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="global.html#PackageLoader">PackageLoader</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#ParserToken">ParserToken</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#PatchRequestCallback">PatchRequestCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#PostRequestCallback">PostRequestCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#PutRequestCallback">PutRequestCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#SortToken">SortToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="global.html#start">start</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#StashKuConfiguration">StashKuConfiguration</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#StashKuMiddleware">StashKuMiddleware</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#StashKuMiddlewareCallback">StashKuMiddlewareCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#StashKuMiddlewareLogCallback">StashKuMiddlewareLogCallback</a></span></li>
+  </nav>
+</header>
+
+
+<main class="layout-main ">
+  <div class="container">
+    <p class="page-kind"></p>
+    <h1 class="page-title">Global</h1>
+    
+
+
+
+
+<section>
+
+
+<header class="not-class">
+
+
+    
+        
+        <!-- <h2></h2> -->
+
+        
+
+        
+
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+
+
+
+    
+        
+
+        
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+     
+
+    
+
+    
+
+
+    
+        <h3 class="subtitle">Members</h3>
+
+        
+            
+
+<article class="member">
+    <div class="method-type">
+        <span class="method-type-signature is-constant">constant</span>
+    </div>
+<h4 class="member-name" id="ISO8601Date">ISO8601Date<span class="type-signature">RegExp</span></h4>
+
+
+
+
+<div class="description">
+    <p>A regular expression to check for a reasonable ISO8601 format date.
+YYYY-MM-DDThh:mm
+YYYY-MM-DDThh:mmTZD
+YYYY-MM-DDThh:mm:ss
+YYYY-MM-DDThh:mm:ssTZD
+YYYY-MM-DDThh:mm:ss.s
+YYYY-MM-DDThh:mm:ss.sTZD</p>
+</div>
+
+
+
+    <h4>Type</h4>
+    <ul>
+        <li>
+            
+
+
+    <span class="param-type">
+        <code>RegExp</code>
+    </span>
+    
+
+        </li>
+    </ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="filter.js.html">filter.js</a><a href="filter.js.html#source.27">, line 27</a>
+        </li>
+    </ul>
+
+
+</article>
+        
+    
+
+    
+        <h3 class="subtitle">Methods</h3>
+
+        
+            
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    <span class="method-type-signature is-async">async</span>
+    </div>
+
+    <h4 class="method-name" id="HttpRequestLoader">HttpRequestLoader<span class="signature">(req, requestType)</span><span class="return-type-signature"> &rarr; {Promise.&lt;(module:requests/get-request~GetRequest|module:requests/post-request~PostRequest|module:requests/put-request~PutRequest|module:requests/patch-request~PatchRequest|module:requests/delete-request~DeleteRequest|module:requests/options-request~OptionsRequest)>}</span>
+    </h4>
+
+
+
+
+
+<div class="method-description">
+    
+    <p>Attempts to parse a request object from an <code>http.IncomingMessage</code>, matched by the request method.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">req</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>http.IncomingMessage</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The request object.</p></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">requestType</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>Object</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The request type expected back.</p></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+    <h4 class="method-heading">Returns</h4>
+    <ul>
+    
+        <li class="method-returns">
+            
+                <code>Promise.&lt;(module:requests/get-request~GetRequest|module:requests/post-request~PostRequest|module:requests/put-request~PutRequest|module:requests/patch-request~PatchRequest|module:requests/delete-request~DeleteRequest|module:requests/options-request~OptionsRequest)></code>
+            
+            
+        </li>
+    
+    </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="node_http-request-loader.js.html">node/http-request-loader.js</a><a href="node_http-request-loader.js.html#source.27">, line 27</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+        
+            
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    <span class="method-type-signature is-async">async</span>
+    </div>
+
+    <h4 class="method-name" id="PackageLoader">PackageLoader<span class="signature">(packageName)</span><span class="return-type-signature"> &rarr; {Promise.&lt;<a href="BaseEngine.html">BaseEngine</a>>}</span>
+    </h4>
+
+
+
+
+
+<div class="method-description">
+    
+    <p>Attempts to load a node package by name which should be a StashKu engine.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">packageName</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The name of the package containing the stashku engine.</p></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+    <h4 class="method-heading">Returns</h4>
+    <ul>
+    
+        <li class="method-returns">
+            
+                <code>Promise.&lt;<a href="BaseEngine.html">BaseEngine</a>></code>
+            
+            
+        </li>
+    
+    </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="node_package-loader.js.html">node/package-loader.js</a><a href="node_package-loader.js.html#source.9">, line 9</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+        
+            
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    <span class="method-type-signature is-async">async</span>
+    </div>
+
+    <h4 class="method-name" id="start">start<span class="signature">()</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+<div class="method-description">
+    
+    <p>Starts the worker to perform actions using the loaded options.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="cli_processors_base-processor.js.html">cli/processors/base-processor.js</a><a href="cli_processors_base-processor.js.html#source.20">, line 20</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+        
+    
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
+
+        
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="ConditionCallback">ConditionCallback<span class="signature">(f)</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">f</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="Filter.html">Filter</a></code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="requests_delete-request.js.html">requests/delete-request.js</a><a href="requests_delete-request.js.html#source.92">, line 92</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="ConditionCallback">ConditionCallback<span class="signature">(f)</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">f</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="Filter.html">Filter</a></code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="requests_get-request.js.html">requests/get-request.js</a><a href="requests_get-request.js.html#source.138">, line 138</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="ConditionCallback">ConditionCallback<span class="signature">(f)</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">f</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="Filter.html">Filter</a></code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="requests_patch-request.js.html">requests/patch-request.js</a><a href="requests_patch-request.js.html#source.127">, line 127</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="Constructor">Constructor</h4>
+
+
+
+
+
+
+    <h4>Type</h4>
+    <ul>
+        <li>
+            
+
+
+    <span class="param-type">
+        <code>instanceOf()</code>
+    </span>
+    |
+
+    <span class="param-type">
+        <code>instanceOf(T)</code>
+    </span>
+    
+
+        </li>
+    </ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="modeling_model-utility.js.html">modeling/model-utility.js</a><a href="modeling_model-utility.js.html#source.158">, line 158</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="Constructor">Constructor</h4>
+
+
+
+
+
+
+    <h4>Type</h4>
+    <ul>
+        <li>
+            
+
+
+    <span class="param-type">
+        <code>instanceOf()</code>
+    </span>
+    |
+
+    <span class="param-type">
+        <code>instanceOf(T)</code>
+    </span>
+    
+
+        </li>
+    </ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.410">, line 410</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="DeleteRequestCallback">DeleteRequestCallback<span class="signature">(request, model<span class="signature-attributes">opt</span>)</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">request</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="DeleteRequest.html">DeleteRequest</a></code>
+    </span>
+    
+
+            
+
+            
+                <span class="param-attributes">
+                
+
+                
+
+                
+                </span>
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">model</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>M</code>
+    </span>
+    
+
+            
+
+            
+                <span class="param-attributes">
+                
+                    &lt;optional&gt;<br>
+                
+
+                
+
+                
+                </span>
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.576">, line 576</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="FetchEngineConfiguration">FetchEngineConfiguration</h4>
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Properties</h4>
+    
+
+<ul class="method-params">
+
+
+    <li>
+        
+            <span class="param-name">root</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+                &lt;optional&gt;<br>
+            
+
+            
+            </span>
+        
+
+        
+            <span class="param-default">
+            
+            </span>
+        
+
+        <div class="param-description">
+            <p>The root URI of each fetch request. If specified, will be prefixed to each resource.</p>
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">path</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+                &lt;optional&gt;<br>
+            
+
+            
+            </span>
+        
+
+        
+            <span class="param-default">
+            
+                <code>"/api"</code>
+            
+            </span>
+        
+
+        <div class="param-description">
+            <p>The path to the URI endpoint. This is prefixed before each resource, but after
+the <code>root</code> (if specified).</p>
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">modelResourceTarget</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+                &lt;optional&gt;<br>
+            
+
+            
+            </span>
+        
+
+        
+            <span class="param-default">
+            
+                <code>"plural.slug"</code>
+            
+            </span>
+        
+
+        <div class="param-description">
+            <p>Optional configuration that instructs the engine which model
+<code>$stashku</code> property to use for the resource name. Can be <code>&quot;name&quot;</code>, <code>&quot;slug&quot;</code>, <code>&quot;plural.name&quot;</code>, or <code>&quot;plural.slug&quot;</code>
+(default).</p>
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">trailingSlash</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>Boolean</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+                &lt;optional&gt;<br>
+            
+
+            
+            </span>
+        
+
+        
+            <span class="param-default">
+            
+                <code>false</code>
+            
+            </span>
+        
+
+        <div class="param-description">
+            <p>Sets whether a slash will be added at the end of the generated URI.</p>
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">fetch</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>RequestInit</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+                &lt;optional&gt;<br>
+            
+
+            
+            </span>
+        
+
+        
+            <span class="param-default">
+            
+            </span>
+        
+
+        <div class="param-description">
+            <p>Optional fetch defaults to apply before request-specific configuration is set.</p>
+        </div>
+
+    </li>
+    
+</ul>
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="engines_fetch-engine.js.html">engines/fetch-engine.js</a><a href="engines_fetch-engine.js.html#source.30">, line 30</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="FetchRequestHeader">FetchRequestHeader</h4>
+
+
+
+
+
+
+    <h4>Type</h4>
+    <ul>
+        <li>
+            
+
+
+    <span class="param-type">
+        <code><a href="global.html#FetchEngineConfiguration">FetchEngineConfiguration</a></code>
+    </span>
+    
+
+        </li>
+    </ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="engines_fetch-engine.js.html">engines/fetch-engine.js</a><a href="engines_fetch-engine.js.html#source.42">, line 42</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="FilterCondition">FilterCondition</h4>
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Properties</h4>
+    
+
+<ul class="method-params">
+
+
+    <li>
+        
+            <span class="param-name">property</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+
+            
+            </span>
+        
+
+        
+
+        <div class="param-description">
+            <p>The property name from the schema affected by the filter.</p>
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">op</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+
+            
+            </span>
+        
+
+        
+
+        <div class="param-description">
+            <p>The filter operator.</p>
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">value</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>*</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+                &lt;optional&gt;<br>
+            
+
+            
+            </span>
+        
+
+        
+
+        <div class="param-description">
+            <p>The value used by the operator on the property value.</p>
+        </div>
+
+    </li>
+    
+</ul>
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="filter.js.html">filter.js</a><a href="filter.js.html#source.3">, line 3</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="FilterLogicalGroup">FilterLogicalGroup</h4>
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Properties</h4>
+    
+
+<ul class="method-params">
+
+
+    <li>
+        
+            <span class="param-name">logic</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            <p>The logical operator to apply to the filters.</p>
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">filters</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>Array.&lt;(<a href="global.html#FilterCondition">FilterCondition</a>|<a href="global.html#FilterLogicalGroup">FilterLogicalGroup</a>)></code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            <p>The filter items and groups under the logical operator.</p>
+        </div>
+
+    </li>
+    
+</ul>
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="filter.js.html">filter.js</a><a href="filter.js.html#source.10">, line 10</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="GetRequestCallback">GetRequestCallback<span class="signature">(request, model<span class="signature-attributes">opt</span>)</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">request</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="GetRequest.html">GetRequest</a></code>
+    </span>
+    
+
+            
+
+            
+                <span class="param-attributes">
+                
+
+                
+
+                
+                </span>
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">model</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>M</code>
+    </span>
+    
+
+            
+
+            
+                <span class="param-attributes">
+                
+                    &lt;optional&gt;<br>
+                
+
+                
+
+                
+                </span>
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.455">, line 455</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="LoggerCallback">LoggerCallback<span class="signature">(state, severity, args)</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">state</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>Always a &quot;log&quot; string.</p></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">severity</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The severity level of the log message, either &quot;error&quot;, &quot;warn&quot;, &quot;info&quot;, or &quot;debug&quot;.</p></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">args</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>Array</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The log message arguments, this can be a mix of types.</p></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="logger.js.html">logger.js</a><a href="logger.js.html#source.2">, line 2</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="MainState">MainState</h4>
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Properties</h4>
+    
+
+<ul class="method-params">
+
+
+    <li>
+        
+            <span class="param-name">versions</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>Object</code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">opts</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code><a href="CLI.html#.CommandLineOptions">CLI.CommandLineOptions</a></code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">args</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>*</code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            
+        </div>
+
+    </li>
+    
+</ul>
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="cli_main.js.html">cli/main.js</a><a href="cli_main.js.html#source.9">, line 9</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="MemoryEngineConfiguration">MemoryEngineConfiguration</h4>
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Properties</h4>
+    
+
+<ul class="method-params">
+
+
+    <li>
+        
+            <span class="param-name">caseSensitive</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>Boolean</code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            <p>Controls whether all resource names are stored in lower-case, and tracked
+case-insensitively or not. By default this is unset in the configuration which will default to <code>false</code> internally
+and allow it to be overridden by request headers. If set explicitly, the request header's <code>caseSensitive</code> flag
+will be ignored.</p>
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">limit</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>Number</code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            <p>Limits the maximum number of objects that can be stored in the memory engine per resource
+name. If this limit is reached, POST requests will throw an error.</p>
+        </div>
+
+    </li>
+    
+</ul>
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="engines_memory-engine.js.html">engines/memory-engine.js</a><a href="engines_memory-engine.js.html#source.34">, line 34</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="MemoryRequestHeader">MemoryRequestHeader</h4>
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Properties</h4>
+    
+
+<ul class="method-params">
+
+
+    <li>
+        
+            <span class="param-name">caseSensitive</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>Boolean</code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            <p>Instructs the memory storage engine to search for a resource by its lower-case
+name (<code>false</code>) or regular-case (<code>true</code>). This will be ignored if the same flag (<code>caseSensitive</code>) is set on the
+memory storage configuration.</p>
+        </div>
+
+    </li>
+    
+</ul>
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="engines_memory-engine.js.html">engines/memory-engine.js</a><a href="engines_memory-engine.js.html#source.44">, line 44</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="ModelNameResolveCallback">ModelNameResolveCallback<span class="signature">(name)</span><span class="return-type-signature"> &rarr; {*}</span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">name</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The model name defined.</p></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+    <h4 class="method-heading">Returns</h4>
+    <ul>
+    
+        <li class="method-returns">
+            
+                <code>*</code>
+            
+            
+                <p>Returns a model type constructor/class associated with the model name.</p>
+            
+        </li>
+    
+    </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.625">, line 625</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="OptionsRequestCallback">OptionsRequestCallback<span class="signature">(request, model<span class="signature-attributes">opt</span>)</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">request</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="OptionsRequest.html">OptionsRequest</a></code>
+    </span>
+    
+
+            
+
+            
+                <span class="param-attributes">
+                
+
+                
+
+                
+                </span>
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">model</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>M</code>
+    </span>
+    
+
+            
+
+            
+                <span class="param-attributes">
+                
+                    &lt;optional&gt;<br>
+                
+
+                
+
+                
+                </span>
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.601">, line 601</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="ParserToken">ParserToken</h4>
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Properties</h4>
+    
+
+<ul class="method-params">
+
+
+    <li>
+        
+            <span class="param-name">type</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+
+            
+            </span>
+        
+
+        
+
+        <div class="param-description">
+            
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">startIndex</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>Number</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+
+            
+            </span>
+        
+
+        
+
+        <div class="param-description">
+            
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">endIndex</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>Number</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+
+            
+            </span>
+        
+
+        
+
+        <div class="param-description">
+            
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">value</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+                &lt;optional&gt;<br>
+            
+
+            
+            </span>
+        
+
+        
+
+        <div class="param-description">
+            
+        </div>
+
+    </li>
+    
+</ul>
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="filter.js.html">filter.js</a><a href="filter.js.html#source.564">, line 564</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="PatchRequestCallback">PatchRequestCallback<span class="signature">(request, model<span class="signature-attributes">opt</span>)</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">request</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="PatchRequest.html">PatchRequest</a></code>
+    </span>
+    
+
+            
+
+            
+                <span class="param-attributes">
+                
+
+                
+
+                
+                </span>
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">model</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>M</code>
+    </span>
+    
+
+            
+
+            
+                <span class="param-attributes">
+                
+                    &lt;optional&gt;<br>
+                
+
+                
+
+                
+                </span>
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.545">, line 545</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="PostRequestCallback">PostRequestCallback<span class="signature">(request, model<span class="signature-attributes">opt</span>)</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">request</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="PostRequest.html">PostRequest</a></code>
+    </span>
+    
+
+            
+
+            
+                <span class="param-attributes">
+                
+
+                
+
+                
+                </span>
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">model</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>M</code>
+    </span>
+    
+
+            
+
+            
+                <span class="param-attributes">
+                
+                    &lt;optional&gt;<br>
+                
+
+                
+
+                
+                </span>
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.484">, line 484</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="PutRequestCallback">PutRequestCallback<span class="signature">(request, model<span class="signature-attributes">opt</span>)</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">request</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="PutRequest.html">PutRequest</a></code>
+    </span>
+    
+
+            
+
+            
+                <span class="param-attributes">
+                
+
+                
+
+                
+                </span>
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">model</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>M</code>
+    </span>
+    
+
+            
+
+            
+                <span class="param-attributes">
+                
+                    &lt;optional&gt;<br>
+                
+
+                
+
+                
+                </span>
+            
+
+            
+
+            <div class="param-description"></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.513">, line 513</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="SortToken">SortToken</h4>
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Properties</h4>
+    
+
+<ul class="method-params">
+
+
+    <li>
+        
+            <span class="param-name">type</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">value</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            
+        </div>
+
+    </li>
+    
+</ul>
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="sort.js.html">sort.js</a><a href="sort.js.html#source.87">, line 87</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="StashKuConfiguration">StashKuConfiguration</h4>
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Properties</h4>
+    
+
+<ul class="method-params">
+
+
+    <li>
+        
+            <span class="param-name">engine</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    |
+
+    <span class="param-type">
+        <code>BaseStorageEngine</code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            <p>The name or instance of the StashKu engine to use.</p>
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">middleware</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>Array.&lt;(<a href="global.html#StashKuMiddleware">StashKuMiddleware</a>|<a href="global.html#StashKuMiddlewareCallback">StashKuMiddlewareCallback</a>|<a href="global.html#StashKuMiddlewareLogCallback">StashKuMiddlewareLogCallback</a>)></code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">resources</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>Array.&lt;String></code>
+    </span>
+    
+
+        
+
+        
+
+        
+
+        <div class="param-description">
+            <p>Optional array of resource names that are allowed through this instance of
+StashKu. Any request asking for a resource not found in this array will throw an error.</p>
+        </div>
+
+    </li>
+    
+</ul>
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.58">, line 58</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+<article class="member">
+    <div class="method-type">
+        
+    </div>
+<h4 class="member-name" id="StashKuMiddleware">StashKuMiddleware</h4>
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Properties</h4>
+    
+
+<ul class="method-params">
+
+
+    <li>
+        
+            <span class="param-name">name</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+                &lt;optional&gt;<br>
+            
+
+            
+            </span>
+        
+
+        
+
+        <div class="param-description">
+            <p>An optional name for the middleware that is used for logging purposes.</p>
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">states</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>Array.&lt;String></code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+                &lt;optional&gt;<br>
+            
+
+            
+            </span>
+        
+
+        
+
+        <div class="param-description">
+            <p>The name(s) of the states to target, either &quot;all&quot;/&quot;*&quot;, &quot;log&quot;, &quot;request&quot;,
+&quot;response&quot;, or &quot;done&quot;.</p>
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">methods</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code>Array.&lt;String></code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+                &lt;optional&gt;<br>
+            
+
+            
+            </span>
+        
+
+        
+
+        <div class="param-description">
+            <p>The name(s) of the methods to target, either &quot;all&quot;/&quot;*&quot;, &quot;get&quot;, &quot;post&quot;, &quot;put&quot;,
+&quot;patch&quot; or &quot;delete&quot;.</p>
+        </div>
+
+    </li>
+    
+
+    <li>
+        
+            <span class="param-name">callback</span>
+        
+
+        
+            
+
+
+    <span class="param-type">
+        <code><a href="global.html#StashKuMiddlewareCallback">StashKuMiddlewareCallback</a></code>
+    </span>
+    |
+
+    <span class="param-type">
+        <code><a href="global.html#StashKuMiddlewareLogCallback">StashKuMiddlewareLogCallback</a></code>
+    </span>
+    
+
+        
+
+        
+            <span class="param-attributes">
+            
+
+            
+            </span>
+        
+
+        
+
+        <div class="param-description">
+            <p>The callback to be called when being processed.</p>
+        </div>
+
+    </li>
+    
+</ul>
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    <h4>Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.48">, line 48</a>
+        </li>
+    </ul>
+
+
+</article>
+            
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="StashKuMiddlewareCallback">StashKuMiddlewareCallback<span class="signature">(stashku, engine, method, request, response, state)</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">stashku</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="StashKu.html">StashKu</a></code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The StashKu instance making the middleware call.</p></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">engine</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>BaseStorageEngine</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The storage engine instance that is processing the request.</p></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">method</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The name of the request method being carried out, typically &quot;get&quot;, &quot;post&quot;, &quot;put&quot;, &quot;patch&quot;,
+&quot;delete&quot;, &quot;options&quot;.</p></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">request</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="GetRequest.html">GetRequest</a></code>
+    </span>
+    |
+
+    <span class="param-type">
+        <code><a href="PostRequest.html">PostRequest</a></code>
+    </span>
+    |
+
+    <span class="param-type">
+        <code><a href="PutRequest.html">PutRequest</a></code>
+    </span>
+    |
+
+    <span class="param-type">
+        <code><a href="PatchRequest.html">PatchRequest</a></code>
+    </span>
+    |
+
+    <span class="param-type">
+        <code><a href="DeleteRequest.html">DeleteRequest</a></code>
+    </span>
+    |
+
+    <span class="param-type">
+        <code><a href="OptionsRequest.html">OptionsRequest</a></code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The request object being specified.</p></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">response</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="Response.html">Response</a></code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The response object (<code>null</code> if not prepared yet).</p></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">state</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The name of the state of where in the RESTful process the callback is being made, either:</p>
+<ul>
+<li>&quot;request&quot;: Indicates the callback was made before the request has handed off to the engine.</li>
+<li>&quot;response&quot;: Indicates the callback was made after the engine's response has been returned.</li>
+<li>&quot;done&quot;: Indicates the callback was made after the engine has completed the response and the action is about to
+complete (StashKu hands off the storage engine response to the caller).</li>
+</ul></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.24">, line 24</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+                
+
+
+    <article class="method">
+
+
+
+
+    
+
+
+    
+
+    <div class="method-type">
+    
+    </div>
+
+    <h4 class="method-name" id="StashKuMiddlewareLogCallback">StashKuMiddlewareLogCallback<span class="signature">(stashku, engine, severity, args)</span><span class="return-type-signature"></span>
+    </h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Parameters</h4>
+    
+
+<ul class="method-params">
+    
+
+        <li>
+            
+                <span class="param-name">stashku</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code><a href="StashKu.html">StashKu</a></code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The StashKu instance making the middleware call.</p></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">engine</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>BaseStorageEngine</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The storage engine instance that is currently loaded.</p></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">severity</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>String</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The severity level of the log message, either &quot;error&quot;, &quot;warn&quot;, &quot;info&quot;, or &quot;debug&quot;.</p></div>
+            
+        </li>
+
+    
+
+        <li>
+            
+                <span class="param-name">args</span>
+            
+
+            
+                
+
+
+    <span class="param-type">
+        <code>Array</code>
+    </span>
+    
+
+            
+
+            
+
+            
+
+            <div class="param-description"><p>The log message arguments, this can be a mix of types.</p></div>
+            
+        </li>
+
+    
+</ul>
+
+
+
+
+
+<div class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="method-heading">Source</h4>
+    <ul>
+        <li class="method-source">
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.40">, line 40</a>
+        </li>
+    </ul>
+
+
+
+    </article>
+
+            
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+  </div>
+</main>
+
+<footer class="layout-footer">
+  <div class="container">
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Thu May 26 2022 16:33:33 GMT-0700 (Pacific Daylight Time)
+  </div>
+</footer>
+
+
+
+<script src="scripts/prism.dev.js"></script>
+</body>
+</html>

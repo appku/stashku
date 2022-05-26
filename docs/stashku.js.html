@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    
+    <title>@AppKu/StashKu: stashku.js</title>
+    
+    
+      <link type="text/css" rel="stylesheet" href="styles/vendor/prism-tomorrow-night.css">
+    
+    <link type="image/x-icon" rel="icon" href="favicon.ico">
+    <link type="image/x-icon" rel="shortcut icon" href="favicon.ico">
+    <link type="text/css" rel="stylesheet" href="styles/styles.css">
+    
+</head>
+<body>
+
+<header class="layout-header">
+  
+    <a href="./">
+      <img
+        src="https://avatars.githubusercontent.com/u/76977527?s=400"
+        alt="@AppKu/StashKu"
+      >
+    </a>
+  
+  <h1><a href="./index.html">@AppKu/StashKu</a></h1>
+  
+  <h2>v1.0.0</h2>
+  
+  
+  <ul class="meta-links">
+    
+    <li><a href="https://appku.com"><i class="bi bi-globe"></i></a></li>
+    
+    <li><a href="https://github.com/appku/stashku"><i class="bi bi-github"></i></a></li>
+    
+  </ul>
+  
+  <nav class="layout-nav">
+    <ul class="nav-introduction">
+      <li class="nav-item"><a href="./index.html">Introduction</a></li>
+    </ul>
+    <ul><li class="nav-heading">Tutorials</li><li class="nav-item"><a href="tutorial-Going Next-Level with Models.html">Going Next-Level with Models</a></li><li class="nav-item"><a href="tutorial-Requests_ DELETE.html">Requests: DELETE</a></li><li class="nav-item"><a href="tutorial-Requests_ GET.html">Requests: GET</a></li><li class="nav-item"><a href="tutorial-Requests_ OPTIONS.html">Requests: OPTIONS</a></li><li class="nav-item"><a href="tutorial-Requests_ PATCH.html">Requests: PATCH</a></li><li class="nav-item"><a href="tutorial-Requests_ POST.html">Requests: POST</a></li><li class="nav-item"><a href="tutorial-Requests_ PUT.html">Requests: PUT</a></li><li class="nav-item"><a href="tutorial-Using the CLI.html">Using the CLI</a></li><li class="nav-item"><a href="tutorial-Using the Fetch Engine.html">Using the Fetch Engine</a></li><li class="nav-item"><a href="tutorial-Using the Memory Engine.html">Using the Memory Engine</a></li></ul><ul><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="BaseEngine.html">BaseEngine</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="BaseEngine.html#config">config</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="BaseEngine.html#log">log</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="BaseEngine.html#name">name</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#configure">configure</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#delete">delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#destroy">destroy</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#get">get</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#options">options</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#patch">patch</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#post">post</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#put">put</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="BaseEngine.html#resources">resources</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="DeleteRequest.html">DeleteRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="DeleteRequest.html#method">method</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#all">all</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#clear">clear</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#count">count</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#from">from</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#headers">headers</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#toJSON">toJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="DeleteRequest.html#where">where</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="FetchEngine.html">FetchEngine</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="FetchEngine.html#config">config</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="FetchEngine.html#data">data</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#configure">configure</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#delete">delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#get">get</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#options">options</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#patch">patch</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#post">post</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#put">put</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="FetchEngine.html#resources">resources</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="Filter.html">Filter</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Filter.html#.LOGIC">LOGIC</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Filter.html#.LOGIC_KEYS">LOGIC_KEYS</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Filter.html#.OP">OP</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Filter.html#.OP_KEYS">OP_KEYS</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Filter.html#dot">dot</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Filter.html#tree">tree</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#.and">and</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#.fromObject">fromObject</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#.isEmpty">isEmpty</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#.or">or</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#.parse">parse</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#add">add</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#and">and</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#clone">clone</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#or">or</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#test">test</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#toJSON">toJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Filter.html#toString">toString</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="GetRequest.html">GetRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="GetRequest.html#method">method</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#clear">clear</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#count">count</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#distinct">distinct</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#from">from</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#headers">headers</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#one">one</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#properties">properties</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#skip">skip</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#sort">sort</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#take">take</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#toJSON">toJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="GetRequest.html#where">where</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="Logger.html">Logger</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Logger.html#callback">callback</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Logger.html#debug">debug</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Logger.html#error">error</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Logger.html#info">info</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Logger.html#warn">warn</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="Main.html">Main</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Main.html#cmd">cmd</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Main.html#state">state</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Main.html#configure">configure</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Main.html#process">process</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Main.html#request">request</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="MemoryEngine.html">MemoryEngine</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="MemoryEngine.html#config">config</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="MemoryEngine.html#data">data</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#configure">configure</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#delete">delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#get">get</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#options">options</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#patch">patch</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#post">post</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#put">put</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#resourceOf">resourceOf</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="MemoryEngine.html#resources">resources</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="ModelGenerator.html">ModelGenerator</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelGenerator.html#.formatModelName">formatModelName</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelGenerator.html#.formatPropName">formatPropName</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelGenerator.html#.generateModelType">generateModelType</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="ModelUtility.html">ModelUtility</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.isValidType">isValidType</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.map">map</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.model">model</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.pk">pk</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.resource">resource</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.schema">schema</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="ModelUtility.html#.unmodel">unmodel</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="OptionsExporter.html">OptionsExporter</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsExporter.html#export">export</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsExporter.html#makePropertyJSDoc">makePropertyJSDoc</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsExporter.html#toJavascriptPropertyDefaultReference">toJavascriptPropertyDefaultReference</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsExporter.html#toJavaScriptString">toJavaScriptString</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="OptionsRequest.html">OptionsRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="OptionsRequest.html#method">method</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsRequest.html#all">all</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsRequest.html#clear">clear</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsRequest.html#from">from</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsRequest.html#headers">headers</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="OptionsRequest.html#toJSON">toJSON</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="PatchRequest.html">PatchRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="PatchRequest.html#method">method</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#all">all</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#clear">clear</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#count">count</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#headers">headers</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#template">template</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#to">to</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#toJSON">toJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PatchRequest.html#where">where</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="PostRequest.html">PostRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="PostRequest.html#method">method</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PostRequest.html#clear">clear</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PostRequest.html#count">count</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PostRequest.html#headers">headers</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PostRequest.html#objects">objects</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PostRequest.html#to">to</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PostRequest.html#toJSON">toJSON</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="PutRequest.html">PutRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="PutRequest.html#method">method</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#clear">clear</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#count">count</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#headers">headers</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#objects">objects</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#pk">pk</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#to">to</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="PutRequest.html#toJSON">toJSON</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="RequestProcessor.html">RequestProcessor</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="RequestProcessor.html#options">options</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="RequestProcessor.html#buildGet">buildGet</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="RequestProcessor.html#buildOptions">buildOptions</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="RequestProcessor.html#start">start</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="Response.html">Response</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Response.html#affected">affected</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Response.html#code">code</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Response.html#data">data</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Response.html#returned">returned</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Response.html#total">total</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Response.html#.empty">empty</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="RESTError.html">RESTError</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="RESTError.html#code">code</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="Sort.html">Sort</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Sort.html#dir">dir</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="Sort.html#property">property</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Sort.html#.asc">asc</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Sort.html#.desc">desc</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Sort.html#.parse">parse</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="Sort.html#toString">toString</a></span></li><li class="nav-heading"><span class="nav-item-type type-class" title="class">C</span><span class="nav-item-name is-class"><a href="StashKu.html">StashKu</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="StashKu.html#config">config</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="StashKu.html#engine">engine</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="StashKu.html#log">log</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="StashKu.html#middleware">middleware</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="StashKu.html#stats">stats</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#.requestFromFile">requestFromFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#.requestFromObject">requestFromObject</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#configure">configure</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#delete">delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#destroy">destroy</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#get">get</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#middlerun">middlerun</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#model">model</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#options">options</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#patch">patch</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#post">post</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#put">put</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="StashKu.html#use">use</a></span></li></ul><ul><li class="nav-heading">Modules</li><li class="nav-heading"><span class="nav-item-type type-module" title="module">M</span><span class="nav-item-name is-module"><a href="module-StringUtility.html">StringUtility</a></span></li></ul><ul><li class="nav-heading">Namespaces</li><li class="nav-heading"><span class="nav-item-type type-namespace" title="namespace">N</span><span class="nav-item-name is-namespace"><a href="CLI.html">CLI</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace" title="namespace">N</span><span class="nav-item-name is-namespace"><a href="Modeling.html">Modeling</a></span></li></ul><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#ConditionCallback">ConditionCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#Constructor">Constructor</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#DeleteRequestCallback">DeleteRequestCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#FetchEngineConfiguration">FetchEngineConfiguration</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#FetchRequestHeader">FetchRequestHeader</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#FilterCondition">FilterCondition</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#FilterLogicalGroup">FilterLogicalGroup</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#GetRequestCallback">GetRequestCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="global.html#HttpRequestLoader">HttpRequestLoader</a></span></li><li class="nav-item"><span class="nav-item-type type-member" title="member">M</span><span class="nav-item-name is-member"><a href="global.html#ISO8601Date">ISO8601Date</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#LoggerCallback">LoggerCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#MainState">MainState</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#MemoryEngineConfiguration">MemoryEngineConfiguration</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#MemoryRequestHeader">MemoryRequestHeader</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#ModelNameResolveCallback">ModelNameResolveCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#OptionsRequestCallback">OptionsRequestCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="global.html#PackageLoader">PackageLoader</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#ParserToken">ParserToken</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#PatchRequestCallback">PatchRequestCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#PostRequestCallback">PostRequestCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#PutRequestCallback">PutRequestCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#SortToken">SortToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function" title="function">F</span><span class="nav-item-name is-function"><a href="global.html#start">start</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#StashKuConfiguration">StashKuConfiguration</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#StashKuMiddleware">StashKuMiddleware</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#StashKuMiddlewareCallback">StashKuMiddlewareCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-typedef" title="typedef">T</span><span class="nav-item-name is-typedef"><a href="global.html#StashKuMiddlewareLogCallback">StashKuMiddlewareLogCallback</a></span></li>
+  </nav>
+</header>
+
+
+<main class="layout-main  layout-content--source">
+  <div class="container">
+    <p class="page-kind">source</p>
+    <h1 class="page-title">stashku.js</h1>
+    
+
+
+
+    
+
+<section>
+    <article>
+        <pre id="source" class="source-page line-numbers"><code class="language-js">import DeleteRequest from './requests/delete-request.js';
+import GetRequest from './requests/get-request.js';
+import OptionsRequest from './requests/options-request.js';
+import PatchRequest from './requests/patch-request.js';
+import PostRequest from './requests/post-request.js';
+import PutRequest from './requests/put-request.js';
+import Response from './response.js';
+import RESTError from './rest-error.js';
+import Filter from './filter.js';
+import Logger from './logger.js';
+import Sort from './sort.js';
+import ModelGenerator from './modeling/model-generator.js';
+import ModelUtility from './modeling/model-utility.js';
+import StringUtility from './utilities/string-utility.js';
+import BaseEngine from './engines/base-engine.js';
+import MemoryEngine from './engines/memory-engine.js';
+import FetchEngine from './engines/fetch-engine.js';
+
+const SUPPORTED_METHODS = ['all', '*', 'get', 'post', 'put', 'patch', 'delete', 'options'];
+const SUPPORTED_STATES = ['log', 'request', 'response', 'done'];
+const IS_BROWSER = (typeof window !== 'undefined');
+let HttpRequestLoader = null; //see .requestFromObject
+
+/**
+ * @callback StashKuMiddlewareCallback
+ * @param {StashKu} stashku - The StashKu instance making the middleware call.
+ * @param {BaseStorageEngine} engine - The storage engine instance that is processing the request.
+ * @param {String} method - The name of the request method being carried out, typically "get", "post", "put", "patch",
+ * "delete", "options".
+ * @param {GetRequest|PostRequest|PutRequest|PatchRequest|DeleteRequest|OptionsRequest} request - The request object being specified.
+ * @param {Response} response - The response object (`null` if not prepared yet).
+ * @param {String} state 
+ * The name of the state of where in the RESTful process the callback is being made, either:
+ *  - "request": Indicates the callback was made before the request has handed off to the engine.
+ *  - "response": Indicates the callback was made after the engine's response has been returned.
+ *  - "done": Indicates the callback was made after the engine has completed the response and the action is about to
+ * complete (StashKu hands off the storage engine response to the caller).
+ */
+
+/**
+ * @callback StashKuMiddlewareLogCallback
+ * @param {StashKu} stashku - The StashKu instance making the middleware call.
+ * @param {BaseStorageEngine} engine - The storage engine instance that is currently loaded.
+ * @param {String} severity - The severity level of the log message, either "error", "warn", "info", or "debug".
+ * @param {Array} args - The log message arguments, this can be a mix of types.
+ */
+
+/**
+ * @typedef StashKuMiddleware
+ * @property {String} [name] - An optional name for the middleware that is used for logging purposes.
+ * @property {Array.&lt;String>} [states] - The name(s) of the states to target, either "all"/"*", "log", "request", 
+ * "response", or "done".
+ * @property {Array.&lt;String>} [methods] - The name(s) of the methods to target, either "all"/"*", "get", "post", "put",
+ * "patch" or "delete".
+ * @property {StashKuMiddlewareCallback|StashKuMiddlewareLogCallback} callback - The callback to be called when being processed.
+ */
+
+/**
+ * @typedef StashKuConfiguration
+ * @property {String|BaseStorageEngine} engine - The name or instance of the StashKu engine to use.
+ * @property {Array.&lt;StashKuMiddleware|StashKuMiddlewareCallback|StashKuMiddlewareLogCallback>} middleware
+ * @property {Array.&lt;String>} resources - Optional array of resource names that are allowed through this instance of
+ * StashKu. Any request asking for a resource not found in this array will throw an error.
+ */
+
+/**
+ * The StashKu class provides the ability to work with a variety of storage mediums through a single, standardized,
+ * RESTful interface, working much like HTTP - using a request and a response.
+ * 
+ * StashKu supports middleware which can be configured to pre- and post-process requests and responses.
+ * @template M
+ * @template I
+ */
+class StashKu {
+    /**
+     * Creates a new StashKu instance using the provided configuration settings (which override defaults).
+     * @param {StashKu | StashKuConfiguration} [config] - The configuration settings which override defaults.
+     */
+    constructor(config) {
+        /**
+         * The currently active storage engine, or the promise to load it.
+         * All operations will await the engine if it is a promise.
+         * @type {BaseStorageEngine|Promise.&lt;BaseStorageEngine>}
+         */
+        this.engine = null;
+
+        /**
+         * Holds onto the last loaded configuration.    
+         * If you wish to change the configuration, you should use the `configure` function.
+         * @type {StashKuConfiguration}
+         */
+        this.config = null;
+
+        /**
+         * Middleware functions that execute before sending requests or returning responses.
+         * @type {Array.&lt;StashKuMiddleware>}
+         */
+        this.middleware = [];
+
+        /**
+         * Counter of all requests handled by this instance (or parent instance in the case of a proxy) of stashku.
+         */
+        this.stats = {
+            requests: {
+                total: 0,
+                get: 0,
+                put: 0,
+                post: 0,
+                patch: 0,
+                delete: 0,
+                options: 0
+            }
+        };
+
+        /**
+         * @type {Logger}
+         */
+        this.log = null;
+
+        if (config &amp;&amp; config.proxy &amp;&amp; config.proxy.model &amp;&amp; config.proxy.parent) {
+            //this instance is being crafted for a call to the `.model` function and is meant to act as
+            //a proxy to a parent StashKu class.
+            if ((config.proxy.parent instanceof StashKu) === false) {
+                throw new RESTError(500, 'StashKu cannot initialize a proxy instance from a non-StashKu parent instance.');
+            }
+            this.log = config.proxy.parent.log;
+            this.engine = config.proxy.parent.engine;
+            this.middleware = config.proxy.parent.middleware;
+            this.stats = config.proxy.parent.stats;
+            this.resources = config.proxy.parent.resources;
+            //shallow-clone configuration, set proxy
+            this.config = Object.assign({}, config.proxy.parent.config, { proxy: config.proxy });
+        } else {
+            this.log = new Logger(this.middlerun.bind(this));
+            //apply standard configuration
+            this.configure(config ?? null);
+        }
+    }
+
+    /**
+     * Adds the specified middleware to the StashKu instance.
+     * @param {StashKuMiddleware|StashKuMiddlewareCallback|StashKuMiddlewareLogCallback} middleware - The middleware to use.
+     * @returns {StashKu}
+     */
+    use(middleware) {
+        if (typeof middleware === 'function') {
+            //config specifies a single middleware function.
+            this.middleware.push({
+                callback: middleware
+            });
+            this.log.debug(`Unnamed middleware loaded at position ${this.middleware.length - 1}.`);
+        } else if (middleware.callback) {
+            if (middleware.states) {
+                if (typeof middleware.states === 'string') {
+                    middleware.states = [middleware.states]; //convert to array
+                } else if (Array.isArray(middleware.states) === false) {
+                    throw new RESTError(500, 'The middleware specified contains invalid states. The states specified must be a string or array of strings.');
+                }
+                if (middleware.states.every(m => typeof m === 'string') === false) {
+                    throw new RESTError(500, 'The middleware specified contains invalid states. All state values specified must be strings.');
+                } else if (middleware.states.every(m => SUPPORTED_STATES.indexOf(m) >= 0) === false) {
+                    throw new RESTError(500, `The middleware specified contains invalid states. Only "${SUPPORTED_STATES.join('", "')}" states are allowed.`);
+                }
+            }
+            if (middleware.methods) {
+                if (typeof middleware.methods === 'string') {
+                    middleware.methods = [middleware.methods]; //convert to array
+                } else if (Array.isArray(middleware.methods) === false) {
+                    throw new RESTError(500, 'The middleware specified contains invalid methods. The methods specified must be a string or array of strings.');
+                }
+                if (middleware.methods.every(m => typeof m === 'string') === false) {
+                    throw new RESTError(500, 'The middleware specified contains invalid methods. All method values specified must be strings.');
+                } else if (middleware.methods.every(m => SUPPORTED_METHODS.indexOf(m) >= 0) === false) {
+                    throw new RESTError(500, `The middleware specified contains invalid methods. Only "${SUPPORTED_METHODS.join('", "')}" methods are allowed.`);
+                }
+            }
+            this.middleware.push(middleware);
+            if (middleware.name) {
+                this.log.debug(`"${middleware.name}" middleware loaded at position ${this.middleware.length - 1}.`);
+            } else {
+                this.log.debug(`Unnamed middleware loaded at position ${this.middleware.length - 1}.`);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Configures this StashKu instance with the specified configuration. If a `null` value is passed, the
+     * configuration is cleared and reset to the default.
+     * 
+     * When the `config` parameter is undefined (not specified), this function can be awaited. This will await the 
+     * import and load of the configured StashKu engine. If the engine is already loaded, the function will return.
+     * @throws Error if the configured storage engine name (`config.engine`) is not registered with StashKu.
+     * @param {StashKuConfiguration} [config] - The configuration settings which override defaults.
+     * @returns {StashKu}
+     */
+    configure(config) {
+        if (typeof config === 'undefined') {
+            if (this.engine &amp;&amp; this.engine.then) {
+                return this.engine.then((v) => this);
+            } else {
+                return this;
+            }
+        }
+        this.log.debug('Configuring StashKu...');
+        //assign defaults
+        let engineDefault = 'memory';
+        if (IS_BROWSER) {
+            engineDefault = 'fetch';
+        } else {
+            engineDefault = process.env.STASHKU_ENGINE ?? 'memory';
+        }
+        this.config = Object.assign({
+            engine: engineDefault,
+            middleware: [],
+            resources: []
+        }, config);
+        this.log.debug('Configuration=', this.config);
+        //load engine
+        if (this.config.engine === 'memory') {
+            this.engine = new MemoryEngine();
+            this.engine.configure(this.config.memory, this.log);
+        } else if (this.config.engine === 'fetch') {
+            this.engine = new FetchEngine();
+            this.engine.configure(this.config.fetch, this.log);
+        } else if (typeof this.config.engine === 'string' &amp;&amp; IS_BROWSER === false) {
+            let enginePackageName = this.config.engine;
+            this.engine = import(/* webpackIgnore: true */'./node/package-loader.js')
+                .then((loader) => {
+                    return loader.default(enginePackageName)
+                        .then(m => {
+                            this.engine = new m.default();
+                            this.engine.configure(this.config[this.config.engine], this.log);
+                        });
+                });
+        } else if (this.config.engine instanceof BaseEngine) {
+            this.engine = this.config.engine;
+        }
+        //load middleware
+        if (Array.isArray(this.config.middleware)) {
+            //array of possible middleware functions and objects
+            for (let mw of this.config.middleware) {
+                this.use(mw);
+            }
+        } else if (typeof this.config.middleware === 'function') {
+            //config specifies a single middleware function.
+            this.middleware.push({
+                callback: this.config.middleware
+            });
+        }
+        this.log.debug('Done configuring StashKu.');
+        return this;
+    }
+
+    /**
+     * Runs configured middleware callbacks matching the current state and request method.
+     * @param {String} state 
+     * The name of the state of where in the RESTful process the callback is being made, either:
+     *  - "request": Indicates the callback was made before the request has handed off to the engine.
+     *  - "response": Indicates the callback was made before the engine's response has been considered.
+     *  - "done": Indicates the callback was made after the engine has completed the response and the action is about to
+     * complete (StashKu hands off the storage engine response to the caller).
+     * @param {GetRequest|PostRequest|PutRequest|PatchRequest|DeleteRequest|OptionsRequest} request - The request object being specified.
+     * @param {Promise.&lt;Response>} response - The response object (`null` if not prepared yet).
+     */
+    async middlerun(state, request, response) {
+        if (SUPPORTED_STATES.indexOf(state) &lt; 0) {
+            throw new Error(`The "state" argument specified contain an invalid value. Only "${SUPPORTED_STATES.join('", "')}" states are allowed.`);
+        }
+        if (this.middleware &amp;&amp; this.middleware.length) {
+            for (let x = 0; x &lt; this.middleware.length; x++) {
+                let mw = this.middleware[x];
+                if (mw.callback) {
+                    let stateAllowed = (!mw.states || mw.states.length === 0 || mw.states.indexOf(state) >= 0);
+                    let methodAllowed = (
+                        state === 'log'
+                        || !mw.methods
+                        || mw.methods.indexOf('*') >= 0
+                        || mw.methods.indexOf('all') >= 0
+                        || mw.methods.indexOf(request.method) >= 0
+                    );
+                    if (stateAllowed &amp;&amp; methodAllowed) {
+                        if (state === 'log') {
+                            //under the "log" state...
+                            //request = severity string
+                            //response = args array
+                            await mw.callback(this, this.engine, request, response);
+                        } else {
+                            if (mw.name) {
+                                this.log.debug(`Calling middleware ${x + 1} of ${this.middleware.length} "${mw.name}".`);
+                            } else {
+                                this.log.debug(`Calling middleware ${x + 1} of ${this.middleware.length}.`);
+                            }
+                            await mw.callback(this, this.engine, request.method, request, response, state);
+                            this.log.debug(`Completed middleware call ${x + 1} of ${this.middleware.length}.`);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Handles the `request` and ensures it is resolved to a response object, even when defined as a callback.
+     * 
+     * @throws Error if the "request" argument is not a callback function or request-like instance.
+     * @throws Error if the engine module fails to load.
+     * @throws Error if the engine is `null`.
+     * @param {GetRequest|PostRequest|PutRequest|PatchRequest|DeleteRequest|OptionsRequest} request - The request to ensure.
+     * @param {*} requestType - The expected request instance type.
+     * @returns {Promise.&lt;Response>} Returns the data objects from storage matching request criteria.
+     * @private
+     */
+    async _handle(request, requestType) {
+        //validate arguments
+        if (!requestType) {
+            throw new Error('A "requestType" parameter argument is required.');
+        }
+        //handle http.IncomingMessageg
+        if (IS_BROWSER === false &amp;&amp; request.url &amp;&amp; request.httpVersion) {
+            request = await StashKu.requestFromObject(request);
+        }
+        //build request
+        let reqModel = this.config?.proxy?.model;
+        if (typeof request === 'function') {
+            //process callback
+            let tmp = new requestType();
+            if (reqModel) {
+                request(tmp, reqModel);
+                tmp.model(reqModel);
+            } else {
+                request(tmp);
+            }
+            request = tmp;
+        } else if ((request instanceof requestType) === false) {
+            throw new Error(`The "request" argument must be a callback function or ${requestType.name} instance.`);
+        } else if (!this.engine) {
+            throw new Error('A StashKu storage engine has not been loaded. An engine must be configured before operations are allowed.');
+        } else if (reqModel) {
+            request.model(reqModel);
+        }
+        //access restrictions
+        if (this.config.resources &amp;&amp; this.config.resources.length) {
+            let resource = request.metadata.from || request.metadata.to;
+            if (this.config.resources.indexOf(resource) &lt; 0) {
+                throw new RESTError(403, 'Forbidden.');
+            }
+        }
+        //pre-process request
+        let response = null;
+        this.stats.requests[request.method]++;
+        this.stats.requests.total++;
+        let reqID = this.stats.requests.total.toString().padStart(16, '0');
+        this.log.debug(`[${reqID}] Processing "${request.method}" request.`);
+        try {
+            await this.engine; //resolve if a promise.
+        } catch (err) {
+            throw new RESTError(500, `The StashKu storage engine "${this.config.engine}" could not be loaded. ${err.toString()}`);
+        }
+        this.log.debug(`[${reqID}] Running "${request.method}" request middleware.`);
+        await this.middlerun('request', request, response);
+        if (this.engine[request.method]) {
+            try {
+                //make the request and get the response
+                this.log.debug(`[${reqID}] Sending "${request.method}" request to engine "${this.engine.name}".`);
+                response = await this.engine[request.method](request);
+                this.log.debug(`[${reqID}] Received response for "${request.method}" request from engine "${this.engine.name}".`);
+                if (reqModel) {
+                    //convert data
+                    this.log.debug(`[${reqID}] Modelling response data.`);
+                    if (response.data &amp;&amp; response.data.length) {
+                        let counter = 0;
+                        for (let m of ModelUtility.model(reqModel, request.method, ...response.data)) {
+                            response.data[counter] = m;
+                            counter++;
+                        }
+                    }
+                }
+                this.log.debug(`[${reqID}] Running middleware for response.`);
+                await this.middlerun('response', request, response);
+            } catch (err) {
+                if ((err instanceof RESTError) === false) {
+                    throw new RESTError(500, `A StashKu internal error occurred while using storage engine "${this.engine.name}".`, err);
+                }
+                throw err;
+            }
+        } else {
+            throw new RESTError(501, `The StashKu storage engine "${this.engine.name}" does not know how to handle the method "${request.method}".`);
+        }
+        //validate engine response
+        if (!response) {
+            throw new RESTError(403, `The StashKu storage engine "${this.engine.name}" did not return a response.`);
+        } else if ((response instanceof Response) === false) {
+            throw new RESTError(500, `The StashKu storage engine "${this.engine.name}" returned an invalid response.`);
+        }
+        this.log.debug(`[${reqID}] Returning "${request.method}" response with total value of ${response ? response.total : '(null)'}.`);
+        return response;
+    }
+
+    /**
+     * This method safely cleans up resources and should be called after the use of the StashKu instance is complete,
+     * such as just before application exit.
+     */
+    async destroy() {
+        if (this.engine &amp;&amp; this.engine.destroy) {
+            await this.engine.destroy();
+        }
+    }
+
+    /**
+     * @template T
+     * @typedef {new(...args: Array) | new(...args: Array) => T} Constructor
+     **/
+
+    /**
+     * Attaches a model to StashKu operations through a new returned (proxy) StashKu instance. The model is attached
+     * only to the returned proxying instance. This allows the use of the model within the request callback methods
+     * as the second argument (`model`), and the resulting `Response` data to be instances of the model.
+     * 
+     * @example
+     * let sk = new StashKu();
+     * ...
+     * //the model object will be exposed as the "m" argument in the callback.
+     * await sk.model(PersonModel).get((r, m) => r...);
+     * await sk.model(PersonModel).post((r, m) => r...);
+     * await sk.model(PersonModel).put((r, m) => r...);
+     * await sk.model(PersonModel).patch((r, m) => r...);
+     * await sk.model(PersonModel).delete((r, m) => r...);
+     * 
+     * @throws Error if the `modelType` argument missing or falsey.
+     * @throws Error if the `modelType` argument is not a class or constructor function.
+     * @template MT
+     * @param {MT} modelType - The model "class" or constructor function.
+     * @returns {StashKu.&lt;MT, InstanceType.&lt;MT>>}
+     */
+    model(modelType) {
+        let parent = this;
+        if (!modelType) {
+            throw new RESTError(500, 'The "modelType" argument is required.');
+        }
+        if (!modelType.constructor || !modelType.prototype) {
+            throw new RESTError(500, 'The "modelType" argument is invalid and must be a class or constructor function.');
+        }
+        if (this.config &amp;&amp; this.config.proxy &amp;&amp; this.config.proxy.parent) { //prevent parent daisy-chaining
+            parent = this.config.proxy.parent;
+        }
+        return new StashKu({
+            proxy: {
+                parent,
+                model: modelType
+            }
+        });
+    }
+
+    /**
+     * @callback GetRequestCallback
+     * @param {GetRequest} request
+     * @param {M} [model]
+     */
+
+    /**
+     * Run a GET `request` through StashKu using the configured storage engine.    
+     * This operation returns objects from storage that match the GET `request` criteria.    
+     * 
+     * @example
+     * let sk = new StashKu();
+     * ...
+     * await sk.get(r => r
+     *     .properties('FirstName', 'LastName')
+     *     .from('Contacts')
+     *     .where(f => f.and('FirstName', f.OP.STARTSWITH, 'Rob'))
+     *     .sort('LastName')
+     * );
+     * 
+     * @throws Error if the storage engine fails to return a response.
+     * @throws Error if the storage engine returns an invalid response object.
+     * @param {GetRequest | GetRequestCallback | Request} [request] - The GET request to send to the storage engine.
+     * @returns {Promise.&lt;Response.&lt;I>>} Returns the data objects from storage matching request criteria.
+     */
+    async get(request) {
+        return await this._handle(request ?? new GetRequest(), GetRequest);
+    }
+
+    /**
+     * @callback PostRequestCallback
+     * @param {PostRequest} request
+     * @param {M} [model]
+     */
+
+    /**
+     * Run a POST `request` to create objects in a target resource using the StashKu configured storage engine.
+     * This operation returns an array of the objects that were created.
+     * 
+     * @example
+     * let sk = new StashKu();
+     * ...
+     * let person1 = { FirstName: 'Robert', LastName: 'Yolo' };
+     * let person2 = { FirstName: 'Suzy', LastName: 'CraftyMine' };
+     * await sk.post(r => r
+     *     .objects(person1, person2)
+     *     .to('Contacts')
+     * );
+     * 
+     * @throws Error if the storage engine fails to return a response.
+     * @throws Error if the storage engine returns an invalid response object.
+     * @param {PostRequest | PostRequestCallback} request - The POST request to send to the storage engine.
+     * @returns {Promise.&lt;Response.&lt;I>>} Returns the data objects from storage that were created with the request criteria.
+     */
+    async post(request) {
+        return await this._handle(request, PostRequest);
+    }
+
+    /**
+     * @callback PutRequestCallback
+     * @param {PutRequest} request
+     * @param {M} [model]
+     */
+
+    /**
+     * Run a PUT `request` to update objects in the target resource using the StashKu configured storage engine.
+     * This operation will respond with the objects updated.
+     * 
+     * @example
+     * let sk = new StashKu();
+     * ...
+     * let person1 = { ID: 1, FirstName: 'Robert', LastName: 'Yolo' };
+     * let person2 = { ID: 2, FirstName: 'Suzy', LastName: 'CraftyMine' };
+     * await sk.put(r => r
+     *     .objects(person1, person2)
+     *     .pk('ID')
+     *     .to('Contacts')
+     * );
+     * 
+     * @throws Error if the storage engine fails to return a response.
+     * @throws Error if the storage engine returns an invalid response object.
+     * @param {PutRequest | PutRequestCallback} request - The PUT request to send to the storage engine.
+     * @returns {Promise.&lt;Response.&lt;I>>} Returns the data objects from storage that were updated with the request criteria. This 
+     * *__may not__* exactly match the objects requested to be updated, as some may have been deleted from storage or
+     * some may not match the key criteria.
+     */
+    async put(request) {
+        return await this._handle(request, PutRequest);
+    }
+
+    /**
+     * @callback PatchRequestCallback
+     * @param {PatchRequest} request
+     * @param {M} [model]
+     */
+
+    /**
+     * Run a PATCH `request` to update any matching objects with the specified template properties and values.
+     * This operation will respond with the objects updated.
+     * 
+     * @example
+     * let sk = new StashKu();
+     * ...
+     * await sk.patch(r => r
+     *     .template({
+     *         walking: true,
+     *         date_walked: new Date()
+     *     })
+     *     .to('Runners')
+     *     .where(f => f.and('Gender', f.OP.EQUALS, 'Female'))
+     * );
+     * @throws Error if the storage engine fails to return a response.
+     * @throws Error if the storage engine returns an invalid response object.
+     * @param {PatchRequest | PatchRequestCallback} request - The PATCH request to send to the storage engine.
+     * @returns {Promise.&lt;Response.&lt;I>>} Returns a response with the total number of the objects affected in storage. No data
+     * objects are typically returned with this request.
+     */
+    async patch(request) {
+        return await this._handle(request, PatchRequest);
+    }
+
+    /**
+     * @callback DeleteRequestCallback
+     * @param {DeleteRequest} request
+     * @param {M} [model]
+     */
+
+    /**
+     * Run a DELETE `request` to delete any matching objects with the specified template properties and values.
+     * This operation will respond with the objects deleted.
+     * 
+     * @example
+     * let sk = new StashKu();
+     * ...
+     * await sk.patch(r => r
+     *     .from('Runners')
+     *     .where(f => f.and('Gender', f.OP.EQUALS, 'Female'))
+     * );
+     * @throws Error if the "request" argument is not a callback function or `DeleteRequest` instance.
+     * @param {DeleteRequest | DeleteRequestCallback} request - The DELETE request to send to the storage engine.
+     * @returns {Promise.&lt;Response.&lt;I>>} Returns the data objects from storage that were deleted with the request criteria.
+     */
+    async delete(request) {
+        return await this._handle(request, DeleteRequest);
+    }
+
+    /**
+     * @callback OptionsRequestCallback
+     * @param {OptionsRequest} request
+     * @param {M} [model]
+     */
+
+    /**
+     * Run an OPTIONS `request` which returns a dynamically constructed model type which defines how StashKu can 
+     * interact with the target (`from`) resource. 
+     * @example
+     * let sk = new StashKu();
+     * ...
+     * await sk.options(r => r
+     *     .from('Runners')
+     * );
+     * @throws Error if the "request" argument is not a callback function or `OptionsRequest` instance.
+     * @param {OptionsRequest | OptionsRequestCallback} request - The OPTIONS request to send to the storage engine.
+     * @returns {Promise.&lt;Response.&lt;I>>} Returns a response with a single data object- the dynamically created model 
+     * configuration.
+     */
+    async options(request) {
+        return await this._handle(request ?? new OptionsRequest(), OptionsRequest);
+    }
+
+    /**
+     * @callback ModelNameResolveCallback
+     * @param {String} name - The model name defined.
+     * @returns {*} Returns a model type constructor/class associated with the model name.
+     */
+
+    /**
+     * Reads a request defintion from file and returns an instance of that request.
+     * @param {fs.PathOrFileDescriptor} jsonFile - The file path to the JSON formatted file defining a single StashKu request.
+     * @param {{encoding: String, flag: String} | String | fs.BufferEncodingOption} [fsOptions] - File encoding options.
+     * @param {ModelNameResolveCallback} [modelNameResolver] - Callback function that resolves a model name into a model type (constructor/class).
+     * @returns {Promise.&lt;DeleteRequest | GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest>}
+     */
+    static async requestFromFile(jsonFile, fsOptions, modelNameResolver) {
+        if (IS_BROWSER === false) {
+            let f = await (await import(/* webpackIgnore: true */'fs/promises')).default.readFile(jsonFile, fsOptions);
+            let obj = JSON.parse(f);
+            return StashKu.requestFromObject(obj, modelNameResolver);
+        }
+        throw new Error('The "requestFromFile" function is not supported on this platform.');
+    }
+
+    /**
+     * Converts a StashKu request-like object into an instance of the appropriate StashKu request. This
+     * can be used in conjunction with `JSON.stringify(...)` and subsequently a `JSON.parse(...)` of a request.
+     * 
+     * If the object is `null` or `undefined`, a `null` value is returned.
+     * @throws Error if the object is missing a method property.
+     * @throws Error if the method property value is invalid.
+     * @param {*} reqObj - The untyped request object.
+     * @param {ModelNameResolveCallback} [modelNameResolver] - Callback function that resolves a model name into a model type (constructor/class).
+     * @returns {Promise.&lt;DeleteRequest | GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest>} 
+     */
+    static async requestFromObject(reqObj, modelNameResolver) {
+        if (reqObj) {
+            //handle http.IncomingMessageg
+            if (IS_BROWSER === false &amp;&amp; reqObj.url &amp;&amp; reqObj.httpVersion) {
+                if (!HttpRequestLoader) {
+                    HttpRequestLoader = (await import(/* webpackIgnore: true */'./node/http-request-loader.js')).default;
+                }
+                return await HttpRequestLoader(reqObj);
+            }
+            if (!reqObj.method || /^delete|get|patch|post|put|options$/i.test(reqObj.method) === false) {
+                throw new Error('The method property value of the object is missing or invalid. Expected a valid request method.');
+            }
+            //construct
+            let mt = null;
+            if (modelNameResolver &amp;&amp; reqObj.model) {
+                mt = modelNameResolver(reqObj.model);
+            }
+            switch (reqObj.method.toLowerCase()) {
+                case 'delete': return new DeleteRequest()
+                    .model(mt)
+                    .headers(reqObj.headers)
+                    .from(reqObj.from ?? null)
+                    .all(reqObj.all ?? false)
+                    .count(reqObj.count ?? false)
+                    .where(Filter.fromObject(reqObj.where));
+                case 'get': return new GetRequest()
+                    .model(mt)
+                    .headers(reqObj.headers)
+                    .from(reqObj.from ?? null)
+                    .properties(...reqObj.properties)
+                    .distinct(reqObj.distinct ?? false)
+                    .count(reqObj.count ?? false)
+                    .skip(reqObj.skip ?? null)
+                    .take(reqObj.take ?? null)
+                    .sort(...reqObj.sorts)
+                    .where(Filter.fromObject(reqObj.where));
+                case 'options': return new OptionsRequest()
+                    .model(mt)
+                    .from(reqObj.from ?? null)
+                    .headers(reqObj.headers);
+                case 'patch': return new PatchRequest()
+                    .model(mt)
+                    .headers(reqObj.headers)
+                    .to(reqObj.to ?? null)
+                    .template(reqObj.template ?? null)
+                    .all(reqObj.all ?? false)
+                    .count(reqObj.count ?? false)
+                    .where(Filter.fromObject(reqObj.where));
+                case 'post': return new PostRequest()
+                    .model(mt)
+                    .headers(reqObj.headers)
+                    .to(reqObj.to ?? null)
+                    .count(reqObj.count ?? false)
+                    .objects(reqObj.objects ?? null);
+                case 'put': return new PutRequest()
+                    .model(mt)
+                    .headers(reqObj.headers)
+                    .to(reqObj.to ?? null)
+                    .count(reqObj.count ?? false)
+                    .pk(...reqObj.pk)
+                    .objects(reqObj.objects ?? null);
+            }
+        }
+        return null;
+    }
+
+}
+
+export {
+    StashKu as default,
+    GetRequest,
+    PostRequest,
+    PutRequest,
+    PatchRequest,
+    DeleteRequest,
+    OptionsRequest,
+    BaseEngine,
+    Response,
+    RESTError,
+    Filter,
+    Sort,
+    ModelGenerator,
+    ModelUtility,
+    StringUtility
+};</code></pre>
+    </article>
+</section>
+
+
+
+
+  </div>
+</main>
+
+<footer class="layout-footer">
+  <div class="container">
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Thu May 26 2022 16:33:33 GMT-0700 (Pacific Daylight Time)
+  </div>
+</footer>
+
+
+
+<script src="scripts/prism.dev.js"></script>
+</body>
+</html>
