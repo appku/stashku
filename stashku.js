@@ -233,6 +233,8 @@ class StashKu {
                             this.engine.configure(this.config[this.config.engine], this.log);
                         });
                 });
+        } else if (this.config.engine instanceof BaseEngine) {
+            this.engine = this.config.engine;
         }
         //load middleware
         if (Array.isArray(this.config.middleware)) {

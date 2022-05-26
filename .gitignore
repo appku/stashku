@@ -5,7 +5,6 @@ test/model-schema/save*.actual*
 *-key.*
 *.key
 *.pub
-docs/
 deploy/
 @Compiled/
 rollup.*
