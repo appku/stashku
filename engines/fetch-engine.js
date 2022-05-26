@@ -22,7 +22,7 @@ const lazyLoadGlobalFetch = async () => {
         } else if (fetch) { // eslint-disable-line no-undef
             globalFetch = fetch; // eslint-disable-line no-undef
         } else {
-            globalFetch = await import('node-fetch').default;
+            globalFetch = await import(/* webpackIgnore: true */'node-fetch').default;
         }
     }
 };
@@ -219,7 +219,6 @@ class FetchEngine extends BaseEngine {
 
     /**
      * @override
-     * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {GetRequest} request - The GET request to send to the storage engine.
      * @returns {Promise.<Response>} Returns the data objects from storage matching request criteria.
      */
@@ -227,25 +226,23 @@ class FetchEngine extends BaseEngine {
         //validate
         await super.get(request);
         //make the request, wrap errors in RESTError
+        let payload = request.toJSON();
+        if (request.metadata.from === payload.from) { //when the request from and the uri resource are the same, there's no need to send the from parameter.
+            delete payload.from;
+        }
+        let res = await this._fetch(request.metadata.from, payload);
+        if (res.ok === false) {
+            throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
+        }
         try {
-            let payload = request.toJSON();
-            if (request.metadata.from === payload.from) { //when the request from and the uri resource are the same, there's no need to send the from parameter.
-                delete payload.from;
-            }
-            let res = await this._fetch(request.metadata.from, payload);
-            if (res.ok === false) {
-                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
-            }
             return await res.json();
         } catch (err) {
-            throw new RESTError(500, err.message, err);
+            throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${err.message}`, err);
         }
     }
 
     /**
      * @override
-     * @description
-     * This will create the resource in memory if it does not already exist.
      * @param {PostRequest} request - The POST request to send to the storage engine.
      * @returns {Promise.<Response>} Returns the data objects from storage that were created with the request criteria.
      */
@@ -253,17 +250,16 @@ class FetchEngine extends BaseEngine {
         //validate
         await super.post(request);
         //process
-        let meta = request.metadata;
-        if (meta.objects && meta.objects.length) {
+        if (request.metadata.objects && request.metadata.objects.length) {
             //make the request, wrap errors in RESTError
+            let res = await this._fetch(request.metadata.to, request, { method: request.method });
+            if (res.ok === false) {
+                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
+            }
             try {
-                let res = await this._fetch(request.metadata.to, request, { method: request.method });
-                if (res.ok === false) {
-                    throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
-                }
                 return await res.json();
             } catch (err) {
-                throw new RESTError(500, err.message, err);
+                throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${err.message}`, err);
             }
         }
         return Response.empty();
@@ -271,53 +267,49 @@ class FetchEngine extends BaseEngine {
 
     /**
      * @override
-     * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {PutRequest} request - The PUT request to send to the storage engine.
      * @returns {Promise.<Response>} Returns the data objects from storage that were updated with the request criteria. This 
-     * *__could potentially not__* exactly match the objects requested to be updated, as some may have been deleted from storage or
-     * some may not match the primary key criteria.
+     * *__may not__* exactly match the objects requested to be updated, as some may have been deleted from storage or
+     * some may not match the key criteria.
      */
     async put(request) {
         //validate
         await super.put(request);
         //process
-        let meta = request.metadata;
-        if (meta.objects && meta.objects.length) {
+        if (request.metadata.objects && request.metadata.objects.length) {
             //make the request, wrap errors in RESTError
+            let res = await this._fetch(request.metadata.to, request, { method: request.method });
+            if (res.ok === false) {
+                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
+            }
             try {
-                let res = await this._fetch(request.metadata.to, request, { method: request.method });
-                if (res.ok === false) {
-                    throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
-                }
                 return await res.json();
             } catch (err) {
-                throw new RESTError(500, `Critical error attempting to process fetch for resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${err.message}`, err);
+                throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${err.message}`, err);
             }
         }
         return Response.empty();
     }
     /**
      * @override
-     * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {PatchRequest} request - The PATCH request to send to the storage engine.
-     * @returns {Promise.<Response>} Returns a response with the total number of the objects affected in storage. No data
-     * objects are typically returned with this request.
+     * @returns {Promise.<Response>} Returns a response with the total number of the objects affected in storage. No
+     * data objects are typically returned with this request.
      */
     async patch(request) {
         //validate
         await super.patch(request);
         //process
-        let meta = request.metadata;
-        if (meta.template) {
+        if (request.metadata.template) {
             //make the request, wrap errors in RESTError
+            let res = await this._fetch(request.metadata.to, request, { method: request.method });
+            if (res.ok === false) {
+                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
+            }
             try {
-                let res = await this._fetch(request.metadata.to, request, { method: request.method });
-                if (res.ok === false) {
-                    throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
-                }
                 return await res.json();
             } catch (err) {
-                throw new RESTError(500, err.message, err);
+                throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${err.message}`, err);
             }
         }
         return Response.empty();
@@ -325,10 +317,6 @@ class FetchEngine extends BaseEngine {
 
     /**
      * @override
-     * @description
-     * If the last item from memory is deleted, the resource is also deleted from memory (resulting in a 404 for the
-     * resource until a new record is added under that resource name).
-     * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {DeleteRequest} request - The DELETE request to send to the storage engine.
      * @returns {Promise.<Response>} Returns the data objects from storage that were deleted with the request criteria.
      */
@@ -336,17 +324,16 @@ class FetchEngine extends BaseEngine {
         //validate
         await super.delete(request);
         //process
-        let meta = request.metadata;
-        if (meta.all || (meta.where && Filter.isEmpty(meta.where) === false)) {
+        if (request.metadata.all || (request.metadata.where && Filter.isEmpty(request.metadata.where) === false)) {
             //make the request, wrap errors in RESTError
+            let res = await this._fetch(request.metadata.from, request, { method: request.method });
+            if (res.ok === false) {
+                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
+            }
             try {
-                let res = await this._fetch(request.metadata.to, request, { method: request.method });
-                if (res.ok === false) {
-                    throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
-                }
                 return await res.json();
             } catch (err) {
-                throw new RESTError(500, err.message, err);
+                throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${err.message}`, err);
             }
         }
         return Response.empty();
@@ -354,28 +341,23 @@ class FetchEngine extends BaseEngine {
 
     /**
      * @override
-     * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {OptionsRequest} request - The OPTIONS request to send to the storage engine.
-     * @returns {Promise.<Response>} Returns a response with a single data object- the dynamically created model configuration.
+     * @returns {Promise.<Response>} Returns a response with a single data object- the dynamically created model
+     * configuration.
      */
     async options(request) {
         //validate
         await super.options(request);
-        //process
-        let meta = request.metadata;
-        if (meta.objects && meta.objects.length) {
-            //make the request, wrap errors in RESTError
-            try {
-                let res = await this._fetch(request.metadata.to, request, { method: request.method });
-                if (res.ok === false) {
-                    throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
-                }
-                return await res.json();
-            } catch (err) {
-                throw new RESTError(500, err.message, err);
-            }
+        //make the request, wrap errors in RESTError
+        let res = await this._fetch(request.metadata.from, request, { method: request.method });
+        if (res.ok === false) {
+            throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
         }
-        return Response.empty();
+        try {
+            return await res.json();
+        } catch (err) {
+            throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${err.message}`, err);
+        }
     }
 
 }

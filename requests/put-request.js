@@ -219,6 +219,7 @@ class PutRequest {
     /**
      * Returns the metadata object to be utilized for stringifying into JSON.
      * @returns {*}
+     * @protected
      */
     toJSON() {
         let metaClone = { to: this.metadata.to };

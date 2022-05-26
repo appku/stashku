@@ -14,12 +14,15 @@ module.exports = {
                 use: ['style-loader', 'css-loader']
             },
             {
-                test: /\.html$/i,
+                test: /\.(html|ico)$/i,
                 loader: 'file-loader',
                 options: {
                     name: '[name].[ext]'
                 }
             }
         ]
+    },
+    devServer: {
+        watchFiles: ['./*']
     }
 };

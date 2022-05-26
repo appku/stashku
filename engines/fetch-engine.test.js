@@ -413,7 +413,7 @@ describe('#patch', () => {
     beforeEach(() => {
         fetchMock.resetMocks();
     });
-    it('makes a fetch for the resource specified in the PutRequest and returns the response object from json.', async () => {
+    it('makes a fetch for the resource specified in the PatchRequest and returns the response object from json.', async () => {
         fetchMock.mockResponseOnce(JSON.stringify({ data: [{ id: 1, hello: 'zoo' }], total: 1, affected: 1, returned: 1 }));
         let e = new FetchEngine();
         e.configure();
@@ -432,6 +432,94 @@ describe('#patch', () => {
             method: 'patch',
             cache: 'no-cache',
             body: '{"to":"themes","template":{"hello":"zoo"},"where":{"logic":"and","filters":[{"property":"id","op":"eq","value":1}]}}',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    });
+});
+
+describe('#delete', () => {
+    beforeEach(() => {
+        fetchMock.resetMocks();
+    });
+    it('makes a fetch for the resource specified in the DeleteRequest and returns the response object from json.', async () => {
+        fetchMock.mockResponseOnce(JSON.stringify({ data: [{ id: 1, hello: 'zoo' }], total: 1, affected: 1, returned: 1 }));
+        let e = new FetchEngine();
+        e.configure();
+        let res = await e.delete(new DeleteRequest()
+            .from('themes')
+            .where(f => f.and('id', f.OP.EQUALS, 1))
+            .headers({ hello: 'world' })
+            .count()
+        );
+        expect(res.data).toEqual([{ id: 1, hello: 'zoo' }]);
+        expect(res.total).toBe(1);
+        expect(res.affected).toBe(1);
+        expect(res.returned).toBe(1);
+        expect(fetchMock.mock.calls.length).toEqual(1);
+        expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
+        expect(fetchMock.mock.calls[0][1]).toEqual({
+            method: 'delete',
+            cache: 'no-cache',
+            body: '{"from":"themes","headers":{"hello":"world"},"count":true,"where":{"logic":"and","filters":[{"property":"id","op":"eq","value":1}]}}',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    });
+});
+
+describe('#delete', () => {
+    beforeEach(() => {
+        fetchMock.resetMocks();
+    });
+    it('makes a fetch for the resource specified in the DeleteRequest and returns the response object from json.', async () => {
+        fetchMock.mockResponseOnce(JSON.stringify({ data: [{ id: 1, hello: 'zoo' }], total: 1, affected: 1, returned: 1 }));
+        let e = new FetchEngine();
+        e.configure();
+        let res = await e.delete(new DeleteRequest()
+            .from('themes')
+            .where(f => f.and('id', f.OP.EQUALS, 1))
+            .headers({ hello: 'world' })
+            .count()
+        );
+        expect(res.data).toEqual([{ id: 1, hello: 'zoo' }]);
+        expect(res.total).toBe(1);
+        expect(res.affected).toBe(1);
+        expect(res.returned).toBe(1);
+        expect(fetchMock.mock.calls.length).toEqual(1);
+        expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
+        expect(fetchMock.mock.calls[0][1]).toEqual({
+            method: 'delete',
+            cache: 'no-cache',
+            body: '{"from":"themes","headers":{"hello":"world"},"count":true,"where":{"logic":"and","filters":[{"property":"id","op":"eq","value":1}]}}',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    });
+});
+
+describe('#options', () => {
+    beforeEach(() => {
+        fetchMock.resetMocks();
+    });
+    it('makes a fetch for the resource specified in the OptionsRequest and returns the response object from json.', async () => {
+        fetchMock.mockResponseOnce(JSON.stringify({ data: [{ id: 1, hello: 'zoo' }], total: 1, affected: 1, returned: 1 }));
+        let e = new FetchEngine();
+        e.configure();
+        let res = await e.options(new OptionsRequest().from('themes'));
+        expect(res.data).toEqual([{ id: 1, hello: 'zoo' }]);
+        expect(res.total).toBe(1);
+        expect(res.affected).toBe(1);
+        expect(res.returned).toBe(1);
+        expect(fetchMock.mock.calls.length).toEqual(1);
+        expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
+        expect(fetchMock.mock.calls[0][1]).toEqual({
+            method: 'options',
+            cache: 'no-cache',
+            body: '{"from":"themes"}',
             headers: {
                 'Content-Type': 'application/json'
             }

@@ -188,13 +188,22 @@ class DeleteRequest {
     /**
      * Returns the metadata object to be utilized for stringifying into JSON.
      * @returns {*}
+     * @protected
      */
     toJSON() {
-        let metaClone = Object.assign({}, this.metadata);
+        let metaClone = { from: this.metadata.from };
         if (this.metadata.headers) {
             metaClone.headers = Object.fromEntries(this.metadata.headers);
         }
-        metaClone.method = this.method;
+        if (this.metadata.all) {
+            metaClone.all = this.metadata.all;
+        }
+        if (this.metadata.count) {
+            metaClone.count = this.metadata.count;
+        }
+        if (this.metadata.where && Filter.isEmpty(this.metadata.where) === false) {
+            metaClone.where = this.metadata.where.toJSON();
+        }
         return metaClone;
     }
 

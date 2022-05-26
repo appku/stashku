@@ -272,8 +272,8 @@ class MemoryEngine extends BaseEngine {
      * @override
      * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {PatchRequest} request - The PATCH request to send to the storage engine.
-     * @returns {Promise.<Response>} Returns a response with the total number of the objects affected in storage. No data
-     * objects are typically returned with this request.
+     * @returns {Promise.<Response>} Returns a response with the total number of the objects affected in storage. No
+     * data objects are typically returned with this request.
      */
     async patch(request) {
         //validate
@@ -338,7 +338,8 @@ class MemoryEngine extends BaseEngine {
      * @override
      * @throws 404 Error when the requested resource is has not been stored in memory.
      * @param {OptionsRequest} request - The OPTIONS request to send to the storage engine.
-     * @returns {Promise.<Response>} Returns a response with a single data object- the dynamically created model configuration.
+     * @returns {Promise.<Response>} Returns a response with a single data object- the dynamically created model
+     * configuration.
      */
     async options(request) {
         //validate

@@ -199,6 +199,5 @@ describe('#toJSON', () => {
         let parsed = JSON.parse(JSON.stringify(r));
         expect(parsed.from).toEqual(r.metadata.from);
         expect(parsed.headers).toEqual({ hello: 'world' });
-        expect(parsed.method).toBe('options');
     });
 });

@@ -181,8 +181,8 @@ class BaseEngine {
      * @throws A 400 REST error if the request metadata is missing "where" conditions to match objects in storage and
      * is not enabled to affect all objects.
      * @param {PatchRequest} request - The PATCH request to send to the storage engine.
-     * @returns {Promise.<Response>} Returns a response with the total number of the objects affected in storage. No data
-     * objects are typically returned with this request.
+     * @returns {Promise.<Response>} Returns a response with the total number of the objects affected in storage. No
+     * data objects are typically returned with this request.
      * @abstract
      */
     async patch(request) {
@@ -245,7 +245,8 @@ class BaseEngine {
      * @throws A 400 REST error if the request metadata is missing "where" conditions to match objects in storage and
      * is not enabled to affect all objects.
      * @param {OptionsRequest} request - The OPTIONS request to send to the storage engine.
-     * @returns {Promise.<Response>} Returns a response with a single data object- the dynamically created model configuration.
+     * @returns {Promise.<Response>} Returns a response with a single data object- the dynamically created model
+     * configuration.
      * @abstract
      */
     async options(request) {

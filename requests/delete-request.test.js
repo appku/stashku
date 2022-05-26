@@ -273,11 +273,10 @@ describe('#toJSON', () => {
             .headers({ hello: 'world' })
             .count();
         let parsed = JSON.parse(JSON.stringify(dr));
-        expect(parsed.all).toEqual(dr.metadata.all);
+        expect(parsed.all).toBeUndefined();
         expect(parsed.from).toEqual(dr.metadata.from);
         expect(parsed.count).toEqual(dr.metadata.count);
         expect(parsed.where).toEqual(JSON.parse(JSON.stringify(dr.metadata.where)));
         expect(parsed.headers).toEqual({ hello: 'world' });
-        expect(parsed.method).toBe('delete');
     });
 });

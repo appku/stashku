@@ -14,6 +14,7 @@ import ModelUtility from './modeling/model-utility.js';
 import StringUtility from './utilities/string-utility.js';
 import BaseEngine from './engines/base-engine.js';
 import MemoryEngine from './engines/memory-engine.js';
+import FetchEngine from './engines/fetch-engine.js';
 
 const SUPPORTED_METHODS = ['all', '*', 'get', 'post', 'put', 'patch', 'delete', 'options'];
 const SUPPORTED_STATES = ['log', 'request', 'response', 'done'];
@@ -200,7 +201,9 @@ class StashKu {
         this.log.debug('Configuring StashKu...');
         //assign defaults
         let engineDefault = 'memory';
-        if (IS_BROWSER === false) {
+        if (IS_BROWSER) {
+            engineDefault = 'fetch';
+        } else {
             engineDefault = process.env.STASHKU_ENGINE ?? 'memory';
         }
         this.config = Object.assign({
@@ -209,9 +212,12 @@ class StashKu {
         }, config);
         this.log.debug('Configuration=', this.config);
         //load engine
-        if (this.config.engine === 'memory' || typeof this.config.engine === 'undefined') {
+        if (this.config.engine === 'memory') {
             this.engine = new MemoryEngine();
             this.engine.configure(this.config.memory, this.log);
+        } else if (this.config.engine === 'fetch') {
+            this.engine = new FetchEngine();
+            this.engine.configure(this.config.fetch, this.log);
         } else if (typeof this.config.engine === 'string' && IS_BROWSER === false) {
             let enginePackageName = this.config.engine;
             this.engine = import(/* webpackIgnore: true */'./node/package-loader.js')
@@ -616,7 +622,7 @@ class StashKu {
             let f = await (await import(/* webpackIgnore: true */'fs/promises')).default.readFile(jsonFile, fsOptions);
             let obj = JSON.parse(f);
             return StashKu.requestFromObject(obj, modelNameResolver);
-        } 
+        }
         throw new Error('The "requestFromFile" function is not supported on this platform.');
     }
 

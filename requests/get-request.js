@@ -332,6 +332,7 @@ class GetRequest {
     /**
      * Returns the metadata object to be utilized for stringifying into JSON.
      * @returns {*}
+     * @protected
      */
     toJSON() {
         let metaClone = { from: this.metadata.from };

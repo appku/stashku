@@ -12,7 +12,7 @@ class OptionsRequest {
      * @param {String} [from] - The target resource name for the OPTIONS request.
      */
     constructor(from) {
-        
+
         this.metadata = {
             /** @type {String} */
             from: from || null,
@@ -129,13 +129,13 @@ class OptionsRequest {
     /**
      * Returns the metadata object to be utilized for stringifying into JSON.
      * @returns {*}
+     * @protected
      */
     toJSON() {
-        let metaClone = Object.assign({}, this.metadata);
+        let metaClone = { from: this.metadata.from };
         if (this.metadata.headers) {
             metaClone.headers = Object.fromEntries(this.metadata.headers);
         }
-        metaClone.method = this.method;
         return metaClone;
     }
 
