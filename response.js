@@ -62,6 +62,17 @@ class Response {
         return new Response();
     }
 
+    /**
+     * Returns the first data record from the response. If no data records are present, null is returned.
+     * @returns {M}
+     */
+    one() {
+        if (this.data && this.data.length) {
+            return this.data[0];
+        }
+        return null;
+    }
+
 }
 
 export default Response;

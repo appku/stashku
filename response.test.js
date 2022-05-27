@@ -33,3 +33,17 @@ describe('.empty', () => {
         expect(Response.empty().returned).toBe(0);
     });
 });
+describe('.one', () => {
+    it('returns only the first record.', () => {
+        let r = new Response(['a', 'b', 'c'], 1, 2, 1);
+        expect(r.one()).toBe('a');
+        r = new Response([{ hi: 'mom' }], 1, 2, 1);
+        expect(r.one()).toEqual({ hi: 'mom' });
+    });
+    it('returns null if no data.', () => {
+        let r = new Response(null, 1, 2, 1);
+        expect(r.one()).toBe(null);
+        r.data = null;
+        expect(r.one()).toBe(null);
+    });
+});

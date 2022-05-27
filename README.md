@@ -193,7 +193,7 @@ StashKu can be configured using the following variables.
   - StashKu configuration property: `model.resource`.
 
 ## Development
-StashKu is developed under the [AppKu]() umbrella, sponsored and backed by [Append](https://append.media). It is built using JavaScript in module format. 
+StashKu is developed under the [AppKu](https://www.appku.com) umbrella, sponsored and backed by [Append](https://append.media). It is built using JavaScript in module format. 
 
 ### Generating Documentation
 You can generate a static JSDoc site under the `docs/` path using the command `npm run docs`. Once generated, you can run `npm run serve-docs` to run a local web server that shows the generated documentation.
