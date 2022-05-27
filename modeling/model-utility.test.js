@@ -276,6 +276,57 @@ describe('.model', () => {
         expect(iterator.next().value).toBeNull();
         expect(iterator.next().value).toBeInstanceOf(TestModel);
     });
+    it('does basic type conversion for definitions with type "Date".', () => {
+        class TestModel {
+            static get dateCreated() { return { target: 'DateCreated', type: 'Date' }; }
+            static get dateDeleted() { return { target: 'DateDeleted', type: 'Date' }; }
+        }
+        let iterator = ModelUtility.model(TestModel, 'get', { DateCreated: '2022-05-16T21:54:51.955Z', DateDeleted: 1652738691955 });
+        let m = iterator.next().value;
+        expect(m).toBeInstanceOf(TestModel);
+        expect(m.dateCreated).toBeInstanceOf(Date);
+        expect(m.dateCreated.toISOString()).toBe('2022-05-16T21:54:51.955Z');
+        expect(m.dateDeleted.toISOString()).toBe('2022-05-16T22:04:51.955Z');
+    });
+    it('does basic type conversion for definitions with type "Boolean".', () => {
+        class TestModel {
+            static get a() { return { target: 'a', type: 'Boolean' }; }
+            static get b() { return { target: 'b', type: 'Boolean' }; }
+        }
+        let pairs = [
+            [1, 0], [5, 0], [0.005, 0],
+            ['yes', 'no'], ['YES', 'NO'], ['Yes', 'No'], ['Y', 'N'], ['y', 'n'],
+            ['true', 'false'], ['TRUE', 'FALSE'], ['True', 'False'], ['T', 'F'], ['t', 'f']
+        ];
+        for (let pair of pairs) {
+            let iterator = ModelUtility.model(TestModel, 'get', { a: pair[0], b: pair[1] });
+            let m = iterator.next().value;
+            expect(m).toBeInstanceOf(TestModel);
+            expect(typeof m.a).toBe('boolean');
+            expect(typeof m.b).toBe('boolean');
+            expect(m.a).toBe(true);
+            expect(m.b).toBe(false);
+        }
+    });
+    it('does basic type conversion for definitions with type "Number".', () => {
+        class TestModel {
+            static get a() { return { target: 'a', type: 'Number' }; }
+            static get b() { return { target: 'b', type: 'Number' }; }
+        }
+        let pairs = [
+            ['15', '-22.554'],
+            ['15.00000', '-22.5540000']
+        ];
+        for (let pair of pairs) {
+            let iterator = ModelUtility.model(TestModel, 'get', { a: pair[0], b: pair[1] });
+            let m = iterator.next().value;
+            expect(m).toBeInstanceOf(TestModel);
+            expect(typeof m.a).toBe('number');
+            expect(typeof m.b).toBe('number');
+            expect(m.a).toBe(15);
+            expect(m.b).toBe(-22.554);
+        }
+    });
     it('converts objects to model instances when specified.', () => {
         class TestModel {
             constructor() {

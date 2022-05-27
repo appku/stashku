@@ -108,7 +108,7 @@ class ModelUtility {
     static resource(modelType, method, resourceProp = 'resource') {
         if (ModelUtility.isValidType(modelType)) {
             if (modelType.$stashku && modelType.$stashku.resource) {
-                let resource =  modelType.$stashku.resource;
+                let resource = modelType.$stashku.resource;
                 switch (resourceProp) {
                     case 'name': resource = modelType.$stashku.name; break;
                     case 'slug': resource = modelType.$stashku.slug; break;
@@ -200,6 +200,19 @@ class ModelUtility {
                     for (let [k, v] of mapping) {
                         if (typeof obj[v.target] !== 'undefined') {
                             model[k] = obj[v.target];
+                            //handle type conversion for objects that may have come from JSON
+                            let valueType = typeof model[k];
+                            if (v.type === 'Date' && (valueType === 'string' || valueType === 'number')) {
+                                model[k] = new Date(model[k]);
+                            } else if (v.type === 'Boolean') {
+                                if (valueType === 'string') {
+                                    model[k] = /^[tTyY1]/.test(model[k]);
+                                } else if (valueType === 'number') {
+                                    model[k] = (model[k] !== 0);
+                                }
+                            } else if (v.type === 'Number' && valueType === 'string') {
+                                model[k] = parseFloat(model[k]);
+                            }
                         } else if (typeof v.default === 'undefined') {
                             //not given by input object, and no default defined- nuke property from model instance.
                             delete model[k];
@@ -266,7 +279,7 @@ class ModelUtility {
                     let record = {};
                     for (let [k, v] of mapping) {
                         if (typeof model[k] !== 'undefined') { //only set a value if the property value is defined.
-                            record[v.target] = model[k]; 
+                            record[v.target] = model[k];
                         }
                         if (v && v.transform) { //run a transform if present.
                             record[v.target] = v.transform.call(modelType, v.target, record[v.target], model, method, 'unmodel');
