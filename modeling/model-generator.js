@@ -38,6 +38,7 @@ class ModelGenerator {
                 dirtyResourceName = dirtyResourceName.replace(reg, '');
             }
         }
+        dirtyResourceName = dirtyResourceName.replace(/[[\]{}]/g, '');
         return StringUtility.camelify(StringUtility.singular(dirtyResourceName), true) + (suffix ?? '');
     }
 

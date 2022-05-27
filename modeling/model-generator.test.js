@@ -15,6 +15,8 @@ describe('.formatModelName', () => {
         expect(ModelGenerator.formatModelName('The Quick brown fox-jumped.')).toBe('TheQuickBrownFoxJumpedModel');
         expect(ModelGenerator.formatModelName('[john].[jumped[')).toBe('JohnJumpedModel');
         expect(ModelGenerator.formatModelName('[acro.NYM].[OK[')).toBe('AcroNYMOKModel');
+        expect(ModelGenerator.formatModelName('[dbo].[ContactRecords]')).toBe('ContactRecordModel');
+        expect(ModelGenerator.formatModelName('{{ContactRecords}}')).toBe('ContactRecordModel');
     });
     it('returns a formatted pascalCase name when given dirty values with a different suffix.', () => {
         expect(ModelGenerator.formatModelName('test-yoda')).toBe('TestYodaModel');
