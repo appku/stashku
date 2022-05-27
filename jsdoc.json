@@ -17,7 +17,7 @@
             "./test"
         ],
         "includePattern": ".+\\.js(doc|x)?$",
-        "excludePattern": "(^|\\/|\\\\)(node_modules(?!\\/@appku\\/stashku-rest)|_|.+\\.test\\.+)"
+        "excludePattern": "(^|\\/|\\\\)(node_modules(?!\\/@appku\\/stashku-rest)|prism|_|.+\\.test\\.+)"
     },
     "typescript": {
         "moduleRoot": "./"

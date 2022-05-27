@@ -26,19 +26,30 @@ describe('#model', () => {
         let r = new DeleteRequest();
         expect(r.model(class MyModel { })).toBe(r);
     });
-    it('sets the metadata "from" property using the model resource name if not already set.', () => {
-        class MyModel {
-            static get $stashku() {
-                return { resource: 'abc' };
+    let resourceProps = [undefined, 'resource', 'name', 'slug', 'plural.name', 'plural.slug'];
+    for (let prop of resourceProps) {
+        it(`sets the metadata "from" property using the model resource property "${prop}".`, () => {
+            class MyModel {
+                static get $stashku() {
+                    return {
+                        resource: 'resource-abc',
+                        name: 'name-abc',
+                        slug: 'slug-abc',
+                        plural: {
+                            name: 'plural.name-abc',
+                            slug: 'plural.slug-abc',
+                        }
+                    };
+                }
             }
-        }
-        let r = new DeleteRequest().model(MyModel);
-        expect(r.metadata.from).toBe('abc');
-        r = new DeleteRequest().model(class TestModel { });
-        expect(r.metadata.from).toBe('TestModels');
-        r = new DeleteRequest().from('someresource').model(MyModel);
-        expect(r.metadata.from).toBe('someresource');
-    });
+            let r = new DeleteRequest().model(MyModel, false, prop);
+            expect(r.metadata.from).toBe((prop ?? 'resource') + '-abc');
+            r = new DeleteRequest().model(class TestModel { });
+            expect(r.metadata.from).toBe('TestModels');
+            r = new DeleteRequest().from('someresource').model(MyModel);
+            expect(r.metadata.from).toBe('someresource');
+        });
+    }
 });
 
 describe('#count', () => {

@@ -24,7 +24,7 @@ let HttpRequestLoader = null; //see .requestFromObject
 /**
  * @callback StashKuMiddlewareCallback
  * @param {StashKu} stashku - The StashKu instance making the middleware call.
- * @param {BaseStorageEngine} engine - The storage engine instance that is processing the request.
+ * @param {BaseEngine} engine - The storage engine instance that is processing the request.
  * @param {String} method - The name of the request method being carried out, typically "get", "post", "put", "patch",
  * "delete", "options".
  * @param {GetRequest|PostRequest|PutRequest|PatchRequest|DeleteRequest|OptionsRequest} request - The request object being specified.
@@ -40,7 +40,7 @@ let HttpRequestLoader = null; //see .requestFromObject
 /**
  * @callback StashKuMiddlewareLogCallback
  * @param {StashKu} stashku - The StashKu instance making the middleware call.
- * @param {BaseStorageEngine} engine - The storage engine instance that is currently loaded.
+ * @param {BaseEngine} engine - The storage engine instance that is currently loaded.
  * @param {String} severity - The severity level of the log message, either "error", "warn", "info", or "debug".
  * @param {Array} args - The log message arguments, this can be a mix of types.
  */
@@ -56,9 +56,17 @@ let HttpRequestLoader = null; //see .requestFromObject
  */
 
 /**
+ * @typedef StashKuModelConfiguration
+ * @property {String} resource - Instructs StashKu which property from the `$stashku` object on a model type to
+ * populate the resource (`to` or `from`) on a request. Can be `"name"`, `"slug"`, `"plural.name"`, `"plural.slug"`,
+ * or `"resource"` (default).
+ */
+
+/**
  * @typedef StashKuConfiguration
- * @property {String|BaseStorageEngine} engine - The name or instance of the StashKu engine to use.
+ * @property {String|BaseEngine} engine - The name or instance of the StashKu engine to use.
  * @property {Array.<StashKuMiddleware|StashKuMiddlewareCallback|StashKuMiddlewareLogCallback>} middleware
+ * @property {StashKuModelConfiguration} model - Configuration describing how StashKu works with models.
  * @property {Array.<String>} resources - Optional array of resource names that are allowed through this instance of
  * StashKu. Any request asking for a resource not found in this array will throw an error.
  */
@@ -80,7 +88,7 @@ class StashKu {
         /**
          * The currently active storage engine, or the promise to load it.
          * All operations will await the engine if it is a promise.
-         * @type {BaseStorageEngine|Promise.<BaseStorageEngine>}
+         * @type {BaseEngine|Promise.<BaseEngine>}
          */
         this.engine = null;
 
@@ -129,7 +137,7 @@ class StashKu {
             this.stats = config.proxy.parent.stats;
             this.resources = config.proxy.parent.resources;
             //shallow-clone configuration, set proxy
-            this.config = Object.assign({}, config.proxy.parent.config, { proxy: config.proxy });
+            this.config = Object.assign({}, config.proxy.parent.config, { proxy: config.proxy }, { model: config.proxy.parent.config.model });
         } else {
             this.log = new Logger(this.middlerun.bind(this));
             //apply standard configuration
@@ -205,17 +213,25 @@ class StashKu {
         this.log.debug('Configuring StashKu...');
         //assign defaults
         let engineDefault = 'memory';
+        let modelDefault = {
+            resource: 'resource'
+        };
         if (IS_BROWSER) {
             engineDefault = 'fetch';
         } else {
             engineDefault = process.env.STASHKU_ENGINE ?? 'memory';
+            modelDefault.resource = process.env.STASHKU_MODEL_RESOURCE ?? 'resource';
         }
         this.config = Object.assign({
             engine: engineDefault,
             middleware: [],
             resources: []
-        }, config);
+        }, config, { model: Object.assign(modelDefault, config?.model) });
         this.log.debug('Configuration=', this.config);
+        //validate config
+        if (this.config?.model?.resource && ['resource', 'name', 'slug', 'plural.name', 'plural.slug'].indexOf(this.config.model.resource) < 0) {
+            throw new Error('Invalid "model.resource" configuration value. The value must be "resource", "name", "slug", "plural.name", or "plural.slug".');
+        }
         //load engine
         if (this.config.engine === 'memory') {
             this.engine = new MemoryEngine();
@@ -327,7 +343,7 @@ class StashKu {
             let tmp = new requestType();
             if (reqModel) {
                 request(tmp, reqModel);
-                tmp.model(reqModel);
+                tmp.model(reqModel, false, this.config?.model?.resource);
             } else {
                 request(tmp);
             }
@@ -337,7 +353,7 @@ class StashKu {
         } else if (!this.engine) {
             throw new Error('A StashKu storage engine has not been loaded. An engine must be configured before operations are allowed.');
         } else if (reqModel) {
-            request.model(reqModel);
+            request.model(reqModel, false, this.config?.model?.resource);
         }
         //access restrictions
         if (this.config.resources && this.config.resources.length) {

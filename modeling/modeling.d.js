@@ -74,7 +74,7 @@
  * a request of the `undefined` action.
  * @typedef Modeling.Configuration
  * @property {String | Modeling.StringByRequestMethod} resource - The resource name of the model.
- * @property {String} [slug] - An optionally stored, singular, lower-kebab-case slugified representation of this model's name.
- * @property {String} [name] - An optionally stored, singular, PascalCase version of this model's name.
- * @property {{slug: String, name: String}} [plural] - An optionally stored, plural form of the model's slug and name.
+ * @property {String | Modeling.StringByRequestMethod} [slug] - An optionally stored, singular, lower-kebab-case slugified representation of this model's name.
+ * @property {String | Modeling.StringByRequestMethod} [name] - An optionally stored, singular, PascalCase version of this model's name.
+ * @property {{slug: String | Modeling.StringByRequestMethod, name: String | Modeling.StringByRequestMethod}} [plural] - An optionally stored, plural form of the model's slug and name.
  */

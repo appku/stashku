@@ -29,19 +29,30 @@ describe('#model', () => {
         let r = new PatchRequest();
         expect(r.model(class MyModel { })).toBe(r);
     });
-    it('sets the metadata "to" property using the model resource name if not already set.', () => {
-        class MyModel {
-            static get $stashku() {
-                return { resource: 'abc' };
+    let resourceProps = [undefined, 'resource', 'name', 'slug', 'plural.name', 'plural.slug'];
+    for (let prop of resourceProps) {
+        it(`sets the metadata "from" property using the model resource property "${prop}".`, () => {
+            class MyModel {
+                static get $stashku() {
+                    return {
+                        resource: 'resource-abc',
+                        name: 'name-abc',
+                        slug: 'slug-abc',
+                        plural: {
+                            name: 'plural.name-abc',
+                            slug: 'plural.slug-abc',
+                        }
+                    };
+                }
             }
-        }
-        let r = new PatchRequest().model(MyModel);
-        expect(r.metadata.to).toBe('abc');
-        r = new PatchRequest().model(class TestModel { });
-        expect(r.metadata.to).toBe('TestModels');
-        r = new PatchRequest().to('someresource').model(MyModel);
-        expect(r.metadata.to).toBe('someresource');
-    });
+            let r = new PatchRequest().model(MyModel, false, prop);
+            expect(r.metadata.to).toBe((prop ?? 'resource') + '-abc');
+            r = new PatchRequest().model(class TestModel { });
+            expect(r.metadata.to).toBe('TestModels');
+            r = new PatchRequest().to('someresource').model(MyModel);
+            expect(r.metadata.to).toBe('someresource');
+        });
+    }
 });
 
 describe('#count', () => {

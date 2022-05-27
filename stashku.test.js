@@ -207,6 +207,36 @@ describe('#use', () => {
 });
 
 describe('#configure', () => {
+    afterEach(() => {
+        //reset env
+        delete process.env.STASHKU_ENGINE;
+        delete process.env.STASHKU_MODEL_RESOURCE;
+    });
+    it('loads expected defaults.', async () => {
+        let stash = new StashKu();
+        await stash.engine;
+        expect(stash.engine.name).toBe('memory');
+        expect(Array.isArray(stash.config.resources)).toBe(true);
+        expect(stash.config.resources.length).toBe(0);
+        expect(Array.isArray(stash.config.middleware)).toBe(true);
+        expect(stash.config.middleware.length).toBe(0);
+        expect(stash.config.model).toEqual({ resource: 'resource' });
+    });
+    it('sets the model configuration from the environment.', async () => {
+        process.env.STASHKU_MODEL_RESOURCE = 'plural.name';
+        let stash = new StashKu();
+        expect(stash.config.model).toEqual({ resource: 'plural.name' });
+    });
+    it('throws on invalid model configuration from the environment.', async () => {
+        process.env.STASHKU_MODEL_RESOURCE = 'yoda';
+        expect(() => new StashKu()).toThrow(/resource/);
+    });
+    it('loads a different built-in engine by value from the environment.', async () => {
+        process.env.STASHKU_ENGINE = 'fetch';
+        let stash = new StashKu();
+        await stash.engine;
+        expect(stash.engine.name).toBe('fetch');
+    });
     it('passes engine configuration on to the loaded engine.', async () => {
         let stash = new StashKu({
             memory: {

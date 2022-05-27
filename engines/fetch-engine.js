@@ -32,9 +32,6 @@ const lazyLoadGlobalFetch = async () => {
  * @property {String} [root] - The root URI of each fetch request. If specified, will be prefixed to each resource.
  * @property {String} [path="/api"] - The path to the URI endpoint. This is prefixed before each resource, but after 
  * the `root` (if specified).
- * @property {String} [modelResourceTarget="plural.slug"] - Optional configuration that instructs the engine which model
- * `$stashku` property to use for the resource name. Can be `"name"`, `"slug"`, `"plural.name"`, or `"plural.slug"`
- * (default).
  * @property {Boolean} [trailingSlash=false] - Sets whether a slash will be added at the end of the generated URI.
  * @property {RequestInit} [fetch] - Optional fetch defaults to apply before request-specific configuration is set.
  */
@@ -65,7 +62,6 @@ class FetchEngine extends BaseEngine {
         this.config = {
             root: null,
             path: null,
-            modelResourceTarget: 'plural.slug',
             trailingSlash: false
         };
     }
@@ -79,7 +75,6 @@ class FetchEngine extends BaseEngine {
         let defaults = {
             root: null,
             path: null,
-            modelResourceTarget: 'plural.slug',
             trailingSlash: false
         };
         if (IS_BROWSER === false) {
@@ -89,17 +84,11 @@ class FetchEngine extends BaseEngine {
             if (typeof process.env.STASHKU_FETCH_PATH === 'string') {
                 defaults.path = process.env.STASHKU_FETCH_PATH;
             }
-            if (typeof process.env.STASHKU_FETCH_MODEL_RESOURCE_TARGET === 'string') {
-                defaults.modelResourceTarget = process.env.STASHKU_FETCH_MODEL_RESOURCE_TARGET;
-            }
             if (typeof process.env.STASHKU_FETCH_TRAILING_SLASH === 'string') {
                 defaults.trailingSlash = !!process.env.STASHKU_FETCH_TRAILING_SLASH.match(/^[tTyY1]/);
             }
         }
         defaults = Object.assign(defaults, config);
-        if (defaults.modelResourceTarget && ['name', 'slug', 'plural.name', 'plural.slug'].indexOf(defaults.modelResourceTarget) < 0) {
-            throw new Error('Invalid "modelResourceTarget" configuration value. The value must be "name", "slug", "plural.name", or "plural.slug".');
-        }
         this.config = defaults;
     }
 
@@ -117,19 +106,6 @@ class FetchEngine extends BaseEngine {
     _uri(resource) {
         if (resource === null || typeof resource === 'undefined') {
             resource = '';
-        }
-        if (resource.$stashku) {
-            switch (this.config.modelResourceTarget) {
-                case 'name': resource = resource.$stashku.name; break;
-                case 'slug': resource = resource.$stashku.slug; break;
-                case 'plural.name': resource = resource.$stashku?.plural?.name; break;
-                default:
-                    resource = resource.$stashku?.plural?.slug;
-                    break;
-            }
-            if (resource === null || typeof resource === 'undefined') {
-                throw new Error(`The model did not define a resource value under "$stashku.${this.config.modelResourceTarget}.`);
-            }
         }
         let uri = [this.config.root, this.config.path, resource].filter(v => typeof v === 'string').map(function (i) {
             return i.replace(/(^\/|\/$)/g, '');

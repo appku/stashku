@@ -173,12 +173,24 @@ Formal documentation is [available here](https://github.com/appku/stashku).
 *This is currently a work-in-progress as of v-1.0.0 and will continue to be improved.*
 
 ## Configuration
-StashKu can be configured using environmental variables.
+StashKu can be configured using the following variables.
 
-| Property | ENV | Type | Default | Description |
-|-|-|-|-|-|
-| engine | STASHKU_ENGINE | `String` | `"memory"` | Specifies the name of the StashKu engine (or package) to initialize. The built-in options are: `"memory"`. |
-| - | STASHKU_MODEL_NAME_REMOVE | `String` | `["/^\\[?dbo\\]?\\./i", "/^\\[?etl\\]?\\./i", "/^\\[?rpt\\]?\\./i"]` | Configures one or more regular expressions that are removed from a generated model's class name (derived from a resource name). By default the configured expressions will strip "dbo.", "etl.", and "rpt." prefixes (common database schema prefixes) from resource names. The regular expressions must be declared within a JSON array in string format. |
+- **`STASHKU_ENGINE`**    
+  Specifies the name of the StashKu engine (or package) to initialize. The built-in options are: `"memory"` and `"fetch"`.
+  - Type: `String`
+  - Default: `"memory"` (node) or `"default"` (browser)
+  - StashKu configuration property: `engine`.
+
+- **`STASHKU_MODEL_NAME_REMOVE`**    
+  Used by the `ModelUtility` for defining regular expressions that match text to be removed from a generated model's class name (derived from a resource name). By default the configured expressions will strip "dbo.", "etl.", and "rpt." prefixes from resource names. The regular expressions must be declared within a JSON array in string format.
+  - Type: `String`
+  - Default: `["/^\\[?dbo\\]?\\./i", "/^\\[?etl\\]?\\./i", "/^\\[?rpt\\]?\\./i"]`
+
+- **`STASHKU_MODEL_RESOURCE`**    
+  Instructs StashKu which property from the `$stashku` object on a model type to populate the resource (`to` or `from`) on a request. Can be `"name"`, `"slug"`, `"plural.name"`, `"plural.slug"`, or `"resource"` (default).
+  - Type: `String`
+  - Default: `"resource"`
+  - StashKu configuration property: `model.resource`.
 
 ## Development
 StashKu is developed under the [AppKu]() umbrella, sponsored and backed by [Append](https://append.media). It is built using JavaScript in module format. 

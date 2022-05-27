@@ -72,11 +72,11 @@ class BaseThemeModel extends Model {
     static get $stashku() {
         return {
             resource: 'themes',
-            name: 'Theme',
-            slug: 'theme',
+            name: 'Theme-API',
+            slug: 'theme-api',
             plural: {
-                name: 'Themes',
-                slug: 'themes'
+                name: 'Themes-API',
+                slug: 'themes-api'
             }
         };
     }

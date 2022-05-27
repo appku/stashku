@@ -44,25 +44,30 @@ describe('#model', () => {
         r = new PutRequest().to('someresource').model(MyModel);
         expect(r.metadata.to).toBe('someresource');
     });
-    it('set the metadata "pk" property using the model defined pk properties, if not already set.', () => {
-        class MyModel {
-            static get Key() {
-                return { pk: true };
+    let resourceProps = [undefined, 'resource', 'name', 'slug', 'plural.name', 'plural.slug'];
+    for (let prop of resourceProps) {
+        it(`sets the metadata "from" property using the model resource property "${prop}".`, () => {
+            class MyModel {
+                static get $stashku() {
+                    return {
+                        resource: 'resource-abc',
+                        name: 'name-abc',
+                        slug: 'slug-abc',
+                        plural: {
+                            name: 'plural.name-abc',
+                            slug: 'plural.slug-abc',
+                        }
+                    };
+                }
             }
-            static get Hello() {
-                return { target: 'world' };
-            }
-            static get Toast() {
-                return { target: 'Butter', pk: true };
-            }
-        }
-        let r = new PutRequest().pk('ID');
-        expect(r.metadata.pk).toEqual(['ID']);
-        r.model(MyModel);
-        expect(r.metadata.pk).toEqual(['ID']);
-        r = new PutRequest().model(MyModel);
-        expect(r.metadata.pk).toEqual(['Key', 'Butter']);
-    });
+            let r = new PutRequest().model(MyModel, false, prop);
+            expect(r.metadata.to).toBe((prop ?? 'resource') + '-abc');
+            r = new PutRequest().model(class TestModel { });
+            expect(r.metadata.to).toBe('TestModels');
+            r = new PutRequest().to('someresource').model(MyModel);
+            expect(r.metadata.to).toBe('someresource');
+        });
+    }
 });
 
 describe('#count', () => {

@@ -46,16 +46,18 @@ class PutRequest {
      * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
      * @param {Boolean} [overwrite = false] - Optional flag that, when `true`, overwrites request settings and values
      * with the model's (where applicable).
+     * @param {String} [resourceProp="resource"] - The resource property used from the model type to set the resource on
+     * this request.
      * @returns {PutRequest}
      * @private
      */
-    model(modelType, overwrite = false) {
+    model(modelType, overwrite = false, resourceProp = 'resource') {
         if (modelType !== null && ModelUtility.isValidType(modelType) === false) {
             throw new Error('Invalid "modelType" argument. The value must be null, a class, or a constructor object');
         }
         if (modelType) {
             if (overwrite === true || !this.metadata.to) {
-                this.to(ModelUtility.resource(modelType, this.method));
+                this.to(ModelUtility.resource(modelType, this.method, resourceProp));
             }
             if (overwrite === true || !this.metadata.pk || !this.metadata.pk?.length) {
                 this

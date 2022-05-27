@@ -49,11 +49,6 @@ describe('#configure', () => {
         e.configure();
         expect(e.config.path).toBeNull();
     });
-    it('sets a default modelResourceTarget property value to "plural.slug".', () => {
-        let e = new FetchEngine();
-        e.configure();
-        expect(e.config.modelResourceTarget).toBe('plural.slug');
-    });
     it('sets a default trailingSlash property value to false.', () => {
         let e = new FetchEngine();
         e.configure();
@@ -64,7 +59,6 @@ describe('#configure', () => {
         e.configure({ root: 'https://localhost' });
         expect(e.config.root).toBe('https://localhost');
         expect(e.config.path).toBeNull();
-        expect(e.config.modelResourceTarget).toBe('plural.slug');
         expect(e.config.trailingSlash).toBe(false);
     });
     it('sets the path property from an object.', () => {
@@ -72,15 +66,6 @@ describe('#configure', () => {
         e.configure({ path: '/api/v2' });
         expect(e.config.root).toBeNull();
         expect(e.config.path).toBe('/api/v2');
-        expect(e.config.modelResourceTarget).toBe('plural.slug');
-        expect(e.config.trailingSlash).toBe(false);
-    });
-    it('sets the modelResourceTarget property from an object.', () => {
-        let e = new FetchEngine();
-        e.configure({ modelResourceTarget: 'slug' });
-        expect(e.config.root).toBeNull();
-        expect(e.config.path).toBeNull();
-        expect(e.config.modelResourceTarget).toBe('slug');
         expect(e.config.trailingSlash).toBe(false);
     });
     it('sets the trailingSlash property from an object.', () => {
@@ -88,7 +73,6 @@ describe('#configure', () => {
         e.configure({ trailingSlash: true });
         expect(e.config.root).toBeNull();
         expect(e.config.path).toBeNull();
-        expect(e.config.modelResourceTarget).toBe('plural.slug');
         expect(e.config.trailingSlash).toBe(true);
     });
     it('sets the root property from a the environmental variable.', () => {
@@ -105,26 +89,12 @@ describe('#configure', () => {
         expect(e.config.path).toBe('');
         delete process.env.STASHKU_FETCH_PATH;
     });
-    it('sets the modelResourceTarget property from a the environmental variable.', () => {
-        let e = new FetchEngine();
-        process.env.STASHKU_FETCH_MODEL_RESOURCE_TARGET = 'slug';
-        e.configure();
-        expect(e.config.modelResourceTarget).toBe('slug');
-        delete process.env.STASHKU_FETCH_MODEL_RESOURCE_TARGET;
-    });
     it('sets the trailingSlash property from a the environmental variable.', () => {
         let e = new FetchEngine();
         process.env.STASHKU_FETCH_TRAILING_SLASH = 'true';
         e.configure();
         expect(e.config.trailingSlash).toBe(true);
         delete process.env.STASHKU_FETCH_TRAILING_SLASH;
-    });
-    it('throws on an invalid modelResourceTarget value.', () => {
-        let e = new FetchEngine();
-        expect(() => e.configure({ modelResourceTarget: 'banana' })).toThrow();
-        process.env.STASHKU_FETCH_MODEL_RESOURCE_TARGET = 'toast';
-        expect(() => e.configure()).toThrow();
-        delete process.env.STASHKU_FETCH_MODEL_RESOURCE_TARGET;
     });
 });
 
@@ -176,52 +146,6 @@ describe('#_uri', () => {
         for (let t of tests) {
             e.configure(t[0]);
             expect(e._uri(t[1])).toBe(t[2]);
-        }
-    });
-    it('leverages a the modelResourceTarget to generate a URI for a model', () => {
-        let e = new FetchEngine();
-        let tests = [
-            [{}, ContactPersonModel, '/contact-persons'],
-            [{ trailingSlash: true }, ContactPersonModel, '/contact-persons/'],
-            [{ root: 'https://0.0.0.0/' }, ContactPersonModel, 'https://0.0.0.0/contact-persons'],
-            [{ root: 'https://0.0.0.0/', path: '/api/v3/' }, ContactPersonModel, 'https://0.0.0.0/api/v3/contact-persons'],
-            [{ root: 'https://0.0.0.0/', trailingSlash: true }, ContactPersonModel, 'https://0.0.0.0/contact-persons/'],
-            [{ root: 'https://0.0.0.0/', path: '/api/v3/', trailingSlash: true }, ContactPersonModel, 'https://0.0.0.0/api/v3/contact-persons/'],
-            [{ modelResourceTarget: 'name' }, ContactPersonModel, '/ContactPersonModel'],
-            [{ trailingSlash: true, modelResourceTarget: 'name' }, ContactPersonModel, '/ContactPersonModel/'],
-            [{ root: 'https://0.0.0.0/', modelResourceTarget: 'name' }, ContactPersonModel, 'https://0.0.0.0/ContactPersonModel'],
-            [{ root: 'https://0.0.0.0/', path: '/api/v3/', modelResourceTarget: 'name' }, ContactPersonModel, 'https://0.0.0.0/api/v3/ContactPersonModel'],
-            [{ root: 'https://0.0.0.0/', trailingSlash: true, modelResourceTarget: 'name' }, ContactPersonModel, 'https://0.0.0.0/ContactPersonModel/'],
-            [{ root: 'https://0.0.0.0/', path: '/api/v3/', trailingSlash: true, modelResourceTarget: 'name' }, ContactPersonModel, 'https://0.0.0.0/api/v3/ContactPersonModel/'],
-            [{ modelResourceTarget: 'plural.name' }, ContactPersonModel, '/ContactPersonModels'],
-            [{ trailingSlash: true, modelResourceTarget: 'plural.name' }, ContactPersonModel, '/ContactPersonModels/'],
-            [{ root: 'https://0.0.0.0/', modelResourceTarget: 'plural.name' }, ContactPersonModel, 'https://0.0.0.0/ContactPersonModels'],
-            [{ root: 'https://0.0.0.0/', path: '/api/v3/', modelResourceTarget: 'plural.name' }, ContactPersonModel, 'https://0.0.0.0/api/v3/ContactPersonModels'],
-            [{ root: 'https://0.0.0.0/', trailingSlash: true, modelResourceTarget: 'plural.name' }, ContactPersonModel, 'https://0.0.0.0/ContactPersonModels/'],
-            [{ root: 'https://0.0.0.0/', path: '/api/v3/', trailingSlash: true, modelResourceTarget: 'plural.name' }, ContactPersonModel, 'https://0.0.0.0/api/v3/ContactPersonModels/'],
-            [{ modelResourceTarget: 'slug' }, ContactPersonModel, '/contact-person'],
-            [{ trailingSlash: true, modelResourceTarget: 'slug' }, ContactPersonModel, '/contact-person/'],
-            [{ root: 'https://0.0.0.0/', modelResourceTarget: 'slug' }, ContactPersonModel, 'https://0.0.0.0/contact-person'],
-            [{ root: 'https://0.0.0.0/', path: '/api/v3/', modelResourceTarget: 'slug' }, ContactPersonModel, 'https://0.0.0.0/api/v3/contact-person'],
-            [{ root: 'https://0.0.0.0/', trailingSlash: true, modelResourceTarget: 'slug' }, ContactPersonModel, 'https://0.0.0.0/contact-person/'],
-            [{ root: 'https://0.0.0.0/', path: '/api/v3/', trailingSlash: true, modelResourceTarget: 'slug' }, ContactPersonModel, 'https://0.0.0.0/api/v3/contact-person/'],
-        ];
-        for (let t of tests) {
-            e.configure(t[0]);
-            expect(e._uri(t[1])).toBe(t[2]);
-        }
-    });
-    it('throws an error when the model is missing the appropriate resoure value.', () => {
-        let e = new FetchEngine();
-        let tests = [
-            [{}, {}],
-            [{}, { slug: 'test-other' }],
-            [{ modelResourceTarget: 'name' }, { slug: 'test-other' }],
-            [{ modelResourceTarget: 'slug' }, { name: 'TestOther' }],
-        ];
-        for (let t of tests) {
-            e.configure(t[0]);
-            expect(() => e._uri(class Test { static get $stashku() { return t[1]; } })).toThrow();
         }
     });
 });

@@ -169,10 +169,10 @@ class BaseProductModel extends Model {
         return {
             resource: 'products',
             name: 'Product',
-            slug: 'product',
+            slug: 'product-api',
             plural: {
                 name: 'Products',
-                slug: 'products'
+                slug: 'products-api'
             }
         };
     }
