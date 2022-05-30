@@ -52,7 +52,7 @@ class Main {
             args: Array.from(process.argv)
         };
         //get package.json
-        let pkg = fairu.packageJSON(__dirname);
+        let pkg = fairu.packageJSON(path.join(__dirname, '..'));
         //setup CLI
         this.cmd
             .version(`StashKu: v-${pkg.version}`)
