@@ -28,8 +28,8 @@ const ISO8601Date = /^\d{4}-\d\d-\d\dT\d\d:\d\d(:\d\d(\.\d+)?)?(([+-]\d\d:\d\d)|
 const NakedValueTokenTerminator = /\s|\)|\(|\[|\]/;
 
 /**
- * Represents a tree of conditions that can be used to filter objects and data based on "properties", "operations", and
- * "values" in logical and/or groupings.
+ * The `Filter` represents a conditional expression. That is, a tree of conditions that can be used to filter objects
+ * and data based on "properties", "operations", and "values" in logical "and" "or" groupings.
  */
 class Filter {
     /**
@@ -86,7 +86,7 @@ class Filter {
                         fg.op = fg.operator;
                         delete fg.operator;
                     }
-                } 
+                }
                 if (typeof fg.property === 'undefined' && typeof fg.op === 'undefined' && typeof fg.logic === 'undefined' && typeof fg.filters === 'undefined') {
                     throw new Error('Invalid filter tree. Found unexpected object that does not appear to be a condition or filter-group (missing expected properties).');
                 }
@@ -189,7 +189,7 @@ class Filter {
         //validate
         if (!logic) {
             throw new Error('The "logic" parameter argument is required.');
-        } else if (Filter.LOGIC_KEYS.indexOf(logic) <= -1) {
+        } else if (LOGIC_KEYS.indexOf(logic) <= -1) {
             throw new Error(`The "logic" parameter argument "${logic}" is invalid or unsupported.`);
         } else if (!property) {
             throw new Error('The "property" parameter argument is required.');
@@ -235,7 +235,7 @@ class Filter {
     _filterLogicalGroup(logic) {
         if (!logic) {
             throw new Error('The "logic" parameter argument is required.');
-        } else if (Filter.LOGIC_KEYS.indexOf(logic) <= -1) {
+        } else if (LOGIC_KEYS.indexOf(logic) <= -1) {
             throw new Error(`The "logic" parameter argument "${logic}" is invalid or unsupported.`);
         }
         return {
@@ -257,12 +257,12 @@ class Filter {
             throw new Error('The "property" parameter argument is required.');
         } else if (!op) {
             throw new Error('The "op" parameter argument is required.');
-        } else if (Filter.OP_KEYS.indexOf(op) <= -1) {
+        } else if (!op || !op.toUpperCase || OP_MAP.has(op.toUpperCase()) === false) {
             throw new Error(`The "op" parameter argument "${op}" is invalid or unsupported.`);
         }
         return {
             property: property,
-            op: op,
+            op: OP_MAP.get(op.toUpperCase()),
             value: value
         };
     }
@@ -581,7 +581,6 @@ class Filter {
         let isLogicalOr = /^OR|\|\|/i;
         let isLogicalAnd = /^AND/i;
         let isLogicalAndAlt = /^&&/i;
-        let sortedOpKeys = Filter.OP_KEYS.sort((a, b) => b.length - a.length); //ensure longest strings are checked first
         for (let i = 0; i < input.length; i++) {
             let newToken = null;
             if (openToken && openToken.type === 'condition-value') { //parsing a value
@@ -656,15 +655,15 @@ class Filter {
                 i += 1;
             } else {
                 if (tokens.length && tokens[tokens.length - 1].type === 'condition-property') { //check for matching operator only if preceding was a conditional-property
-                    for (let op of sortedOpKeys) {
-                        if (input.substr(i, op.length)?.localeCompare(op, undefined, { sensitivity: 'base' }) === 0) {
+                    for (let [token, op] of OP_MAP) {
+                        if (input.substring(i, i + token.length).toUpperCase() === token) {
                             newToken = {
                                 type: 'condition-op',
                                 startIndex: i,
-                                endIndex: i + op.length,
+                                endIndex: i + token.length,
                                 value: op
                             };
-                            i += op.length - 1;
+                            i += token.length - 1;
                             break;
                         }
                     }
@@ -814,7 +813,7 @@ Filter.LOGIC = {
  * Array of valid logic strings.
  * @type {Array.<String>}
  */
-Filter.LOGIC_KEYS = Object.keys(Filter.LOGIC).map(k => Filter.LOGIC[k]);
+const LOGIC_KEYS = Object.keys(Filter.LOGIC).map(k => Filter.LOGIC[k]);
 
 /**
  * @readonly
@@ -839,9 +838,26 @@ Filter.OP = {
 };
 
 /**
- * Array of valid conditional comparison strings.
- * @type {Array.<String>}
+ * Mapping of all operations plus additionally supported shortcut tokens (such as ">", "<", "==", "!=", etc.) as keys
+ * with their supported underlying operation (value).
+ * 
+ * This is sorted in order of longest token to shortest which helps tokenization grab the longest matching token first.
+ * @type {Map.<String, String>}
  */
-Filter.OP_KEYS = Object.keys(Filter.OP).map(k => Filter.OP[k]);
+const OP_MAP = new Map(
+    Array.from(Object.entries(Filter.OP))
+        .concat(Array.from(Object.entries(Filter.OP).map(v => [v[1].toUpperCase(), v[1]])))
+        .concat([
+            ['>', Filter.OP.GREATERTHAN],
+            ['<', Filter.OP.LESSTHAN],
+            ['>=', Filter.OP.GREATERTHANOREQUAL],
+            ['<=', Filter.OP.LESSTHANOREQUAL],
+            ['==', Filter.OP.EQUALS],
+            ['!=', Filter.OP.NOTEQUALS],
+            ['~~', Filter.OP.CONTAINS],
+            ['!~~', Filter.OP.DOESNOTCONTAIN],
+        ])
+        .sort((a, b) => b[0].length - a[0].length)
+);
 
 export default Filter;

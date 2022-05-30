@@ -1,5 +1,12 @@
 import Filter from './filter.js';
 
+const VALID_OP_TOKENS = [
+    'EQUALS', 'EQ', 'NOTEQUALS', 'NEQ', 'ISNULL', 'ISNOTNULL', 'LESSTHAN', 'LT', 'LESSTHANOREQUAL',
+    'LTE', 'GREATERTHAN', 'GT', 'GREATERTHANOREQUAL', 'GTE', 'STARTSWITH', 'ENDSWITH', 'CONTAINS',
+    'DOESNOTCONTAIN', 'ISEMPTY', 'ISNOTEMPTY', 'IN', 'NOTIN', 'NIN', '>', '<', '>=', '<=', '==', '!=',
+    '~~', '!~~'
+];
+
 describe('#constructor', () => {
     it('initializes ok.', () => {
         expect(() => { new Filter(); }).not.toThrow();
@@ -479,6 +486,14 @@ describe('#_filterCondition', () => {
     it('returns a new filter condition with the property, op, and value set.', () => {
         expect(new Filter()._filterCondition('abc', Filter.OP.ISNULL)).toEqual({ property: 'abc', op: Filter.OP.ISNULL });
     });
+    it('parses all supported tokens.', () => {
+        let ops = Array.from(Object.values(Filter.OP));
+        for (let t of VALID_OP_TOKENS) {
+            let cond = new Filter()._filterCondition('test', t, 'whatever');
+            expect(cond.property).toBe('test');
+            expect(ops.indexOf(cond.op)).toBeGreaterThanOrEqual(0);
+        }
+    });
 });
 
 describe('.parse', () => {
@@ -621,6 +636,26 @@ describe('._tokenize', () => {
                 expect(t.style).toMatch(/naked|double-quote|single-quote|array/);
             }
         }
+    });
+    it('properly tokenizes all available OP tokens.', () => {
+        let ops = Array.from(Object.values(Filter.OP));
+        let test = '';
+        for (let ts of VALID_OP_TOKENS) {
+            if (test) {
+                test += ` AND {Test} ${ts} 1`;
+            } else {
+                test += `{Test} ${ts} 1`;
+            }
+        }
+        let tokens = Filter._tokenize(test);
+        let counter = 0;
+        for (let t of tokens) {
+            if (t.type === 'condition-op') {
+                counter++;
+                expect(ops.indexOf(t.value)).toBeGreaterThanOrEqual(0);
+            }
+        }
+        expect(counter).toBe(VALID_OP_TOKENS.length);
     });
 });
 
