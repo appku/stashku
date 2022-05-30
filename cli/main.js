@@ -3,8 +3,15 @@
 /* eslint-disable no-console */
 import { Command, Option } from 'commander/esm.mjs';
 import fairu from '@appku/fairu';
+import path from 'path';
 import dotenv from 'dotenv';
 import RequestProcessor from './processors/request-processor.js';
+
+const __dirname = (
+    process.platform === 'win32' ?
+        path.dirname(decodeURI(new URL(import.meta.url).pathname)).substring(1) :
+        path.dirname(decodeURI(new URL(import.meta.url).pathname))
+);
 
 /**
  * @typedef MainState
@@ -44,9 +51,11 @@ class Main {
         this.state = {
             args: Array.from(process.argv)
         };
+        //get package.json
+        let pkg = fairu.packageJSON(__dirname);
         //setup CLI
         this.cmd
-            .version(`StashKu: v-${process.env.npm_package_version}`)
+            .version(`StashKu: v-${pkg.version}`)
             .option('-e, --env <filepath>', 'Specify a .env file to load. This .env will be loaded instead of any .env in the current working directory.')
             .option('-q, --quiet', 'Do not output status information to the console.')
             .option('-v, --verbose', 'Output extra details & logs about the command being executed.')
