@@ -6,3 +6,4 @@ test/**/*
 coverage/**/*
 demo/**/*
 .vscode/**/*
+**/*.test.js
