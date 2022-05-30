@@ -1,6 +1,8 @@
 ///<reference path="./modeling.d.js" />
 import StringUtility from '../utilities/string-utility.js';
 import RESTError from '../rest-error.js';
+import Sort from '../sort.js';
+import Filter from '../filter.js';
 
 /**
  * A utility class for working with StashKu-compatible model objects.
@@ -18,8 +20,11 @@ class ModelUtility {
     }
 
     /**
-     * Returns a map of modelled properties (keys) and their definitions (values). The value is a property definition
-     * that details how the modelled property maps to the underlying storage, including the actual storage `target`.
+     * Returns a map of modeled properties (keys) and their definitions (values). The value is a property definition
+     * that details how the modeled property maps to the underlying storage, including the actual storage `target`.
+     * 
+     * The modeled property (key) is not always the same as the "target" property - it is the property that is
+     * represented through the model itself, which may have a definition pointing to a "target" property.
      * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
      * @returns {Map.<String, Modeling.PropertyDefinition>}
      */
@@ -312,6 +317,56 @@ class ModelUtility {
                 }
             } else {
                 yield null;
+            }
+        }
+    }
+
+    /**
+     * Translates one or more `Sort` instance's modeled property names by changing them into their target
+     * property names.
+     * 
+     * If a `Sort` property name cannot be translated (it is not found on the model), it is left as-is.
+     * @throws 500 `RESTError` if the "modelType" argument is missing or not a supported StashKu model type object.
+     * @template T
+     * @param {T} modelType - The model "class" or constructor function.
+     * @param  {...Sort} sorts - The `Sort` instances to be modeled.
+     */
+    static unmodelSorts(modelType, ...sorts) {
+        let map = ModelUtility.map(modelType);
+        if (sorts && sorts.length) {
+            for (let s of sorts) {
+                if (s && s.property) {
+                    if (map.has(s.property)) {
+                        s.property = map.get(s.property).target;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Translates one or more `Filter` instances and the underlying conditions by changing modeled property names
+     * into their target property names.
+     * 
+     * If a `Filter` instance condition cannot be translated, it is left as-is.
+     * @throws 500 `RESTError` if the "modelType" argument is missing or not a supported StashKu model type object.
+     * @template T
+     * @param {T} modelType - The model "class" or constructor function.
+     * @param  {...Filter} filters - The `Sort` instances to be modeled.
+     */
+    static unmodelFilters(modelType, ...filters) {
+        let map = ModelUtility.map(modelType);
+        if (filters && filters.length) {
+            for (let filter of filters) {
+                if (filter instanceof Filter) {
+                    filter.walk(f => {
+                        if (f.property) { //is a logical condition
+                            if (map.has(f.property)) {
+                                f.property = map.get(f.property).target;
+                            }
+                        }
+                    });
+                }
             }
         }
     }

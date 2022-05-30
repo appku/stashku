@@ -52,6 +52,7 @@ class DeleteRequest {
             if (overwrite === true || !this.metadata.from) {
                 this.from(ModelUtility.resource(modelType, this.method, resourceProp));
             }
+            ModelUtility.unmodelFilters(modelType, this.metadata.where);
         }
         return this;
     }

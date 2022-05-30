@@ -31,6 +31,34 @@ describe('#model', () => {
         let r = new GetRequest();
         expect(r.model(class MyModel { })).toBe(r);
     });
+    class TestModel {
+        static get a() { return 'aaa'; }
+        static get b() {
+            return { target: 'bbbb' };
+        }
+        static get c() {
+            return { target: 'c' };
+        }
+    }
+    it('translates modeled sorts.', () => {
+        let r = new GetRequest().sort(new Sort('a'), new Sort('b', Sort.DIR.DESC), new Sort('c'));
+        r.model(TestModel);
+        expect(r.metadata.sorts[0].property).toBe('aaa');
+        expect(r.metadata.sorts[1].property).toBe('bbbb');
+        expect(r.metadata.sorts[2].property).toBe('c');
+    });
+    it('translates modeled where conditions.', () => {
+        let r = new GetRequest().where('{a} == 55 OR {b} ~~ "soda" OR {c} != 53');
+        r.model(TestModel);
+        expect(r.metadata.where.tree).toEqual({
+            logic: 'or',
+            filters: [
+                { property: 'aaa', op: 'eq', value: 55 },
+                { property: 'bbbb', op: 'contains', value: 'soda' },
+                { property: 'c', op: 'neq', value: 53 }
+            ]
+        });
+    });
     let resourceProps = [undefined, 'resource', 'name', 'slug', 'plural.name', 'plural.slug'];
     for (let prop of resourceProps) {
         it(`sets the metadata "from" property using the model resource property "${prop}".`, () => {

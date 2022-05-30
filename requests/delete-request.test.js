@@ -26,6 +26,27 @@ describe('#model', () => {
         let r = new DeleteRequest();
         expect(r.model(class MyModel { })).toBe(r);
     });
+    it('translates modeled where conditions.', () => {
+        class TestModel {
+            static get a() { return 'aaa'; }
+            static get b() {
+                return { target: 'bbbb' };
+            }
+            static get c() {
+                return { target: 'c' };
+            }
+        }
+        let r = new DeleteRequest().where('{a} == 55 OR {b} ~~ "soda" OR {c} != 53');
+        r.model(TestModel);
+        expect(r.metadata.where.tree).toEqual({
+            logic: 'or',
+            filters: [
+                { property: 'aaa', op: 'eq', value: 55 },
+                { property: 'bbbb', op: 'contains', value: 'soda' },
+                { property: 'c', op: 'neq', value: 53 }
+            ]
+        });
+    });
     let resourceProps = [undefined, 'resource', 'name', 'slug', 'plural.name', 'plural.slug'];
     for (let prop of resourceProps) {
         it(`sets the metadata "from" property using the model resource property "${prop}".`, () => {

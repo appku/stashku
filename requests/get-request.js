@@ -70,6 +70,8 @@ class GetRequest {
                 }
                 this.properties(...targets);
             }
+            ModelUtility.unmodelFilters(modelType, this.metadata.where);
+            ModelUtility.unmodelSorts(modelType, ...this.metadata.sorts);
         }
         return this;
     }

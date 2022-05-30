@@ -1,3 +1,4 @@
+import jest from 'jest-mock';
 import Filter from './filter.js';
 
 const VALID_OP_TOKENS = [
@@ -177,6 +178,29 @@ describe('.isEmpty', () => {
             logic: Filter.LOGIC.AND
         });
         expect(Filter.isEmpty(f)).toBe(false);
+    });
+});
+
+describe('#walk', () => {
+    it('callback is called for every logical group and condition in the filter.', () => {
+        let f = Filter
+            .or('test0', Filter.OP.EQUALS, 1)
+            .or('test1', Filter.OP.EQUALS, 2)
+            .and('test2', Filter.OP.EQUALS, 3)
+            .and(Filter
+                .or('test3', Filter.OP.CONTAINS, 'joe')
+                .or('test4', Filter.OP.CONTAINS, 'susan')
+            );
+        let cb = jest.fn();
+        f.walk(cb);
+        expect(cb).toHaveBeenCalledTimes(8);
+        let once = [];
+        for (let i = 0; i < cb.mock.calls.length; i++) {
+            expect(typeof cb.mock.calls[i][0]).toBe('object');
+            expect(typeof cb.mock.calls[i][1]).toBe('number');
+            expect(once.indexOf(cb.mock.calls[i][0])).toBe(-1); //should only ever call for a node once.
+            once.push(cb.mock.calls[i][0]);
+        }
     });
 });
 
@@ -637,7 +661,7 @@ describe('._tokenize', () => {
             }
         }
     });
-    it('properly tokenizes all available OP tokens.', () => {
+    it('properly tokenizes all available OP token strings.', () => {
         let ops = Array.from(Object.values(Filter.OP));
         let test = '';
         for (let ts of VALID_OP_TOKENS) {

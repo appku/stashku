@@ -46,7 +46,7 @@
         "node": ">=14"
     },
     "dependencies": {
-        "@appku/fairu": "^1.0.4",
+        "@appku/fairu": "^1.0.6",
         "commander": "^9.2.0",
         "deep-is": "^0.1.3",
         "dot": "^1.1.3",

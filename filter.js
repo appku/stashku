@@ -1,17 +1,5 @@
 ///<reference path="./modeling/modeling.d.js" />
-
-/**
- * @typedef FilterCondition
- * @property {String} property - The property name from the schema affected by the filter.
- * @property {String} op - The filter operator.
- * @property {*} [value] - The value used by the operator on the property value.
- */
-
-/**
- * @typedef FilterLogicalGroup
- * @property {String} logic - The logical operator to apply to the filters.
- * @property {Array.<FilterCondition|FilterLogicalGroup>} filters - The filter items and groups under the logical operator.
- */
+///<reference path="./filter.d.js" />
 
 /**
  * A regular expression to check for a reasonable ISO8601 format date.
@@ -34,17 +22,17 @@ const NakedValueTokenTerminator = /\s|\)|\(|\[|\]/;
 class Filter {
     /**
      * Creates a new `Filter` instance.
-     * @param {Filter|FilterLogicalGroup} [tree] - Create the filter with an existing filter tree object.
+     * @param {Filter|Filtering.LogicalGroup} [tree] - Create the filter with an existing filter tree object.
      */
     constructor(tree) {
 
         /**
-         * @type {FilterLogicalGroup}
+         * @type {Filtering.LogicalGroup}
          */
         this.tree = null;
 
         /**
-         * @type {FilterLogicalGroup}
+         * @type {Filtering.LogicalGroup}
          * @private
          */
         this._current = null;
@@ -104,7 +92,7 @@ class Filter {
 
     /**
      * Create a new `Filter` instance and opening with a logical "and" operator.
-     * @param {String|Filter|FilterLogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
+     * @param {String|Filter|Filtering.LogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter}
@@ -115,7 +103,7 @@ class Filter {
 
     /**
      * Create a new `Filter` instance and opening with a logical "or" operator.
-     * @param {String|Filter|FilterLogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
+     * @param {String|Filter|Filtering.LogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter}
@@ -127,7 +115,7 @@ class Filter {
     /**
      * Checks if the specified filter is empty (contains no logical conditions) and returns a `true` if empty, `false`
      * if not.
-     * @param {Filter|FilterLogicalGroup} filter - The filter to check.
+     * @param {Filter|Filtering.LogicalGroup} filter - The filter to check.
      * @returns {Boolean}
      */
     static isEmpty(filter) {
@@ -150,8 +138,28 @@ class Filter {
     }
 
     /**
+     * Walks the tree of the filter and calls the callback for each logical group and condition.
+     * @param {Filtering.WalkCallback} cb - The callback.
+     */
+    walk(cb) {
+        let walker = (filter, depth, parent) => {
+            if (filter instanceof Filter) {
+                walker(filter.tree, 0, null);
+            } else {
+                cb(filter, depth, parent);
+                if (filter.filters) {
+                    for (let f of filter.filters) {
+                        walker(f, depth + 1, filter);
+                    }
+                }
+            }
+        };
+        walker(this);
+    }
+
+    /**
      * Adds a new condition using a logical "or" operator.
-     * @param {String|Filter|FilterLogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
+     * @param {String|Filter|Filtering.LogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter}
@@ -162,7 +170,7 @@ class Filter {
 
     /**
      * Adds a new condition using a logical "or" operator.
-     * @param {String|Filter|FilterLogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
+     * @param {String|Filter|Filtering.LogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter}
@@ -174,7 +182,7 @@ class Filter {
     /**
      * Adds a new condition or filter group to the tree using the given logical operator.
      * @param {String} logic - The logical operator.
-     * @param {String|Filter|FilterLogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
+     * @param {String|Filter|Filtering.LogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the property value.
      * @returns {Filter} 
@@ -229,7 +237,7 @@ class Filter {
     /**
      * Creates a new logical group object.
      * @param {String} logic - The logical operator.
-     * @returns {FilterLogicalGroup}
+     * @returns {Filtering.LogicalGroup}
      * @private
      */
     _filterLogicalGroup(logic) {
@@ -249,7 +257,7 @@ class Filter {
      * @param {String} property - The property affected by the filter.
      * @param {String} [op] - The filter operator.
      * @param {*} [value] - The value used by the operator on the property value.
-     * @returns {FilterCondition}
+     * @returns {Filtering.Condition}
      * @private
      */
     _filterCondition(property, op, value) {
@@ -283,8 +291,8 @@ class Filter {
 
     /**
      * Makes a copy of the filter group and returns the clone.
-     * @param {FilterLogicalGroup} orig - The group to clone.
-     * @returns {FilterLogicalGroup}
+     * @param {Filtering.LogicalGroup} orig - The group to clone.
+     * @returns {Filtering.LogicalGroup}
      * @private
      */
     _cloneFilterGroup(orig) {
@@ -321,7 +329,7 @@ class Filter {
 
     /**
      * Checks if the given model matches the given filter group criteria.
-     * @param {FilterLogicalGroup|FilterCondition} conditionOrGroup - The filter criteria to check.
+     * @param {Filtering.LogicalGroup|Filtering.Condition} conditionOrGroup - The filter criteria to check.
      * @param {Model} model - The model to evaluate. 
      * @returns {Boolean}
      * @private
@@ -411,7 +419,7 @@ class Filter {
 
     /**
      * Converts the filter to a readable string.
-     * @param {FilterLogicalGroup|FilterCondition} [fg] - Optional filter condition or filter group to convert to a string.
+     * @param {Filtering.LogicalGroup|Filtering.Condition} [fg] - Optional filter condition or filter group to convert to a string.
      * @returns {String}
      */
     toString(fg) {
@@ -478,7 +486,7 @@ class Filter {
 
     /**
      * Returns the tree object to be utilized for stringifying into JSON.
-     * @returns {FilterLogicalGroup}
+     * @returns {Filtering.LogicalGroup}
      */
     toJSON() {
         return this.tree;
@@ -486,7 +494,7 @@ class Filter {
 
     /**
      * Creates a new `Filter` instance using the object containing a filter tree.
-     * @param {FilterLogicalGroup} obj - The filter tree object.
+     * @param {Filtering.LogicalGroup} obj - The filter tree object.
      * @returns {Filter}
      */
     static fromObject(obj) {

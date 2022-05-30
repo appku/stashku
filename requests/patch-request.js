@@ -67,6 +67,7 @@ class PatchRequest {
                     this.metadata.template = m;
                 }
             }
+            ModelUtility.unmodelFilters(modelType, this.metadata.where);
         }
         return this;
     }

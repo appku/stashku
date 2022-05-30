@@ -1,5 +1,7 @@
-import ModelUtility from './model-utility.js';
 import jest from 'jest-mock';
+import Sort from '../sort.js';
+import Filter from '../filter.js';
+import ModelUtility from './model-utility.js';
 
 const invalidModelTypeValues = [
     new Date(),
@@ -547,5 +549,78 @@ describe('.unmodel', () => {
         expect(nextModel.a).toBe('hello');
         expect(nextModel.b).toBeUndefined();
         expect(nextModel.c).toBe('!!!');
+    });
+});
+
+describe('.unmodelSorts', () => {
+    class TestModel {
+        constructor() {
+        }
+        static get a() { return 'aaa'; }
+        static get b() {
+            return { target: 'bbbb' };
+        }
+        static get c() {
+            return { target: 'c' };
+        }
+    }
+    it('skips over invalid filter objects.', () => {
+        expect(() => ModelUtility.unmodelSorts(null, undefined, 0, new Date())).not.toThrow();
+    });
+    it('maps modeled properties to target properties', () => {
+        let test = [
+            new Sort('tacos', Sort.DIR.ASC),
+            new Sort('a', Sort.DIR.DESC),
+            new Sort('c', Sort.DIR.ASC)
+        ];
+        ModelUtility.unmodelSorts(TestModel, ...test);
+        expect(test[0].property).toBe('tacos');
+        expect(test[0].dir).toBe(Sort.DIR.ASC);
+        expect(test[1].property).toBe('aaa');
+        expect(test[1].dir).toBe(Sort.DIR.DESC);
+        expect(test[2].property).toBe('c');
+        expect(test[2].dir).toBe(Sort.DIR.ASC);
+    });
+});
+
+describe('.unmodelFilters', () => {
+    class TestModel {
+        static get a() { return 'aaa'; }
+        static get b() {
+            return { target: 'bbbb' };
+        }
+        static get c() {
+            return { target: 'c' };
+        }
+    }
+    it('skips over invalid filter objects.', () => {
+        expect(() => ModelUtility.unmodelFilters(null, undefined, 0, new Date())).not.toThrow();
+    });
+    it('maps modeled properties to target properties', () => {
+        let test = [
+            Filter.and('test', Filter.OP.EQUALS, 'tacos'),
+            Filter.and('a', Filter.OP.GREATERTHAN, 555).and('c', Filter.OP.LESSTHAN, 123),
+            Filter.parse('{a} == 55 OR {b} ~~ "soda" OR {c} != 53'),
+        ];
+        ModelUtility.unmodelFilters(TestModel, ...test);
+        expect(test[0].tree).toEqual({
+            logic: 'and',
+            filters: [{ property: 'test', op: 'eq', value: 'tacos' }]
+        });
+        expect(test[1].tree).toEqual({
+            logic: 'and',
+            filters: [
+                { property: 'aaa', op: 'gt', value: 555 },
+                { property: 'c', op: 'lt', value: 123 }
+            ]
+        });
+        expect(test[2].tree).toEqual({
+            logic: 'or',
+            filters: [
+                { property: 'aaa', op: 'eq', value: 55 },
+                { property: 'bbbb', op: 'contains', value: 'soda' },
+                { property: 'c', op: 'neq', value: 53 }
+            ]
+        });
     });
 });
