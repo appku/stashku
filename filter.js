@@ -40,6 +40,8 @@ class Filter {
         /**
          * When enabled (default) the Filter will support dot-notation property names, allowing nested object value
          * evaluation. If disabled, dot-notation property names will be treated as the explicit property name.
+         * 
+         * This only affects the operation of the `test` function which evaluates objects with filter criteria.
          * @type {Boolean}
          */
         this.dot = true;
@@ -308,16 +310,16 @@ class Filter {
     }
 
     /**
-     * Tests the filter criteria against the specified model(s). If any model fails a filter, or no models are
-     * specified, a `false` value is returned. If all models pass the filters, a `true` value is returned.
-     * @param {...Model} models - The models to test the filter against.
+     * Tests the filter criteria against the specified object(s). If any object fails a filter, or no objects are
+     * specified, a `false` value is returned. If all objects pass the filters, a `true` value is returned.
+     * @param {...Model} models - The objects to test the filter against.
      * @returns {Boolean}
      */
-    test(...models) {
-        if (models && models.length) {
+    test(...objects) {
+        if (objects && objects.length) {
             if (this.tree && Filter.isEmpty(this) === false && Array.isArray(this.tree.filters) && this.tree.filters.length) {
-                for (let x = models.length - 1; x >= 0; x--) {
-                    if (this._evaluateCriteria(this.tree, models[x]) === false) {
+                for (let x = objects.length - 1; x >= 0; x--) {
+                    if (this._evaluateCriteria(this.tree, objects[x]) === false) {
                         return false;
                     }
                 }

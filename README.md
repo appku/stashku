@@ -1,9 +1,25 @@
 # StashKu
-StashKu is a data storage agnostic, flat-data framework provides mechanisms for model usage and pure, RESTful operations against common data storage engines & mediums. The framework provides the tools and engines to begin leveraging it out of the box. Specifically the engines for in-memory storage and fetch requests (ideal for the browser-side of applications) are provided.
+StashKu is a data storage agnostic, flat-data framework that provides an interface for RESTful operations against common data storage mediums. The framework provides the tools needed to begin leveraging and extending it out of the box. Specifically, two "engines" are provided to get you started- One for in-memory storage, and another for fetch requests.
 
-Other engines can be built on top of StashKu to provide even more support of other storage mediums, including APIs, disks and other hardware, and even websites. As long as it can be interacted with through RESTful requests such as GET, POST, PUT, PATCH, DELETE, and OPTIONS, StashKu could potentially have an engine for it.
+"Engines" act as the translator of StashKu RESTful requests to whatever data storage medium is on the other end - whether it's a hard disk, a hardware sensor, a database, or even an API. They are responsible for crafting standardized responses which StashKu hands back off to the requestor. As long as it can be interacted with through RESTful requests such as GET, POST, PUT, PATCH, DELETE, and OPTIONS, StashKu could *potentially* have an engine for it. If you'd like to create your own engine, check out the tutorials on our formal [documentation site](https://appku.github.io/stashku/index.html).
 
-StashKu supports being used directly in the browser, or on server-side (node). ─=≡Σ(((ﾉ☉ヮ⚆)ﾉ
+StashKu supports some amazing features:
+
+- Can be used in modern browsers or on server-side (node). ─=≡Σ(((ﾉ☉ヮ⚆)ﾉ
+- [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) via [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) requests, paging, sorting, constraining properties, and even filtering via conditional expressions.
+- Sorting through objects or string expressions:    
+  *e.g. `{FirstName} DESC` `{LastName} ASC`*
+- Filtering through objects, chained callback objects, or string expressions:    
+  *e.g. `({FirstName} CONTAINS "Chris" OR {Age} >= 30) AND {Ticket} == true`*
+- Support of models with JSDoc & VS Code intellisense. 
+- A command line interface which allows you to make GET and OPTIONS requests (generate models).    
+  *See: [Going next-level with Models](https://appku.github.io/stashku/tutorial-Going%20Next-Level%20with%20Models.html).*
+- Middleware support.    
+  *See: [Writing your own middleware tutorial](https://appku.github.io/stashku/tutorial-Writing%20Your%20Own%20Middleware.html).*
+- Pluggable engine support.    
+  *See: [Writing your own engine tutorial](https://appku.github.io/stashku/tutorial-Writing%20Your%20Own%20Engine.html).*
+- Built-in logging extensibility through standard logger callbacks.    
+  *Check out our console/file log middleware [stashku-log](https://github.com/appku/stashku-log).*
 
 You may be interested in these other engines:
 - [stashku-sql](https://github.com/appku/stashku-sql): A library for interacting with Microsoft SQL Server and Postgres databases through StashKu.
@@ -181,16 +197,48 @@ StashKu can be configured using the following variables.
   - Default: `"memory"` (node) or `"default"` (browser)
   - StashKu configuration property: `engine`.
 
+  **JavaScript Example**
+  ```js
+  new StashKu({
+      engine: '@appku/stashku-sql'
+  })
+  ```
+  **Shell/Environment Example**
+  ```sh
+  export STASHKU_ENGINE='@appku/stashku-sql'
+  ```
+
 - **`STASHKU_MODEL_NAME_REMOVE`**    
   Used by the `ModelUtility` for defining regular expressions that match text to be removed from a generated model's class name (derived from a resource name). By default the configured expressions will strip "dbo.", "etl.", and "rpt." prefixes from resource names. The regular expressions must be declared within a JSON array in string format.
   - Type: `String`
   - Default: `["/^\\[?dbo\\]?\\./i", "/^\\[?etl\\]?\\./i", "/^\\[?rpt\\]?\\./i"]`
+
+  **Shell/Environment Example**
+  ```sh
+  export STASHKU_MODEL_NAME_REMOVE='["/^\\[?schema\\]?\\./i"]'
+  ```
 
 - **`STASHKU_MODEL_RESOURCE`**    
   Instructs StashKu which property from the `$stashku` object on a model type to populate the resource (`to` or `from`) on a request. Can be `"name"`, `"slug"`, `"plural.name"`, `"plural.slug"`, or `"resource"` (default).
   - Type: `String`
   - Default: `"resource"`
   - StashKu configuration property: `model.resource`.
+
+  **JavaScript Example**
+  ```js
+  new StashKu({
+      model: { resource: 'plural.slug' }
+  })
+  ```
+  **Shell/Environment Example**
+  ```sh
+  export STASHKU_MODEL_RESOURCE=plural.slug
+  ```
+
+The built-in engines all have their own supported configuration's as well, you can find them described through their API documentation or the available tutorials:
+
+- Memory: [Tutorial](https://appku.github.io/stashku/tutorial-Using%20the%20Memory%20Engine.html) or [API](https://appku.github.io/stashku/MemoryEngine.html)
+- Fetch: [Tutorial](https://appku.github.io/stashku/tutorial-Using%20the%20Fetch%20Engine.html) or [API](https://appku.github.io/stashku/FetchEngine.html)
 
 ## Development
 StashKu is developed under the [AppKu](https://www.appku.com) umbrella, sponsored and backed by [Append](https://append.media). It is built using JavaScript in module format. 
