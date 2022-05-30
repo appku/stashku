@@ -761,13 +761,13 @@ class Filter {
                 return new Date(value);
             } else if (/^(""|'')$/.test(value)) { //empty string
                 return '';
-            } else if (/^".+[^\\]"$/.test(value)) {
-                return value.substr(1, value.length - 2).replace(/\\"/g, '"');
-            } else if (/^'.+[^\\]'$/.test(value)) {
-                return value.substr(1, value.length - 2).replace(/\\'/g, '\'');
-            } else if (/^".+([^"]|\\")$/.test(value) || /^([^"]|\\").+[^\\]"$/.test(value)) {
+            } else if (/^".*[^\\]"$/.test(value)) {
+                return value.substring(1, value.length - 1).replace(/\\"/g, '"');
+            } else if (/^'.*[^\\]'$/.test(value)) {
+                return value.substring(1, value.length - 1).replace(/\\'/g, '\'');
+            } else if (/^".*([^"]|\\")$/.test(value) || /^([^"]|\\").*[^\\]"$/.test(value)) {
                 throw new SyntaxError(`Error parsing filter value "${value}", unterminated double-quoted value.`);
-            } else if (/^'.+([^']|\\')$/.test(value) || /^([^']|\\').+[^\\]'$/.test(value)) {
+            } else if (/^'.*([^']|\\')$/.test(value) || /^([^']|\\').*[^\\]'$/.test(value)) {
                 throw new SyntaxError(`Error parsing filter value "${value}", unterminated single-quoted value.`);
             } else if (/^\[.*\]$/.test(value)) {
                 let extract = [];

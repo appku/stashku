@@ -645,6 +645,24 @@ describe('._tokenize', () => {
             )).toBe(2);
         }
     });
+    it('captures double-quoted string values', () => {
+        let test = '{apples} EQ "yoda" AND {apples} EQ "y"';
+        let tokens = Filter._tokenize(test);
+        expect(tokens.length).toBe(7);
+        expect(tokens[2].type).toBe('condition-value');
+        expect(tokens[2].value).toBe('"yoda"');
+        expect(tokens[6].type).toBe('condition-value');
+        expect(tokens[6].value).toBe('"y"');
+    });
+    it('captures single-quoted string values', () => {
+        let test = '{apples} EQ \'yoda\' AND {apples} EQ \'y\'';
+        let tokens = Filter._tokenize(test);
+        expect(tokens.length).toBe(7);
+        expect(tokens[2].type).toBe('condition-value');
+        expect(tokens[2].value).toBe('\'yoda\'');
+        expect(tokens[6].type).toBe('condition-value');
+        expect(tokens[6].value).toBe('\'y\'');
+    });
     it('generates a valid array of tokens.', () => {
         let test = '{apples} GTE 1 OR ({bananas} CONTAINS "Moose" AND {name} CONTAINS \'bob\') OR {char} NEQ "yoda"';
         let tokens = Filter._tokenize(test);
@@ -723,6 +741,7 @@ describe('._parseValueString', () => {
         expect(Filter._parseValueString('Date: 2587-01-14T03:14Z')).toBe('Date: 2587-01-14T03:14Z');
     });
     it('parses a double-quoted string.', () => {
+        expect(Filter._parseValueString('"e"')).toBe('e');
         expect(Filter._parseValueString('"1234"')).toBe('1234');
         expect(Filter._parseValueString('"true"')).toBe('true');
         expect(Filter._parseValueString('"FALSE"')).toBe('FALSE');
@@ -740,6 +759,7 @@ describe('._parseValueString', () => {
         }
     });
     it('parses a single-quoted string.', () => {
+        expect(Filter._parseValueString('\'e\'')).toBe('e');
         expect(Filter._parseValueString('\'1234\'')).toBe('1234');
         expect(Filter._parseValueString('\'true\'')).toBe('true');
         expect(Filter._parseValueString('\'FALSE\'')).toBe('FALSE');
