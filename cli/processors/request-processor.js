@@ -46,58 +46,67 @@ class RequestProcessor extends BaseProcessor {
             .format(fairu.Format.json)
             .read();
         //build the request
+        let multiResource = [this.options.resource];
         let req = null;
-        if (reqFile[0].read) {
-            req = StashKu.requestFromObject(reqFile[0].data);
-        }
-        if (this.options.method === 'get') {
-            req = this.buildGet(req);
-        } else if (this.options.method === 'options') {
-            req = this.buildOptions(req);
-        } else {
-            throw new Error(`No supported method specified for processing ("${this.options.method}" is invalid or unsupported).`);
-        }
-        //save query to file (do this early to help facilitate troubleshooting).
-        if (this.options.save) {
-            await fairu.with(this.options.save).stringify(fairu.Format.json).write(req);
-        }
-        //run the request
-        if (!this.options.cli.quiet && this.options.cli.verbose) {
-            console.debug(`Running GET request on "${this.stash.engine.name}" engine for the "${this.options.resource}" resource.`);
-            console.debug(JSON.stringify(req.metadata, null, 4));
-        }
-        let res = await this.stash[this.options.method](req);
-        //output response to console
-        if (!this.options.cli.quiet) {
-            let outputObj = res;
-            //handle options requests sending a constructor instead of instance.
-            if (this.options.method === 'options') {
-                outputObj = Object.assign({}, res, { data: [] });
-                for (let i = 0; i < res.returned; i++) {
-                    outputObj.data.push(ModelUtility.schema(res.data[i]));
-                }
+        if (reqFile[0].readable) {
+            if (Array.isArray(reqFile[0].data)) {
+                multiResource = reqFile[0].data;
+            } else {
+                req = StashKu.requestFromObject(reqFile[0].data);
             }
-            console.log(fairu.stringify(this.options.cli.format, outputObj));
         }
-        //save output to file
-        if (this.options.output) {
-            await fairu.with(this.options.output).format(this.options.cli.format).write(res);
-        }
-        //handle options exporting
-        if (this.options.method === 'options') {
-            let exportMap = await new OptionsExporter().export(res, {
-                dirPath: this.options.export,
-                overwrite: !!this.options.force
-            });
-            if (!this.options.cli.quiet && this.options.dryRun) {
-                for (let [resource, mt] of exportMap) {
-                    if (mt) {
-                        console.log(`/** ${resource} base: **/\n${mt.base}\n\n/**${resource} extending: **/\n${mt.extending}`);
-                    } else {
-                        console.log(`${resource}: <null>`);
+        for (let resource of multiResource) {
+            if (this.options.method === 'get') {
+                req = this.buildGet(req, resource);
+            } else if (this.options.method === 'options') {
+                req = this.buildOptions(req, resource);
+            } else {
+                throw new Error(`No supported method specified for processing ("${this.options.method}" is invalid or unsupported).`);
+            }
+            console.log(req);
+            //save query to file (do this early to help facilitate troubleshooting).
+            if (this.options.save) {
+                await fairu.with(this.options.save).stringify(fairu.Format.json).write(req);
+            }
+            //run the request
+            if (!this.options.cli.quiet && this.options.cli.verbose) {
+                console.debug(`Running GET request on "${this.stash.engine.name}" engine for the "${resource}" resource.`);
+                console.debug(JSON.stringify(req.metadata, null, 4));
+            }
+            let res = await this.stash[this.options.method](req);
+            //output response to console
+            if (!this.options.cli.quiet) {
+                let outputObj = res;
+                //handle options requests sending a constructor instead of instance.
+                if (this.options.method === 'options') {
+                    outputObj = Object.assign({}, res, { data: [] });
+                    for (let i = 0; i < res.returned; i++) {
+                        outputObj.data.push(ModelUtility.schema(res.data[i]));
+                    }
+                }
+                console.log(fairu.stringify(this.options.cli.format, outputObj));
+            }
+            //save output to file
+            if (this.options.output) {
+                await fairu.with(this.options.output).format(this.options.cli.format).write(res);
+            }
+            //handle options exporting
+            if (this.options.method === 'options') {
+                let exportMap = await new OptionsExporter().export(res, {
+                    dirPath: this.options.export,
+                    overwrite: !!this.options.force
+                });
+                if (!this.options.cli.quiet && this.options.dryRun) {
+                    for (let [r, mt] of exportMap) {
+                        if (mt) {
+                            console.log(`/** ${r} base: **/\n${mt.base}\n\n/**${r} extending: **/\n${mt.extending}`);
+                        } else {
+                            console.log(`${r}: <null>`);
+                        }
                     }
                 }
             }
+            req = null;
         }
     }
 
@@ -106,10 +115,10 @@ class RequestProcessor extends BaseProcessor {
      * @param {GetRequest} req - An exisiting `GetRequest` to build upon.
      * @returns {GetRequest}
      */
-    buildGet(req) {
+    buildGet(req, resource) {
         if (!req) {
             req = new GetRequest();
-            req.from(this.options.resource);
+            req.from(resource);
         } else if ((req instanceof GetRequest) === false) {
             throw new Error('The "req" argument when specified must be a GetRequest instance.');
         }
@@ -142,10 +151,10 @@ class RequestProcessor extends BaseProcessor {
      * @param {OptionsRequest} req - An exisiting `OptionsRequest` to build upon.
      * @returns {OptionsRequest}
      */
-    buildOptions(req) {
+    buildOptions(req, resource) {
         if (!req) {
             req = new OptionsRequest();
-            req.from(this.options.resource);
+            req.from(resource);
         } else if ((req instanceof OptionsRequest) === false) {
             throw new Error('The "req" argument when specified must be a OptionsRequest instance.');
         }

@@ -178,6 +178,11 @@ Taking it a step further, you can generate extensible JavaScript models represen
 ```sh
 npx stashku options "Products" -x ./models/
 ```
+Optionally, supplying a JSON array from a file of resource names to export:
+```sh
+npx stashku options ./model-list.json -x ./models/
+```
+
 The generated models are 100% usable in StashKu and are designed to provide VS-Code compatible intellisense proper
 JSdoc tags.
 
