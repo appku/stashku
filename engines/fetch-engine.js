@@ -81,7 +81,7 @@ class FetchEngine extends BaseEngine {
             path: null,
             trailingSlash: false
         };
-        if (IS_BROWSER === false) {
+        if (IS_BROWSER === false || typeof process?.env === 'object') {
             if (typeof process.env.STASHKU_FETCH_ROOT === 'string') {
                 defaults.root = process.env.STASHKU_FETCH_ROOT;
             }

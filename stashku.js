@@ -216,11 +216,11 @@ class StashKu {
         let modelDefault = {
             resource: 'resource'
         };
-        if (IS_BROWSER) {
-            engineDefault = 'fetch';
-        } else {
-            engineDefault = process.env.STASHKU_ENGINE ?? 'memory';
+        if (typeof process?.env === 'object') {
+            engineDefault = process.env.STASHKU_ENGINE ?? (IS_BROWSER ? 'fetch' : 'memory');
             modelDefault.resource = process.env.STASHKU_MODEL_RESOURCE ?? 'resource';
+        } else {
+            engineDefault = (IS_BROWSER ? 'fetch' : 'memory');
         }
         this.config = Object.assign({
             engine: engineDefault,

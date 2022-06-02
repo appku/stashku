@@ -29,8 +29,10 @@ class ModelGenerator {
      */
     static formatModelName(dirtyResourceName, suffix = 'Model') {
         let removes = ['/^\\[?dbo\\]?./i', '/^\\[?etl\\]?./i', '/^\\[?rpt\\]?./i'];
-        if (process.env.STASHKU_MODEL_NAME_REMOVE) {
-            removes = JSON.parse(process.env.STASHKU_MODEL_NAME_REMOVE);
+        if (typeof process?.env === 'object') {
+            if (process.env.STASHKU_MODEL_NAME_REMOVE) {
+                removes = JSON.parse(process.env.STASHKU_MODEL_NAME_REMOVE);
+            }
         }
         if (removes && Array.isArray(removes)) {
             for (let rStr of removes) {
@@ -97,7 +99,7 @@ class ModelGenerator {
         Object.defineProperty(mt, 'name', { value: className });
         //add json stringification support
         let toSchema = ModelUtility.schema;
-        mt.toJSON = (function() {
+        mt.toJSON = (function () {
             return toSchema(this);
         }).bind(mt);
         //add static properties
