@@ -22,6 +22,9 @@ module.exports = {
             }
         ]
     },
+    plugins: [
+        new webpack.EnvironmentPlugin()
+    ],
     devServer: {
         watchFiles: ['./*'],
         onListening: async (devServer) => {

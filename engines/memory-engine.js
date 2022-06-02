@@ -83,7 +83,7 @@ class MemoryEngine extends BaseEngine {
             caseSensitive: null,
             limit: 0
         };
-        if (IS_BROWSER === false || typeof process?.env === 'object') {
+        if (IS_BROWSER === false || (typeof process !== 'undefined' && typeof process.env === 'object')) {
             let limit = parseInt(process.env.STASHKU_MEMORY_LIMIT);
             if (limit) {
                 defaults.limit = limit;

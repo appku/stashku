@@ -216,7 +216,7 @@ class StashKu {
         let modelDefault = {
             resource: 'resource'
         };
-        if (typeof process?.env === 'object') {
+        if (typeof process !== 'undefined' && typeof process.env === 'object') {
             engineDefault = process.env.STASHKU_ENGINE ?? (IS_BROWSER ? 'fetch' : 'memory');
             modelDefault.resource = process.env.STASHKU_MODEL_RESOURCE ?? 'resource';
         } else {

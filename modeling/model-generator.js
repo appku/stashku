@@ -29,7 +29,7 @@ class ModelGenerator {
      */
     static formatModelName(dirtyResourceName, suffix = 'Model') {
         let removes = ['/^\\[?dbo\\]?./i', '/^\\[?etl\\]?./i', '/^\\[?rpt\\]?./i'];
-        if (typeof process?.env === 'object') {
+        if (typeof process !== 'undefined' && typeof process.env === 'object') {
             if (process.env.STASHKU_MODEL_NAME_REMOVE) {
                 removes = JSON.parse(process.env.STASHKU_MODEL_NAME_REMOVE);
             }
