@@ -45,7 +45,12 @@ describe('#model', () => {
                 }
             }
             let r = new PostRequest().model(MyModel, false, prop);
-            expect(r.metadata.to).toBe((prop ?? 'resource') + '-abc');
+            expect(r.metadata.to).toBe('resource-abc');
+            if (!prop || prop === 'resource') {
+                expect(r.metadata.headers).toBeNull();
+            } else {
+                expect(r.metadata.headers.get('model')).toEqual({ resource: (prop ?? 'resource') + '-abc' });
+            }
             r = new PostRequest().model(class TestModel { });
             expect(r.metadata.to).toBe('TestModels');
             r = new PostRequest().to('someresource').model(MyModel);

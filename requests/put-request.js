@@ -57,7 +57,10 @@ class PutRequest {
         }
         if (modelType) {
             if (overwrite === true || !this.metadata.to) {
-                this.to(ModelUtility.resource(modelType, this.method, resourceProp));
+                this.to(ModelUtility.resource(modelType, this.method));
+                if (resourceProp && resourceProp !== 'resource') {
+                    this.headers({ model: { resource: ModelUtility.resource(modelType, this.method, resourceProp) } });
+                }
             }
             if (overwrite === true || !this.metadata.pk || !this.metadata.pk?.length) {
                 this

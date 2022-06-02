@@ -43,7 +43,12 @@ describe('#model', () => {
                 }
             }
             let r = new OptionsRequest().model(MyModel, false, prop);
-            expect(r.metadata.from).toBe((prop ?? 'resource') + '-abc');
+            expect(r.metadata.from).toBe('resource-abc');
+            if (!prop || prop === 'resource') {
+                expect(r.metadata.headers).toBeNull();
+            } else {
+                expect(r.metadata.headers.get('model')).toEqual({ resource: (prop ?? 'resource') + '-abc' });
+            }
             r = new OptionsRequest().model(class TestModel { });
             expect(r.metadata.from).toBe('TestModels');
             r = new OptionsRequest().from('someresource').model(MyModel);

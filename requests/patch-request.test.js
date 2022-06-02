@@ -67,7 +67,12 @@ describe('#model', () => {
                 }
             }
             let r = new PatchRequest().model(MyModel, false, prop);
-            expect(r.metadata.to).toBe((prop ?? 'resource') + '-abc');
+            expect(r.metadata.to).toBe('resource-abc');
+            if (!prop || prop === 'resource') {
+                expect(r.metadata.headers).toBeNull();
+            } else {
+                expect(r.metadata.headers.get('model')).toEqual({ resource: (prop ?? 'resource') + '-abc' });
+            }
             r = new PatchRequest().model(class TestModel { });
             expect(r.metadata.to).toBe('TestModels');
             r = new PatchRequest().to('someresource').model(MyModel);

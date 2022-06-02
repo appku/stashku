@@ -204,10 +204,11 @@ class FetchEngine extends BaseEngine {
         await super.get(request);
         //make the request, wrap errors in RESTError
         let payload = request.toJSON();
-        if (request.metadata.from === payload.from) { //when the request from and the uri resource are the same, there's no need to send the from parameter.
+        let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.from;
+        if (request.metadata.from === resource) { //when the request from and the uri resource are the same, there's no need to send the from parameter.
             delete payload.from;
         }
-        let res = await this._fetch(request.metadata.from, payload);
+        let res = await this._fetch(resource, payload);
         if (res.ok === false) {
             throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
         }
@@ -229,8 +230,9 @@ class FetchEngine extends BaseEngine {
         await super.post(request);
         //process
         if (request.metadata.objects && request.metadata.objects.length) {
+            let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.to;
             //make the request, wrap errors in RESTError
-            let res = await this._fetch(request.metadata.to, request, { method: request.method });
+            let res = await this._fetch(resource, request, { method: request.method });
             if (res.ok === false) {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
             }
@@ -256,8 +258,9 @@ class FetchEngine extends BaseEngine {
         await super.put(request);
         //process
         if (request.metadata.objects && request.metadata.objects.length) {
+            let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.to;
             //make the request, wrap errors in RESTError
-            let res = await this._fetch(request.metadata.to, request, { method: request.method });
+            let res = await this._fetch(resource, request, { method: request.method });
             if (res.ok === false) {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
             }
@@ -281,8 +284,9 @@ class FetchEngine extends BaseEngine {
         await super.patch(request);
         //process
         if (request.metadata.template) {
+            let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.to;
             //make the request, wrap errors in RESTError
-            let res = await this._fetch(request.metadata.to, request, { method: request.method });
+            let res = await this._fetch(resource, request, { method: request.method });
             if (res.ok === false) {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
             }
@@ -306,8 +310,9 @@ class FetchEngine extends BaseEngine {
         await super.delete(request);
         //process
         if (request.metadata.all || (request.metadata.where && Filter.isEmpty(request.metadata.where) === false)) {
+            let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.from;
             //make the request, wrap errors in RESTError
-            let res = await this._fetch(request.metadata.from, request, { method: request.method });
+            let res = await this._fetch(resource, request, { method: request.method });
             if (res.ok === false) {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
             }
@@ -330,8 +335,9 @@ class FetchEngine extends BaseEngine {
     async options(request) {
         //validate
         await super.options(request);
+        let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.from;
         //make the request, wrap errors in RESTError
-        let res = await this._fetch(request.metadata.from, request, { method: request.method });
+        let res = await this._fetch(resource, request, { method: request.method });
         if (res.ok === false) {
             throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
         }

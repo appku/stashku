@@ -61,7 +61,10 @@ class GetRequest {
         }
         if (modelType) {
             if (overwrite === true || !this.metadata.from) {
-                this.from(ModelUtility.resource(modelType, this.method, resourceProp));
+                this.from(ModelUtility.resource(modelType, this.method));
+                if (resourceProp && resourceProp !== 'resource') {
+                    this.headers({ model: { resource: ModelUtility.resource(modelType, this.method, resourceProp) } });
+                }
             }
             if (overwrite === true || !this.metadata.properties || this.metadata.properties.length === 0) {
                 let targets = [];

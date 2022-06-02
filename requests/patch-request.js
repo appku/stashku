@@ -60,7 +60,10 @@ class PatchRequest {
         }
         if (modelType) {
             if (overwrite === true || !this.metadata.to) {
-                this.to(ModelUtility.resource(modelType, this.method, resourceProp));
+                this.to(ModelUtility.resource(modelType, this.method));
+                if (resourceProp && resourceProp !== 'resource') {
+                    this.headers({ model: { resource: ModelUtility.resource(modelType, this.method, resourceProp) } });
+                }
             }
             if (this.metadata.template) {
                 for (let m of ModelUtility.unmodel(modelType, this.method, this.metadata.template)) {

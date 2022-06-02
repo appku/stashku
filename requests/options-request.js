@@ -47,7 +47,10 @@ class OptionsRequest {
         }
         if (modelType) {
             if (overwrite === true || !this.metadata.from) {
-                this.from(ModelUtility.resource(modelType, this.method, resourceProp));
+                this.from(ModelUtility.resource(modelType, this.method));
+                if (resourceProp && resourceProp !== 'resource') {
+                    this.headers({ model: { resource: ModelUtility.resource(modelType, this.method, resourceProp) } });
+                }
             }
         }
         return this;
