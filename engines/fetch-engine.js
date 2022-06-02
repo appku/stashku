@@ -33,6 +33,9 @@ const lazyLoadGlobalFetch = async () => {
  * @property {String} [path="/api"] - The path to the URI endpoint. This is prefixed before each resource, but after 
  * the `root` (if specified).
  * @property {Boolean} [trailingSlash=false] - Sets whether a slash will be added at the end of the generated URI.
+ * @property {Boolean} [omitResource=false] - Omits `to` and `from` properties and values from the request payload
+ * sent over fetch. This may help force endpoints to ensure the resource is determined on their end instead of by
+ * the requestor.
  * @property {RequestInit} [fetch] - Optional fetch defaults to apply before request-specific configuration is set.
  */
 
@@ -62,7 +65,8 @@ class FetchEngine extends BaseEngine {
         this.config = {
             root: null,
             path: null,
-            trailingSlash: false
+            trailingSlash: false,
+            omitResource: false
         };
     }
 
@@ -86,6 +90,9 @@ class FetchEngine extends BaseEngine {
             }
             if (typeof process.env.STASHKU_FETCH_TRAILING_SLASH === 'string') {
                 defaults.trailingSlash = !!process.env.STASHKU_FETCH_TRAILING_SLASH.match(/^[tTyY1]/);
+            }
+            if (typeof process.env.STASHKU_FETCH_OMIT_RESOURCE === 'string') {
+                defaults.omitResource = !!process.env.STASHKU_FETCH_OMIT_RESOURCE.match(/^[tTyY1]/);
             }
         }
         defaults = Object.assign(defaults, config);
@@ -205,7 +212,7 @@ class FetchEngine extends BaseEngine {
         //make the request, wrap errors in RESTError
         let payload = request.toJSON();
         let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.from;
-        if (request.metadata.from === resource) { //when the request from and the uri resource are the same, there's no need to send the from parameter.
+        if (request.metadata.from === resource || this.config.omitResource) { //when the request from and the uri resource are the same, there's no need to send the from parameter.
             delete payload.from;
         }
         let res = await this._fetch(resource, payload);
@@ -230,9 +237,13 @@ class FetchEngine extends BaseEngine {
         await super.post(request);
         //process
         if (request.metadata.objects && request.metadata.objects.length) {
+            let payload = request.toJSON();
             let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.to;
+            if (this.config.omitResource) {
+                delete payload.to;
+            }
             //make the request, wrap errors in RESTError
-            let res = await this._fetch(resource, request, { method: request.method });
+            let res = await this._fetch(resource, payload, { method: request.method });
             if (res.ok === false) {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
             }
@@ -258,9 +269,13 @@ class FetchEngine extends BaseEngine {
         await super.put(request);
         //process
         if (request.metadata.objects && request.metadata.objects.length) {
+            let payload = request.toJSON();
             let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.to;
+            if (this.config.omitResource) {
+                delete payload.to;
+            }
             //make the request, wrap errors in RESTError
-            let res = await this._fetch(resource, request, { method: request.method });
+            let res = await this._fetch(resource, payload, { method: request.method });
             if (res.ok === false) {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
             }
@@ -284,9 +299,13 @@ class FetchEngine extends BaseEngine {
         await super.patch(request);
         //process
         if (request.metadata.template) {
+            let payload = request.toJSON();
             let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.to;
+            if (this.config.omitResource) {
+                delete payload.to;
+            }
             //make the request, wrap errors in RESTError
-            let res = await this._fetch(resource, request, { method: request.method });
+            let res = await this._fetch(resource, payload, { method: request.method });
             if (res.ok === false) {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
             }
@@ -310,9 +329,13 @@ class FetchEngine extends BaseEngine {
         await super.delete(request);
         //process
         if (request.metadata.all || (request.metadata.where && Filter.isEmpty(request.metadata.where) === false)) {
+            let payload = request.toJSON();
             let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.from;
+            if (this.config.omitResource) {
+                delete payload.from;
+            }
             //make the request, wrap errors in RESTError
-            let res = await this._fetch(resource, request, { method: request.method });
+            let res = await this._fetch(resource, payload, { method: request.method });
             if (res.ok === false) {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
             }

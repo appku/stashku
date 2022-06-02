@@ -333,7 +333,8 @@ class StashKu {
             throw new Error('A "requestType" parameter argument is required.');
         }
         //handle http.IncomingMessageg
-        if (IS_BROWSER === false && request.url && request.httpVersion) {
+        if (IS_BROWSER === false && request.url && request.httpVersion) { //looks like we want to process a StashKu request from an HTTP request.
+
             request = await StashKu.requestFromObject(request);
         }
         //build request
