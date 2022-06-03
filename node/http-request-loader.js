@@ -2,6 +2,7 @@ import qs from 'qs';
 import url from 'url';
 import path from 'path';
 import Filter from '../filter.js';
+import ModelUtility from '../modeling/model-utility.js';
 import DeleteRequest from '../requests/delete-request.js';
 import GetRequest from '../requests/get-request.js';
 import OptionsRequest from '../requests/options-request.js';
@@ -20,138 +21,143 @@ function bodyParse(req) {
 
 /**
  * Attempts to parse a request object from an `http.IncomingMessage`, matched by the request method.
- * @param {http.IncomingMessage} req - The request object.
- * @param {Object} requestType - The request type expected back.
+ * @param {http.IncomingMessage} httpReq - The request object.
+ * @param {Modeling.AnyModelType} [modelType] - Optional model set 
  * @returns {Promise.<GetRequest | PostRequest | PutRequest | PatchRequest | DeleteRequest | OptionsRequest>}
  */
-async function HttpRequestLoader(req, requestType) {
-    let method = req.method.toLowerCase();
-    let r = null;
-    if (method === 'get') {
-        r = new GetRequest();
-        let url = new URL(req.url, 'http://localhost');
+async function HttpRequestLoader(httpReq, modelType) {
+    let method = httpReq.method.toLowerCase();
+    let req = null;
+    let resource = null;
+    if (modelType) {
+        resource = ModelUtility.resource(modelType, method);
+    } else {
+        let url = new URL(httpReq.url, 'http://localhost');
         if (url.pathname) {
-            r.from(path.basename(url.pathname));
+            resource = path.basename(url.pathname);
         }
+    }
+    if (method === 'get') {
+        req = new GetRequest().from(resource);
         if (url.search) {
             let clone = qs.parse(url.search.substring(1));
             if (clone.from) {
-                r.from(clone.from);
+                req.from(clone.from);
             }
             if (clone.count) {
-                r.metadata.count = !!clone.count;
+                req.metadata.count = !!clone.count;
             }
             if (clone.distinct) {
-                r.metadata.distinct = !!clone.distinct;
+                req.metadata.distinct = !!clone.distinct;
             }
             if (clone.headers) {
-                r.headers(clone.headers);
+                req.headers(clone.headers);
             }
             if (clone.properties && clone.properties.length) {
-                r.properties(...clone.properties);
+                req.properties(...clone.properties);
             }
             if (clone.skip) {
-                r.metadata.skip = clone.skip;
+                req.metadata.skip = clone.skip;
             }
             if (clone.sorts && clone.sorts.length) {
-                r.sort(...clone.sorts);
+                req.sort(...clone.sorts);
             }
             if (clone.take) {
-                r.metadata.take = clone.take;
+                req.metadata.take = clone.take;
             }
             if (typeof clone.where === 'string') {
-                r.where(new Filter(JSON.parse(clone.where)));
+                req.where(new Filter(JSON.parse(clone.where)));
             } else {
-                r.where(Filter.fromObject(clone.where));
+                req.where(Filter.fromObject(clone.where));
             }
         }
     } else if (method === 'post') {
-        r = new PostRequest();
-        let clone = bodyParse(req);
+        req = new PostRequest().to(resource);
+        let clone = bodyParse(httpReq);
         if (clone.to) {
-            r.to(clone.to);
+            req.to(clone.to);
         }
         if (clone.count) {
-            r.metadata.count = !!clone.count;
+            req.metadata.count = !!clone.count;
         }
         if (clone.headers) {
-            r.headers(clone.headers);
+            req.headers(clone.headers);
         }
         if (clone.objects && clone.objects.length) {
-            r.objects(...clone.objects);
+            req.objects(...clone.objects);
         }
     } else if (method === 'put') {
-        r = new PutRequest();
-        let clone = bodyParse(req);
+        req = new PutRequest().to(resource);
+        let clone = bodyParse(httpReq);
         if (clone.to) {
-            r.to(clone.to);
+            req.to(clone.to);
         }
         if (clone.count) {
-            r.metadata.count = !!clone.count;
+            req.metadata.count = !!clone.count;
         }
         if (clone.headers) {
-            r.headers(clone.headers);
+            req.headers(clone.headers);
         }
         if (clone.pk && clone.pk.length) {
-            r.pk(...clone.pk);
+            req.pk(...clone.pk);
         }
         if (clone.objects && clone.objects.length) {
-            r.objects(...clone.objects);
+            req.objects(...clone.objects);
         }
     } else if (method === 'patch') {
-        r = new PatchRequest();
-        let clone = bodyParse(req);
+        req = new PatchRequest().to(resource);
+        let clone = bodyParse(httpReq);
         if (clone.to) {
-            r.to(clone.to);
+            req.to(clone.to);
         }
         if (clone.count) {
-            r.metadata.count = !!clone.count;
+            req.metadata.count = !!clone.count;
         }
         if (clone.all) {
-            r.metadata.all = !!clone.all;
+            req.metadata.all = !!clone.all;
         }
         if (clone.headers) {
-            r.headers(clone.headers);
+            req.headers(clone.headers);
         }
         if (clone.template) {
-            r.template(clone.template);
+            req.template(clone.template);
         }
         if (typeof clone.where === 'string') {
-            r.where(new Filter(JSON.parse(clone.where)));
+            req.where(new Filter(JSON.parse(clone.where)));
         } else {
-            r.where(Filter.fromObject(clone.where));
+            req.where(Filter.fromObject(clone.where));
         }
     } else if (method === 'delete') {
-        r = new DeleteRequest();
-        let clone = bodyParse(req);
+        req = new DeleteRequest().to(resource);
+        let clone = bodyParse(httpReq);
         if (clone.from) {
-            r.from(clone.from);
+            req.from(clone.from);
         }
         if (clone.count) {
-            r.metadata.count = !!clone.count;
+            req.metadata.count = !!clone.count;
         }
         if (clone.all) {
-            r.metadata.all = !!clone.all;
+            req.metadata.all = !!clone.all;
         }
         if (clone.headers) {
-            r.headers(clone.headers);
+            req.headers(clone.headers);
         }
         if (typeof clone.where === 'string') {
-            r.where(new Filter(JSON.parse(clone.where)));
+            req.where(new Filter(JSON.parse(clone.where)));
         } else {
-            r.where(Filter.fromObject(clone.where));
+            req.where(Filter.fromObject(clone.where));
         }
     } else if (method === 'options') {
-        r = new OptionsRequest();
-        let clone = bodyParse(req);
+        req = new OptionsRequest().to(resource);
+        let clone = bodyParse(httpReq);
         if (clone.from) {
-            r.from(clone.from);
+            req.from(clone.from);
         }
         if (clone.headers) {
-            r.headers(clone.headers);
+            req.headers(clone.headers);
         }
     }
-    return r;
+    return req;
 }
 
 export default HttpRequestLoader;

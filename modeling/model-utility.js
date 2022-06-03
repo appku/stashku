@@ -106,20 +106,13 @@ class ModelUtility {
      * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
      * @param {String} [method] - The name of the method that should override the default value if it is explicitly
      * specified. If it is not found, but an `all` or `'*'` property is found, it is used instead.
-     * @param {String} [resourceProp="resource"] - The resource property used from the model type to set the resource on
-     * this request.
      * @returns {String}
      */
-    static resource(modelType, method, resourceProp = 'resource') {
+    static resource(modelType, method) {
         if (ModelUtility.isValidType(modelType)) {
+            method = method?.toLowerCase();
             if (modelType.$stashku && modelType.$stashku.resource) {
                 let resource = modelType.$stashku.resource;
-                switch (resourceProp) {
-                    case 'name': resource = modelType.$stashku.name; break;
-                    case 'slug': resource = modelType.$stashku.slug; break;
-                    case 'plural.name': resource = modelType.$stashku.plural.name; break;
-                    case 'plural.slug': resource = modelType.$stashku.plural.slug; break;
-                }
                 let resType = typeof resource;
                 if (resType === 'string') {
                     return resource;

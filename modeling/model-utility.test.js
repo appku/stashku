@@ -121,90 +121,56 @@ describe('.resource', () => {
             expect(ModelUtility.resource(invalid)).toBeNull();
         }
     });
-    let resourceProps = [undefined, 'resource', 'name', 'slug', 'plural.name', 'plural.slug'];
-    for (let prop of resourceProps) {
-        it(`with resource property "${prop}": returns a string when the resource property is present as a string.`, () => {
-            for (let m of [class TestModel { }, function TestModel2() { }]) {
-                m.$stashku = { resource: 'resource-abc', plural: {} };
-                switch (prop) {
-                    case 'name': m.$stashku.name = prop + '-abc'; break;
-                    case 'slug': m.$stashku.slug = prop + '-abc'; break;
-                    case 'plural.name': m.$stashku.plural.name = prop + '-abc'; break;
-                    case 'plural.slug': m.$stashku.plural.slug = prop + '-abc'; break;
-                }
-                expect(ModelUtility.resource(m, null, prop)).toBe((prop ?? 'resource') + '-abc');
-            }
-        });
-        it(`with resource property "${prop}": returns a string value for a specific action on a resource object.`, () => {
-            for (let m of [class TestModel { }, function TestModel2() { }]) {
-                for (let action of methods) {
-                    m.$stashku = { resource: {}, name: {}, slug: {}, plural: { name: {}, slug: {} } };
-                    switch (prop) {
-                        case 'name': m.$stashku.name[action] = prop + '-abc'; break;
-                        case 'slug': m.$stashku.slug[action] = prop + '-abc'; break;
-                        case 'plural.name': m.$stashku.plural.name[action] = prop + '-abc'; break;
-                        case 'plural.slug': m.$stashku.plural.slug[action] = prop + '-abc'; break;
-                        default: m.$stashku.resource[action] = 'resource-abc'; break;
-                    }
-                    expect(ModelUtility.resource(m, action, prop)).toBe((prop ?? 'resource') + '-abc');
-                }
-            }
-        });
-        it(`with resource property "${prop}": falls-back to "all" or "*" property string values when the method property is not present.`, () => {
-            for (let m of [class TestModel { }, function TestModel2() { }]) {
-                for (let action of methods) {
-                    m.$stashku = { resource: {}, name: {}, slug: {}, plural: { name: {}, slug: {} } };
-                    switch (prop) {
-                        case 'name': m.$stashku.name[action] = prop + '-abc'; break;
-                        case 'slug': m.$stashku.slug[action] = prop + '-abc'; break;
-                        case 'plural.name': m.$stashku.plural.name[action] = prop + '-abc'; break;
-                        case 'plural.slug': m.$stashku.plural.slug[action] = prop + '-abc'; break;
-                        default: m.$stashku.resource[action] = 'resource-abc'; break;
-                    }
-                    for (let fallback of ['all', '*']) {
-                        switch (prop) {
-                            case 'name': m.$stashku.name[fallback] = prop + '-fallback'; break;
-                            case 'slug': m.$stashku.slug[fallback] = prop + '-fallback'; break;
-                            case 'plural.name': m.$stashku.plural.name[fallback] = prop + '-fallback'; break;
-                            case 'plural.slug': m.$stashku.plural.slug[fallback] = prop + '-fallback'; break;
-                            default: m.$stashku.resource[fallback] = 'resource-fallback'; break;
-                        }
-                        expect(ModelUtility.resource(m, action, prop)).toBe((prop ?? 'resource') + '-abc');
-                    }
-                }
-            }
-        });
-        it(`with resource property "${prop}": falls-back to the plural of the class/constructor name when no resource property is present.`, () => {
+    it('returns a string when the resource property is present as a string.', () => {
+        for (let m of [class TestModel { }, function TestModel2() { }]) {
+            m.$stashku = { resource: 'abc' };
+            expect(ModelUtility.resource(m)).toBe('abc');
+        }
+    });
+    it('returns a string value for a specific action on a resource object.', () => {
+        for (let m of [class TestModel { }, function TestModel2() { }]) {
             for (let action of methods) {
-                expect(ModelUtility.resource(class TestModel { }, action, prop)).toBe('TestModels');
-                expect(ModelUtility.resource(function TestModel2() { }, action, prop)).toBe('TestModel2s');
+                m.$stashku = { resource: {} };
+                m.$stashku.resource[action] = 'abc';
+                expect(ModelUtility.resource(m, action)).toBe('abc');
             }
-        });
-        it(`with resource property "${prop}": returns null when the resource is a non-supported value.`, () => {
-            for (let m of [class TestModel { }, function TestModel2() { }]) {
-                for (let action of methods) {
-                    for (let invalid of [123, true]) {
-                        m.$stashku = { resource: invalid, plural: {} };
-                        switch (prop) {
-                            case 'name': m.$stashku.name = invalid; break;
-                            case 'slug': m.$stashku.slug = invalid; break;
-                            case 'plural.name': m.$stashku.plural.name = invalid; break;
-                            case 'plural.slug': m.$stashku.plural.slug = invalid; break;
-                        }
-                        expect(ModelUtility.resource(m, action)).toBeNull();
-                    }
+        }
+    });
+    it('falls-back to "all" or "*" property string values when the method property is not present.', () => {
+        for (let m of [class TestModel { }, function TestModel2() { }]) {
+            for (let action of methods) {
+                for (let fallback of ['all', '*']) {
+                    m.$stashku = { resource: {} };
+                    m.$stashku.resource[fallback] = 'abc';
+                    expect(ModelUtility.resource(m, action)).toBe('abc');
                 }
             }
-        });
-        it(`with resource property "${prop}": returns null when the action and fallback properties are not present.`, () => {
-            for (let m of [class TestModel { }, function TestModel2() { }]) {
-                for (let action of methods) {
-                    m.$stashku = { resource: {} };
+        }
+    });
+    it('falls-back to the plural of the class/constructor name when no resource property is present.', () => {
+        for (let action of methods) {
+            expect(ModelUtility.resource(class TestModel { }, action)).toBe('TestModels');
+            expect(ModelUtility.resource(function TestModel2() { }, action)).toBe('TestModel2s');
+        }
+    });
+    it('returns null when the resource is a non-supported value.', () => {
+        for (let m of [class TestModel { }, function TestModel2() { }]) {
+            for (let action of methods) {
+                for (let invalid of [123, true]) {
+                    m.$stashku = { resource: invalid };
                     expect(ModelUtility.resource(m, action)).toBeNull();
                 }
             }
-        });
-    }
+        }
+    });
+    it('returns null when the action and fallback properties are not present.', () => {
+        for (let m of [class TestModel { }, function TestModel2() { }]) {
+            for (let action of methods) {
+                m.$stashku = { resource: {} };
+                expect(ModelUtility.resource(m, action)).toBeNull();
+            }
+        }
+    });
 });
 
 describe('.pk', () => {

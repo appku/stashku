@@ -330,14 +330,12 @@ class StashKu {
         if (!requestType) {
             throw new Error('A "requestType" parameter argument is required.');
         }
-        //handle http.IncomingMessageg
-        if (IS_BROWSER === false && request.url && request.httpVersion) { //looks like we want to process a StashKu request from an HTTP request.
-
-            request = await StashKu.requestFromObject(request);
-        }
         //build request
         let reqModel = this.config?.proxy?.model;
-        if (typeof request === 'function') {
+        if (IS_BROWSER === false && request.url && request.httpVersion) { //looks like we want to process a StashKu request from an HTTP request.
+            request = await StashKu.requestFromObject(request);
+            request.model(reqModel, false, this.config?.model?.header);
+        } else if (typeof request === 'function') {
             //process callback
             let tmp = new requestType();
             if (reqModel) {
@@ -667,36 +665,38 @@ class StashKu {
      * @throws Error if the object is missing a method property.
      * @throws Error if the method property value is invalid.
      * @param {*} reqObj - The untyped request object.
-     * @param {ModelNameResolveCallback} [modelNameResolver] - Callback function that resolves a model name into a model type (constructor/class).
+     * @param {ModelNameResolveCallback | Modeling.AnyModelType} [modelNameResolver] - Callback function that resolves 
+     * a model name into a model type (constructor/class). Optionally can be a model type.
      * @returns {Promise.<DeleteRequest | GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest>} 
      */
     static async requestFromObject(reqObj, modelNameResolver) {
         if (reqObj) {
+            if (!reqObj.method || /^delete|get|patch|post|put|options$/i.test(reqObj.method) === false) {
+                throw new Error('The method property value of the object is missing or invalid. Expected a valid request method.');
+            }
+            //get a model type, if available
+            let mt = null;
+            if (typeof modelNameResolver === 'function' && reqObj.model && typeof reqObj.model === 'string') {
+                mt = modelNameResolver(reqObj.model);
+            } else if (ModelUtility.isValidType(modelNameResolver)) {
+                mt = modelNameResolver;
+            }
             //handle http.IncomingMessageg
             if (IS_BROWSER === false && reqObj.url && reqObj.httpVersion) {
                 if (!HttpRequestLoader) {
                     HttpRequestLoader = (await import(/* webpackIgnore: true */'./node/http-request-loader.js')).default;
                 }
-                return await HttpRequestLoader(reqObj);
-            }
-            if (!reqObj.method || /^delete|get|patch|post|put|options$/i.test(reqObj.method) === false) {
-                throw new Error('The method property value of the object is missing or invalid. Expected a valid request method.');
+                return await HttpRequestLoader(reqObj, mt);
             }
             //construct
-            let mt = null;
-            if (modelNameResolver && reqObj.model) {
-                mt = modelNameResolver(reqObj.model);
-            }
             switch (reqObj.method.toLowerCase()) {
                 case 'delete': return new DeleteRequest()
-                    .model(mt)
                     .headers(reqObj.headers)
                     .from(reqObj.from ?? null)
                     .all(reqObj.all ?? false)
                     .count(reqObj.count ?? false)
                     .where(Filter.fromObject(reqObj.where));
                 case 'get': return new GetRequest()
-                    .model(mt)
                     .headers(reqObj.headers)
                     .from(reqObj.from ?? null)
                     .properties(...reqObj.properties)
@@ -707,11 +707,9 @@ class StashKu {
                     .sort(...reqObj.sorts)
                     .where(Filter.fromObject(reqObj.where));
                 case 'options': return new OptionsRequest()
-                    .model(mt)
                     .from(reqObj.from ?? null)
                     .headers(reqObj.headers);
                 case 'patch': return new PatchRequest()
-                    .model(mt)
                     .headers(reqObj.headers)
                     .to(reqObj.to ?? null)
                     .template(reqObj.template ?? null)
@@ -719,13 +717,11 @@ class StashKu {
                     .count(reqObj.count ?? false)
                     .where(Filter.fromObject(reqObj.where));
                 case 'post': return new PostRequest()
-                    .model(mt)
                     .headers(reqObj.headers)
                     .to(reqObj.to ?? null)
                     .count(reqObj.count ?? false)
                     .objects(reqObj.objects ?? null);
                 case 'put': return new PutRequest()
-                    .model(mt)
                     .headers(reqObj.headers)
                     .to(reqObj.to ?? null)
                     .count(reqObj.count ?? false)
