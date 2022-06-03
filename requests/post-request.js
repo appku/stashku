@@ -39,21 +39,21 @@ class PostRequest {
      * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
      * @param {Boolean} [overwrite = false] - Optional flag that, when `true`, overwrites request settings and values
      * with the model's (where applicable).
-     * @param {String} [resourceProp="resource"] - The resource property used from the model type to set the resource on
-     * this request.
+     * @param {Boolean} [header=false] - Optional flag that, when `true`, adds a `model` header to the request with
+     * the model type's `$stashku` definition.
      * @returns {PostRequest}
      * @private
      */
-    model(modelType, overwrite = false, resourceProp = 'resource') {
+    model(modelType, overwrite = false, header = false) {
         if (modelType !== null && ModelUtility.isValidType(modelType) === false) {
             throw new Error('Invalid "modelType" argument. The value must be null, a class, or a constructor object');
         }
         if (modelType) {
             if (overwrite === true || !this.metadata.to) {
                 this.to(ModelUtility.resource(modelType, this.method));
-                if (resourceProp && resourceProp !== 'resource') {
-                    this.headers({ model: { resource: ModelUtility.resource(modelType, this.method, resourceProp) } });
-                }
+            }
+            if (header) {
+                this.headers({ model: modelType.$stashku });
             }
             if (this.metadata.objects) {
                 this.metadata.objects = Array.from(ModelUtility.unmodel(modelType, this.method, ...this.metadata.objects));

@@ -210,7 +210,7 @@ describe('#configure', () => {
     afterEach(() => {
         //reset env
         delete process.env.STASHKU_ENGINE;
-        delete process.env.STASHKU_MODEL_RESOURCE;
+        delete process.env.STASHKU_MODEL_HEADER;
     });
     it('loads expected defaults.', async () => {
         let stash = new StashKu();
@@ -220,16 +220,12 @@ describe('#configure', () => {
         expect(stash.config.resources.length).toBe(0);
         expect(Array.isArray(stash.config.middleware)).toBe(true);
         expect(stash.config.middleware.length).toBe(0);
-        expect(stash.config.model).toEqual({ resource: 'resource' });
+        expect(stash.config.model).toEqual({ header: false });
     });
     it('sets the model configuration from the environment.', async () => {
-        process.env.STASHKU_MODEL_RESOURCE = 'plural.name';
+        process.env.STASHKU_MODEL_HEADER = true;
         let stash = new StashKu();
-        expect(stash.config.model).toEqual({ resource: 'plural.name' });
-    });
-    it('throws on invalid model configuration from the environment.', async () => {
-        process.env.STASHKU_MODEL_RESOURCE = 'yoda';
-        expect(() => new StashKu()).toThrow(/resource/);
+        expect(stash.config.model).toEqual({ header: true });
     });
     it('loads a different built-in engine by value from the environment.', async () => {
         process.env.STASHKU_ENGINE = 'fetch';

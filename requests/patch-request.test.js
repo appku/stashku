@@ -50,35 +50,29 @@ describe('#model', () => {
             ]
         });
     });
-    let resourceProps = [undefined, 'resource', 'name', 'slug', 'plural.name', 'plural.slug'];
-    for (let prop of resourceProps) {
-        it(`sets the metadata "from" property using the model resource property "${prop}".`, () => {
-            class MyModel {
-                static get $stashku() {
-                    return {
-                        resource: 'resource-abc',
-                        name: 'name-abc',
-                        slug: 'slug-abc',
-                        plural: {
-                            name: 'plural.name-abc',
-                            slug: 'plural.slug-abc',
-                        }
-                    };
-                }
+    it('adds the model type $stashku header when specified.', () => {
+        class ContactPersonModel {
+            static get $stashku() {
+                return {
+                    name: 'ContactPersonModel',
+                    slug: 'contact-person',
+                    plural: {
+                        name: 'ContactPersonModels',
+                        slug: 'contact-persons',
+                    }
+                };
             }
-            let r = new PatchRequest().model(MyModel, false, prop);
-            expect(r.metadata.to).toBe('resource-abc');
-            if (!prop || prop === 'resource') {
-                expect(r.metadata.headers).toBeNull();
-            } else {
-                expect(r.metadata.headers.get('model')).toEqual({ resource: (prop ?? 'resource') + '-abc' });
+        }
+        let r = new PatchRequest().model(ContactPersonModel, false, true);
+        expect(r.metadata.headers.get('model')).toEqual({
+            name: 'ContactPersonModel',
+            slug: 'contact-person',
+            plural: {
+                name: 'ContactPersonModels',
+                slug: 'contact-persons',
             }
-            r = new PatchRequest().model(class TestModel { });
-            expect(r.metadata.to).toBe('TestModels');
-            r = new PatchRequest().to('someresource').model(MyModel);
-            expect(r.metadata.to).toBe('someresource');
         });
-    }
+    });
 });
 
 describe('#count', () => {

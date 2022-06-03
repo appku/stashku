@@ -223,21 +223,21 @@ StashKu can be configured using the following variables.
   export STASHKU_MODEL_NAME_REMOVE='["/^\\[?schema\\]?\\./i"]'
   ```
 
-- **`STASHKU_MODEL_RESOURCE`**    
-  Instructs StashKu which property from the `$stashku` object on a model type to populate the resource (`to` or `from`) on a request. Can be `"name"`, `"slug"`, `"plural.name"`, `"plural.slug"`, or `"resource"` (default).
-  - Type: `String`
-  - Default: `"resource"`
-  - StashKu configuration property: `model.resource`.
+- **`STASHKU_MODEL_HEADER`** 
+  Instructs StashKu to add a header `model` with the value of the `$stashku` definition to all modelled RESTful requests. Certain engines, such as `fetch` may offer advanced features that leverage model information in their operation. This is disabled by default.
+  - Type: `Boolean`
+  - Default: `false`
+  - StashKu configuration property: `model.header`.
 
   **JavaScript Example**
   ```js
   new StashKu({
-      model: { resource: 'plural.slug' }
+      model: { header: false }
   })
   ```
   **Shell/Environment Example**
   ```sh
-  export STASHKU_MODEL_RESOURCE=plural.slug
+  export STASHKU_MODEL_HEADER=false
   ```
 
 The built-in engines all have their own supported configuration's as well, you can find them described through their API documentation or the available tutorials:

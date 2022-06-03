@@ -60,6 +60,8 @@ describe('#configure', () => {
         expect(e.config.root).toBe('https://localhost');
         expect(e.config.path).toBeNull();
         expect(e.config.trailingSlash).toBe(false);
+        expect(e.config.model.header).toBe(false);
+        expect(e.config.model.pathProperty).toBe('resource');
     });
     it('sets the path property from an object.', () => {
         let e = new FetchEngine();
@@ -67,6 +69,8 @@ describe('#configure', () => {
         expect(e.config.root).toBeNull();
         expect(e.config.path).toBe('/api/v2');
         expect(e.config.trailingSlash).toBe(false);
+        expect(e.config.model.header).toBe(false);
+        expect(e.config.model.pathProperty).toBe('resource');
     });
     it('sets the trailingSlash property from an object.', () => {
         let e = new FetchEngine();
@@ -74,6 +78,26 @@ describe('#configure', () => {
         expect(e.config.root).toBeNull();
         expect(e.config.path).toBeNull();
         expect(e.config.trailingSlash).toBe(true);
+        expect(e.config.model.header).toBe(false);
+        expect(e.config.model.pathProperty).toBe('resource');
+    });
+    it('sets the model.header property from an object.', () => {
+        let e = new FetchEngine();
+        e.configure({ model: { header: true } });
+        expect(e.config.root).toBeNull();
+        expect(e.config.path).toBeNull();
+        expect(e.config.trailingSlash).toBe(false);
+        expect(e.config.model.header).toBe(true);
+        expect(e.config.model.pathProperty).toBe('resource');
+    });
+    it('sets the model.pathProperty property from an object.', () => {
+        let e = new FetchEngine();
+        e.configure({ model: { pathProperty: 'slug' } });
+        expect(e.config.root).toBeNull();
+        expect(e.config.path).toBeNull();
+        expect(e.config.trailingSlash).toBe(false);
+        expect(e.config.model.header).toBe(false);
+        expect(e.config.model.pathProperty).toBe('slug');
     });
     it('sets the root property from a the environmental variable.', () => {
         let e = new FetchEngine();
@@ -95,6 +119,20 @@ describe('#configure', () => {
         e.configure();
         expect(e.config.trailingSlash).toBe(true);
         delete process.env.STASHKU_FETCH_TRAILING_SLASH;
+    });
+    it('sets the model.header property from a the environmental variable.', () => {
+        let e = new FetchEngine();
+        process.env.STASHKU_FETCH_MODEL_HEADER = 'true';
+        e.configure();
+        expect(e.config.model.header).toBe(true);
+        delete process.env.STASHKU_FETCH_MODEL_HEADER;
+    });
+    it('sets the model.pathProperty property from a the environmental variable.', () => {
+        let e = new FetchEngine();
+        process.env.STASHKU_FETCH_MODEL_PATH_PROPERTY = 'slug';
+        e.configure();
+        expect(e.config.model.pathProperty).toBe('slug');
+        delete process.env.STASHKU_FETCH_MODEL_PATH_PROPERTY;
     });
 });
 
@@ -243,6 +281,45 @@ describe('#_fetch', () => {
     });
 });
 
+describe('#_getResourcePath', () => {
+    let testHeader = {
+        resource: 'resource-abc',
+        name: 'name-abc',
+        slug: 'slug-abc',
+        plural: {
+            name: 'plural.name-abc',
+            slug: 'plural.slug-abc',
+        }
+    };
+    let requests = [
+        new GetRequest().from('resource-abc').headers({ model: testHeader }),
+        new PostRequest().to('resource-abc').headers({ model: testHeader }),
+        new PutRequest().to('resource-abc').headers({ model: testHeader }),
+        new PatchRequest().to('resource-abc').headers({ model: testHeader }),
+        new DeleteRequest().from('resource-abc').headers({ model: testHeader }),
+        new OptionsRequest().from('resource-abc').headers({ model: testHeader }),
+    ];
+    let pathProps = [undefined, 'resource', 'name', 'slug', 'plural.name', 'plural.slug'];
+    for (let req of requests) {
+        it(`returns the resource of a ${req.method} request.`, async () => {
+            let e = new FetchEngine();
+            e.configure();
+            expect(e._getResourcePath(req)).toBe('resource-abc');
+        });
+        for (let p of pathProps) {
+            it(`returns the resource of a ${req.method} request using the ${p} path property.`, async () => {
+                let e = new FetchEngine();
+                e.configure({
+                    model: {
+                        pathProperty: p
+                    }
+                });
+                expect(e._getResourcePath(req)).toBe((p ?? 'resource') + '-abc');
+            });
+        }
+    }
+});
+
 describe('#resources', () => {
     beforeEach(() => {
         fetchMock.resetMocks();
@@ -273,7 +350,7 @@ describe('#get', () => {
         expect(res.affected).toBe(0);
         expect(res.returned).toBe(2);
         expect(fetchMock.mock.calls.length).toEqual(1);
-        expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
+        expect(fetchMock.mock.calls[0][0]).toEqual('/themes?from=themes');
         expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'GET', cache: 'no-cache' });
     });
 });

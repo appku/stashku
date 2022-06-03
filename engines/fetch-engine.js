@@ -28,6 +28,16 @@ const lazyLoadGlobalFetch = async () => {
 };
 
 /**
+ * @typedef FetchEngineModelConfiguration
+ * @property {String} [pathProperty="resource"] - Instructs StashKu which property from the `$stashku` object on
+ * a model type to populate the resource (`to` or `from`) on a request. Can be `"name"`, `"slug"`, `"plural.name"`, 
+ * `"plural.slug"`, or `"resource"` (default).
+ * @property {Boolean} [header=false] - Determines whether the fetch request to the HTTP endpoint will include the
+ * model header when `STASHKU_MODEL_HEADER` is enabled. By default this is disabled and the header `model` property
+ * will *not* be sent. Setting this flag to `true` will forward the `model` header of the StashKu request.
+ */
+
+/**
  * @typedef FetchEngineConfiguration
  * @property {String} [root] - The root URI of each fetch request. If specified, will be prefixed to each resource.
  * @property {String} [path="/api"] - The path to the URI endpoint. This is prefixed before each resource, but after 
@@ -36,11 +46,8 @@ const lazyLoadGlobalFetch = async () => {
  * @property {Boolean} [omitResource=false] - Omits `to` and `from` properties and values from the request payload
  * sent over fetch. This may help force endpoints to ensure the resource is determined on their end instead of by
  * the requestor.
+ * @property {FetchEngineModelConfiguration} [model]
  * @property {RequestInit} [fetch] - Optional fetch defaults to apply before request-specific configuration is set.
- */
-
-/**
- * @typedef {FetchEngineConfiguration} FetchRequestHeader
  */
 
 /**
@@ -60,7 +67,7 @@ class FetchEngine extends BaseEngine {
         this.data = new Map();
 
         /**
-         * @type {MemoryStorageEngineConfiguration}
+         * @type {FetchEngineConfiguration}
          */
         this.config = {
             root: null,
@@ -72,7 +79,7 @@ class FetchEngine extends BaseEngine {
 
     /**
      * @inheritdoc
-     * @param {MemoryStorageEngineConfiguration} config - The configuration object for the storage engine.
+     * @param {FetchEngineConfiguration} config - The configuration object for the storage engine.
      */
     configure(config) {
         super.configure(config);
@@ -80,6 +87,10 @@ class FetchEngine extends BaseEngine {
             root: null,
             path: null,
             trailingSlash: false
+        };
+        let modelDefaults = {
+            header: false,
+            pathProperty: 'resource'
         };
         if (IS_BROWSER === false || (typeof process !== 'undefined' && typeof process.env === 'object')) {
             if (typeof process.env.STASHKU_FETCH_ROOT === 'string') {
@@ -94,44 +105,26 @@ class FetchEngine extends BaseEngine {
             if (typeof process.env.STASHKU_FETCH_OMIT_RESOURCE === 'string') {
                 defaults.omitResource = !!process.env.STASHKU_FETCH_OMIT_RESOURCE.match(/^[tTyY1]/);
             }
+            if (typeof process.env.STASHKU_FETCH_MODEL_HEADER === 'string') {
+                modelDefaults.header = !!process.env.STASHKU_FETCH_MODEL_HEADER.match(/^[tTyY1]/);
+            }
+            if (typeof process.env.STASHKU_FETCH_MODEL_PATH_PROPERTY === 'string') {
+                modelDefaults.pathProperty = process.env.STASHKU_FETCH_MODEL_PATH_PROPERTY;
+            }
         }
         defaults = Object.assign(defaults, config);
+        defaults.model = Object.assign({}, modelDefaults, defaults.model);
+        //validate config
+        if (this.config?.model?.pathProperty && ['resource', 'name', 'slug', 'plural.name', 'plural.slug'].indexOf(this.config.model.pathProperty) < 0) {
+            throw new Error(`Invalid "model.pathProperty" configuration value "${this.config?.model?.pathProperty}". The value must be "resource", "name", "slug", "plural.name", or "plural.slug".`);
+        }
         this.config = defaults;
     }
 
     /**
-     * Builds the full target URI for the fetch request based on engine settings.
-     * The resource may be the literal resource target (string) or a model type.
-     * 
-     * @throws Error if the resource value is null or undefined.
-     * @throws Error if a model type was specified but it is missing the resource value under the configured 
-     * resource target.
-     * @param {String|Modeling.AnyModelType} resource - The resource name (or model type).
-     * @returns {String}
-     * @private
-     */
-    _uri(resource) {
-        if (resource === null || typeof resource === 'undefined') {
-            resource = '';
-        }
-        let uri = [this.config.root, this.config.path, resource].filter(v => typeof v === 'string').map(function (i) {
-            return i.replace(/(^\/|\/$)/g, '');
-        }).join('/');
-        if (this.config.trailingSlash && uri.endsWith('/') === false && uri.indexOf('?') < 0) {
-            uri += '/';
-        } else if (this.config.trailingSlash !== true && uri.endsWith('/')) {
-            uri = uri.substring(0, uri.length - 1);
-        }
-        if (uri.startsWith('/') === false && !this.config.root && !uri.match(/^.+\/\/+/)) {
-            uri = '/' + uri;
-        }
-        return uri;
-    }
-
-    /**
      * Serializes the given object into a query paramater (URL) string.
-     * @param {*} obj - the object
-     * @param {*} prefix - the prefix
+     * @param {*} obj - The object to be serialized
+     * @param {String} [prefix] - When traversing an object, assign this prefix of the prior object key (recursive).
      * @returns {String}
      * @private
      */
@@ -159,19 +152,48 @@ class FetchEngine extends BaseEngine {
     }
 
     /**
+     * Builds the full target URI for the fetch request based on engine settings.
+     * The resource may be the literal resource target (string) or a model type.
+     * 
+     * @throws Error if the resource value is null or undefined.
+     * @throws Error if a model type was specified but it is missing the resource value under the configured 
+     * resource target.
+     * @param {String} resourcePath - The resource (path).
+     * @returns {String}
+     * @private
+     */
+    _uri(resourcePath) {
+        if (resourcePath === null || typeof resourcePath === 'undefined') {
+            resourcePath = '';
+        }
+        let uri = [this.config.root, this.config.path, resourcePath].filter(v => typeof v === 'string').map(function (i) {
+            return i.replace(/(^\/|\/$)/g, '');
+        }).join('/');
+        if (this.config.trailingSlash && uri.endsWith('/') === false && uri.indexOf('?') < 0) {
+            uri += '/';
+        } else if (this.config.trailingSlash !== true && uri.endsWith('/')) {
+            uri = uri.substring(0, uri.length - 1);
+        }
+        if (uri.startsWith('/') === false && !this.config.root && !uri.match(/^.+\/\/+/)) {
+            uri = '/' + uri;
+        }
+        return uri;
+    }
+
+    /**
      * Makes a fetch call to a remote endpoint and returns the response.
-     * @param {String|Modeling.AnyModelType} resource - The resource name (or model type).
+     * @param {String} resourcePath - The resource (path) to fetch.
      * @param {*} data - The data to be sent.
      * @param {RequestInit} settings - The `fetch` settings to apply.
      * @returns {Promise.<globalThis.Response>}
      * @private
      */
-    async _fetch(resource, data, settings) {
+    async _fetch(resourcePath, data, settings) {
         settings = Object.assign({
             method: 'GET',
             cache: 'no-cache'
         }, this.config.fetch, settings);
-        let targetURI = this._uri(resource);
+        let targetURI = this._uri(resourcePath);
         settings.method = settings.method.toUpperCase(); //always upper
         if (data) {
             if (settings.method === 'GET') {
@@ -189,6 +211,32 @@ class FetchEngine extends BaseEngine {
         }
         await lazyLoadGlobalFetch();
         return globalFetch(targetURI, settings);
+    }
+
+    /**
+     * Determines the resource path to use for the fetch request.
+     * @param {DeleteRequest | GetRequest | PatchRequest | PostRequest | PutRequest | OptionsRequest} request - The 
+     * StashKu request to extract the proper resource path from.
+     * @returns {String}
+     * @private
+     */
+    _getResourcePath(request) {
+        let resource = null;
+        if (this.config.model.pathProperty && request.metadata.headers) {
+            let modelHeader = request.metadata.headers.get('model');
+            if (modelHeader) {
+                switch (this.config.model.pathProperty) {
+                    case 'name': resource = modelHeader.name; break;
+                    case 'slug': resource = modelHeader.slug; break;
+                    case 'plural.name': resource = modelHeader.plural.name; break;
+                    case 'plural.slug': resource = modelHeader.plural.slug; break;
+                }
+            }
+        }
+        if (!resource) {
+            resource = request.metadata.from || request.metadata.to;
+        }
+        return resource;
     }
 
     /**
@@ -211,11 +259,17 @@ class FetchEngine extends BaseEngine {
         await super.get(request);
         //make the request, wrap errors in RESTError
         let payload = request.toJSON();
-        let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.from;
-        if (request.metadata.from === resource || this.config.omitResource) { //when the request from and the uri resource are the same, there's no need to send the from parameter.
+        let resourcePath = this._getResourcePath(request);
+        if (!this.config?.model?.header && payload.headers) {
+            delete payload.headers.model;
+            if (Object.keys(payload.headers).length === 0) {
+                delete payload.headers;
+            }
+        }
+        if (this.config.omitResource) {
             delete payload.from;
         }
-        let res = await this._fetch(resource, payload);
+        let res = await this._fetch(resourcePath, payload);
         if (res.ok === false) {
             throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
         }
@@ -238,12 +292,18 @@ class FetchEngine extends BaseEngine {
         //process
         if (request.metadata.objects && request.metadata.objects.length) {
             let payload = request.toJSON();
-            let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.to;
+            let resourcePath = this._getResourcePath(request);
+            if (!this.config?.model?.header && payload.headers) {
+                delete payload.headers.model;
+                if (Object.keys(payload.headers).length === 0) {
+                    delete payload.headers;
+                }
+            }
             if (this.config.omitResource) {
                 delete payload.to;
             }
             //make the request, wrap errors in RESTError
-            let res = await this._fetch(resource, payload, { method: request.method });
+            let res = await this._fetch(resourcePath, payload, { method: request.method });
             if (res.ok === false) {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
             }
@@ -270,12 +330,18 @@ class FetchEngine extends BaseEngine {
         //process
         if (request.metadata.objects && request.metadata.objects.length) {
             let payload = request.toJSON();
-            let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.to;
+            let resourcePath = this._getResourcePath(request);
+            if (!this.config?.model?.header && payload.headers) {
+                delete payload.headers.model;
+                if (Object.keys(payload.headers).length === 0) {
+                    delete payload.headers;
+                }
+            }
             if (this.config.omitResource) {
                 delete payload.to;
             }
             //make the request, wrap errors in RESTError
-            let res = await this._fetch(resource, payload, { method: request.method });
+            let res = await this._fetch(resourcePath, payload, { method: request.method });
             if (res.ok === false) {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
             }
@@ -300,12 +366,18 @@ class FetchEngine extends BaseEngine {
         //process
         if (request.metadata.template) {
             let payload = request.toJSON();
-            let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.to;
+            let resourcePath = this._getResourcePath(request);
+            if (!this.config?.model?.header && payload.headers) {
+                delete payload.headers.model;
+                if (Object.keys(payload.headers).length === 0) {
+                    delete payload.headers;
+                }
+            }
             if (this.config.omitResource) {
                 delete payload.to;
             }
             //make the request, wrap errors in RESTError
-            let res = await this._fetch(resource, payload, { method: request.method });
+            let res = await this._fetch(resourcePath, payload, { method: request.method });
             if (res.ok === false) {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
             }
@@ -330,12 +402,18 @@ class FetchEngine extends BaseEngine {
         //process
         if (request.metadata.all || (request.metadata.where && Filter.isEmpty(request.metadata.where) === false)) {
             let payload = request.toJSON();
-            let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.from;
+            let resourcePath = this._getResourcePath(request);
+            if (!this.config?.model?.header && payload.headers) {
+                delete payload.headers.model;
+                if (Object.keys(payload.headers).length === 0) {
+                    delete payload.headers;
+                }
+            }
             if (this.config.omitResource) {
                 delete payload.from;
             }
             //make the request, wrap errors in RESTError
-            let res = await this._fetch(resource, payload, { method: request.method });
+            let res = await this._fetch(resourcePath, payload, { method: request.method });
             if (res.ok === false) {
                 throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
             }
@@ -358,9 +436,17 @@ class FetchEngine extends BaseEngine {
     async options(request) {
         //validate
         await super.options(request);
-        let resource = request.metadata.headers?.get('model')?.resource ?? request.metadata.from;
+        //process
+        let payload = request.toJSON();
+        let resourcePath = this._getResourcePath(request);
+        if (!this.config?.model?.header && payload.headers) {
+            delete payload.headers.model;
+            if (Object.keys(payload.headers).length === 0) {
+                delete payload.headers;
+            }
+        }
         //make the request, wrap errors in RESTError
-        let res = await this._fetch(resource, request, { method: request.method });
+        let res = await this._fetch(resourcePath, payload, { method: request.method });
         if (res.ok === false) {
             throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
         }

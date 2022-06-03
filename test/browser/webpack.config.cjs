@@ -23,7 +23,19 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.EnvironmentPlugin()
+        new webpack.DefinePlugin({
+            'process': JSON.stringify({
+                env: {
+                    STASHKU_MODEL_HEADER: process.env.STASHKU_MODEL_HEADER,
+                    STASHKU_FETCH_ROOT: process.env.STASHKU_FETCH_ROOT,
+                    STASHKU_FETCH_PATH: process.env.STASHKU_FETCH_PATH,
+                    STASHKU_FETCH_TRAILING_SLASH: process.env.STASHKU_FETCH_TRAILING_SLASH,
+                    STASHKU_FETCH_OMIT_RESOURCE: process.env.STASHKU_FETCH_OMIT_RESOURCE,
+                    STASHKU_FETCH_MODEL_PATH_PROPERTY: process.env.STASHKU_FETCH_MODEL_PATH_PROPERTY,
+                    STASHKU_FETCH_MODEL_HEADER: process.env.STASHKU_FETCH_MODEL_HEADER
+                }
+            })
+        })
     ],
     devServer: {
         watchFiles: ['./*'],

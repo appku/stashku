@@ -57,9 +57,9 @@ let HttpRequestLoader = null; //see .requestFromObject
 
 /**
  * @typedef StashKuModelConfiguration
- * @property {String} resource - Instructs StashKu which property from the `$stashku` object on a model type to
- * populate the resource (`to` or `from`) on a request. Can be `"name"`, `"slug"`, `"plural.name"`, `"plural.slug"`,
- * or `"resource"` (default).
+ * @property {Boolean} [header=false] - Instructs StashKu to add a header `model` with the value of the `$stashku`
+ * definition to all modelled RESTful requests. Certain engines, such as `fetch` may offer advanced features that
+ * leverage model information in their operation.
  */
 
 /**
@@ -214,11 +214,13 @@ class StashKu {
         //assign defaults
         let engineDefault = 'memory';
         let modelDefault = {
-            resource: 'resource'
+            header: false
         };
         if (typeof process !== 'undefined' && typeof process.env === 'object') {
             engineDefault = process.env.STASHKU_ENGINE ?? (IS_BROWSER ? 'fetch' : 'memory');
-            modelDefault.resource = process.env.STASHKU_MODEL_RESOURCE ?? 'resource';
+            if (typeof process.env.STASHKU_MODEL_HEADER === 'string') {
+                modelDefault.header = !!process.env.STASHKU_MODEL_HEADER.match(/^[tTyY1]/);
+            }
         } else {
             engineDefault = (IS_BROWSER ? 'fetch' : 'memory');
         }
@@ -228,10 +230,6 @@ class StashKu {
             resources: []
         }, config, { model: Object.assign(modelDefault, config?.model) });
         this.log.debug('Configuration=', this.config);
-        //validate config
-        if (this.config?.model?.resource && ['resource', 'name', 'slug', 'plural.name', 'plural.slug'].indexOf(this.config.model.resource) < 0) {
-            throw new Error('Invalid "model.resource" configuration value. The value must be "resource", "name", "slug", "plural.name", or "plural.slug".');
-        }
         //load engine
         if (this.config.engine === 'memory') {
             this.engine = new MemoryEngine();
@@ -344,7 +342,7 @@ class StashKu {
             let tmp = new requestType();
             if (reqModel) {
                 request(tmp, reqModel);
-                tmp.model(reqModel, false, this.config?.model?.resource);
+                tmp.model(reqModel, false, this.config?.model?.header);
             } else {
                 request(tmp);
             }
@@ -354,7 +352,7 @@ class StashKu {
         } else if (!this.engine) {
             throw new Error('A StashKu storage engine has not been loaded. An engine must be configured before operations are allowed.');
         } else if (reqModel) {
-            request.model(reqModel, false, this.config?.model?.resource);
+            request.model(reqModel, false, this.config?.model?.header);
         }
         //access restrictions
         if (this.config.resources && this.config.resources.length) {

@@ -151,7 +151,6 @@ async function HttpRequestLoader(req, requestType) {
             r.headers(clone.headers);
         }
     }
-    console.log('http parse', method, r);
     return r;
 }
 
