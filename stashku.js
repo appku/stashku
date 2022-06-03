@@ -333,8 +333,11 @@ class StashKu {
         //build request
         let reqModel = this.config?.proxy?.model;
         if (IS_BROWSER === false && request.url && request.httpVersion) { //looks like we want to process a StashKu request from an HTTP request.
-            request = await StashKu.requestFromObject(request);
-            request.model(reqModel, false, this.config?.model?.header);
+            request = await StashKu.requestFromObject(request, reqModel);
+            if (reqModel) {
+                request.model(reqModel, false, this.config?.model?.header);
+            }
+            console.log('http', request);
         } else if (typeof request === 'function') {
             //process callback
             let tmp = new requestType();
@@ -671,9 +674,6 @@ class StashKu {
      */
     static async requestFromObject(reqObj, modelNameResolver) {
         if (reqObj) {
-            if (!reqObj.method || /^delete|get|patch|post|put|options$/i.test(reqObj.method) === false) {
-                throw new Error('The method property value of the object is missing or invalid. Expected a valid request method.');
-            }
             //get a model type, if available
             let mt = null;
             if (typeof modelNameResolver === 'function' && reqObj.model && typeof reqObj.model === 'string') {
@@ -684,9 +684,13 @@ class StashKu {
             //handle http.IncomingMessageg
             if (IS_BROWSER === false && reqObj.url && reqObj.httpVersion) {
                 if (!HttpRequestLoader) {
+                    console.log('httpload', mt, modelNameResolver);
                     HttpRequestLoader = (await import(/* webpackIgnore: true */'./node/http-request-loader.js')).default;
                 }
                 return await HttpRequestLoader(reqObj, mt);
+            }
+            if (!reqObj.method || /^delete|get|patch|post|put|options$/i.test(reqObj.method) === false) {
+                throw new Error('The method property value of the object is missing or invalid. Expected a valid request method.');
             }
             //construct
             switch (reqObj.method.toLowerCase()) {

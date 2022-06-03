@@ -29,13 +29,11 @@ async function HttpRequestLoader(httpReq, modelType) {
     let method = httpReq.method.toLowerCase();
     let req = null;
     let resource = null;
+    let url = new URL(httpReq.url, 'http://localhost');
     if (modelType) {
         resource = ModelUtility.resource(modelType, method);
-    } else {
-        let url = new URL(httpReq.url, 'http://localhost');
-        if (url.pathname) {
-            resource = path.basename(url.pathname);
-        }
+    } else if (url.pathname) {
+        resource = path.basename(url.pathname);
     }
     if (method === 'get') {
         req = new GetRequest().from(resource);

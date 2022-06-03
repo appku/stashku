@@ -3,6 +3,7 @@ import StashKu from '@appku/stashku';
 import fairu from '@appku/fairu';
 import bodyParser from 'body-parser';
 import qs from 'qs';
+import ThemeModel from '../models/theme-model.js';
 
 /**
  * @param {express.Express} app
@@ -18,7 +19,7 @@ async function configure(app, config) {
     app.all('/*', async (req, res) => {
         let method = req.method.toLowerCase();
         try {
-            let response = await stash[method](req);
+            let response = await stash.model(ThemeModel)[method](req);
             res.send(response);
         } catch (err) {
             console.error(err);
