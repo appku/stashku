@@ -337,7 +337,6 @@ class StashKu {
             if (reqModel) {
                 request.model(reqModel, false, this.config?.model?.header);
             }
-            console.log('http', request);
         } else if (typeof request === 'function') {
             //process callback
             let tmp = new requestType();
@@ -684,7 +683,6 @@ class StashKu {
             //handle http.IncomingMessageg
             if (IS_BROWSER === false && reqObj.url && reqObj.httpVersion) {
                 if (!HttpRequestLoader) {
-                    console.log('httpload', mt, modelNameResolver);
                     HttpRequestLoader = (await import(/* webpackIgnore: true */'./node/http-request-loader.js')).default;
                 }
                 return await HttpRequestLoader(reqObj, mt);
