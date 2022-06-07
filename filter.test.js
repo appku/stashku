@@ -182,6 +182,15 @@ describe('.isEmpty', () => {
 });
 
 describe('#walk', () => {
+    it('handles null and empty filters.', () => {
+        let cb = jest.fn();
+        let f = new Filter();
+        f.walk(cb);
+        expect(cb).toHaveBeenCalledTimes(0);
+        f.tree = { logic: Filter.LOGIC.AND, filters: null };
+        f.walk(cb);
+        expect(cb).toHaveBeenCalledTimes(0);
+    });
     it('callback is called for every logical group and condition in the filter.', () => {
         let f = Filter
             .or('test0', Filter.OP.EQUALS, 1)

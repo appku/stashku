@@ -148,10 +148,12 @@ class Filter {
             if (filter instanceof Filter) {
                 walker(filter.tree, 0, null);
             } else {
-                cb(filter, depth, parent);
-                if (filter.filters) {
-                    for (let f of filter.filters) {
-                        walker(f, depth + 1, filter);
+                if (filter && (filter.filters || filter.property || filter.field)) {
+                    cb(filter, depth, parent);
+                    if (filter.filters) {
+                        for (let f of filter.filters) {
+                            walker(f, depth + 1, filter);
+                        }
                     }
                 }
             }
