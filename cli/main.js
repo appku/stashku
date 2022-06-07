@@ -60,7 +60,7 @@ class Main {
             .option('-q, --quiet', 'Do not output status information to the console.')
             .option('-v, --verbose', 'Output extra details & logs about the command being executed.')
             .addOption(new Option('--format <format>', 'Defines the format of the resulting data when converted to a string.').default('json').choices(['json', 'yaml', 'toml']))
-            .option('--test', 'Use the in-memory engine preloaded with a "themes" and "products" resources for testing.')
+            .option('--test, --samples', 'Use the in-memory engine preloaded with a "themes" and "products" resources for testing.')
             .showSuggestionAfterError()
             .showHelpAfterError();
         this.cmd

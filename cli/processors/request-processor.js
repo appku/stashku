@@ -7,8 +7,15 @@ import Sort from '../../sort.js';
 import ModelUtility from '../../modeling/model-utility.js';
 import BaseProcessor from './base-processor.js';
 import StashKu from '../../stashku.js';
-import fairu from '@appku/fairu';
 import OptionsExporter from '../options-exporter.js';
+import fairu from '@appku/fairu';
+import path from 'path';
+
+const __dirname = (
+    process.platform === 'win32' ?
+        path.dirname(decodeURI(new URL(import.meta.url).pathname)).substring(1) :
+        path.dirname(decodeURI(new URL(import.meta.url).pathname))
+);
 
 /**
  * Runs a standard RESTful StashKu GET request using command line options to define the request metadata. Callers can
@@ -34,21 +41,24 @@ class RequestProcessor extends BaseProcessor {
      * @inheritdoc
      */
     async start() {
-        if (this.options.cli.test) {
+        if (this.options.cli.test || this.options.cli.samples) {
             this.stash = new StashKu({ engine: 'memory' });
-            this.stash.engine.data.set('products', (await fairu.with('./test/memory-engine/data-products.json').format(fairu.Format.json).read())[0].data);
-            this.stash.engine.data.set('themes', (await fairu.with('./test/memory-engine/data-themes.json').format(fairu.Format.json).read())[0].data);
+            this.stash.engine.data.set('products', (await fairu.with(path.join(__dirname, '../templates/samples/data-products.json')).format(fairu.Format.json).read())[0].data);
+            this.stash.engine.data.set('themes', (await fairu.with(path.join(__dirname, '../templates/samples/data-themes.json')).format(fairu.Format.json).read())[0].data);
         } else {
             this.stash = new StashKu();
         }
-        let reqFile = await fairu.with(this.options.resource)
-            .throw(false)
-            .format(fairu.Format.json)
-            .read();
+        let reqFile = null;
+        if (this.options.resource != '*') {
+            reqFile = await fairu.with(this.options.resource)
+                .throw(false)
+                .format(fairu.Format.json)
+                .read();
+        }
         //build the request
         let multiResource = [this.options.resource];
         let req = null;
-        if (reqFile[0].readable) {
+        if (reqFile && reqFile.length && reqFile[0].readable) {
             if (Array.isArray(reqFile[0].data)) {
                 multiResource = reqFile[0].data;
             } else {
