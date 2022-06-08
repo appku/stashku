@@ -126,7 +126,7 @@ async function HttpRequestLoader(httpReq, modelType) {
             req.where(Filter.fromObject(clone.where));
         }
     } else if (method === 'delete') {
-        req = new DeleteRequest().to(resource);
+        req = new DeleteRequest().from(resource);
         let clone = bodyParse(httpReq);
         if (clone.from) {
             req.from(clone.from);
@@ -146,7 +146,7 @@ async function HttpRequestLoader(httpReq, modelType) {
             req.where(Filter.fromObject(clone.where));
         }
     } else if (method === 'options') {
-        req = new OptionsRequest().to(resource);
+        req = new OptionsRequest().from(resource);
         let clone = bodyParse(httpReq);
         if (clone.from) {
             req.from(clone.from);
