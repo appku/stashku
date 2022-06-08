@@ -33,6 +33,7 @@ describe('.empty', () => {
         expect(Response.empty().returned).toBe(0);
     });
 });
+
 describe('.one', () => {
     it('returns only the first record.', () => {
         let r = new Response(['a', 'b', 'c'], 1, 2, 1);

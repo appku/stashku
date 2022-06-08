@@ -21,20 +21,20 @@ class Response {
         this.code = code || 200;
 
         /**
-         * An array of the objects returned from storage.
+         * An array of the objects or values resulting from the request to the engine.
          * @type {Array.<M>}
          */
         this.data = data || [];
 
         /**
-         * The number of objects (records) *available* (i.e. resulting from) the request query in consideration of
+         * The number of objects or values *available* (i.e. resulting from) the request query in consideration of
          * any `where` conditions, but disregarding any `skip` and `take` paging limitations.    
          * @type {Number}
          */
         this.total = parseInt(total) || 0;
 
         /**
-         * The number of objects (records) affected (altered/touched/created) in storage as a result of the request.
+         * The number of objects or values affected (altered/touched/created) in storage as a result of the request.
          * 
          * This number is always `0` for GET requests.
          * @type {Number}
@@ -42,7 +42,7 @@ class Response {
         this.affected = parseInt(affected) || 0;
 
         /**
-         * The number of objects (records) returned from storage as a result of the request.    
+         * The number of objects or values to be returned from the engine as a result of the request.
          * 
          * This number *will be* populated on GET requests utilizing the `.count()` flag, even though no objects are returned in `data`.
          * @type {Number}

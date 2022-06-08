@@ -64,7 +64,8 @@ The beauty of StashKu is it's alignment with REST. Out-of-the-box, StashKu provi
 - OPTIONS: For retrieving resource schema.
 
 You can use these methods to submit a RESTful request to your loaded engine and act on it's resources.
-No matter the engine, the *request* and *response* structure and interface is the **same**. (ღ˘⌣˘ღ)
+No matter the engine, the *request* and *response* structure and interface is the **same**.    
+(ღ˘⌣˘ღ)
 
 > **For Example**    
 > The `@appku/stashku-sql` engine provides an interface to a database. Submitting a GET request through 
@@ -146,6 +147,16 @@ let stash = new StashKu();
 let response = await stash.options(r => r.from('Contacts'));
 //Response { data: [...], total, returned, affected }
 ```
+
+#### Responses That Make Life Easy
+The great thing about StashKu, is that no matter what engine you use, the request **&amp;** response is standard. The response from a request always has the following properties:
+
+- `data` - `Array.<*>`: An array of the objects or values resulting from the request to the engine.
+- `total` - `Number`: The number of objects or values resulting from the request in consideration of any `where` conditions (if applicable), but disregarding any `skip` and `take` paging limitations (only on GET requests).
+- `affected` - `Number`: The number of objects or values affected (altered/touched/created) in storage as a result of the request This number is always `0` for GET requests.
+- `returned` - `Number`: The number of objects or values to be returned from the engine as a result of the request.
+
+Every `Response` also includes a single helper function: `one()` which will return the first value of the data, if it is present, otherwise it returns `null`.
 
 ### CLI Quick-Start
 Stashku provides a CLI that is available via the `stashku` command. This can be used when installed locally with the 
