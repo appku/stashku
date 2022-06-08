@@ -238,7 +238,10 @@ describe('#_fetch', () => {
         });
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/');
-        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'GET', cache: 'no-cache' });
+        expect(fetchMock.mock.calls[0][1].method).toEqual('GET');
+        expect(fetchMock.mock.calls[0][1].cache).toEqual('no-cache');
+        expect(fetchMock.mock.calls[0][1].headers.get('accept')).toEqual('application/json');
+        expect(fetchMock.mock.calls[0][1].headers.get('content-type')).toEqual('application/json');
     });
     it('overrides default fetch settings with configured.', async () => {
         let e = new FetchEngine();
@@ -251,7 +254,11 @@ describe('#_fetch', () => {
         await e._fetch('', null, null);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/');
-        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'GET', cache: 'default', mode: 'cors' });
+        expect(fetchMock.mock.calls[0][1].method).toEqual('GET');
+        expect(fetchMock.mock.calls[0][1].cache).toEqual('default');
+        expect(fetchMock.mock.calls[0][1].mode).toEqual('cors');
+        expect(fetchMock.mock.calls[0][1].headers.get('accept')).toEqual('application/json');
+        expect(fetchMock.mock.calls[0][1].headers.get('content-type')).toEqual('application/json');
     });
     it('parameterizes data when method is GET.', async () => {
         let e = new FetchEngine();
@@ -259,7 +266,10 @@ describe('#_fetch', () => {
         await e._fetch('', { abc: 123, hello: 'world' }, null);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/?abc=123&hello=world');
-        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'GET', cache: 'no-cache' });
+        expect(fetchMock.mock.calls[0][1].method).toEqual('GET');
+        expect(fetchMock.mock.calls[0][1].cache).toEqual('no-cache');
+        expect(fetchMock.mock.calls[0][1].headers.get('accept')).toEqual('application/json');
+        expect(fetchMock.mock.calls[0][1].headers.get('content-type')).toEqual('application/json');
     });
     describe('uses body with JSON for data when...', () => {
         let e = new FetchEngine();
@@ -270,12 +280,11 @@ describe('#_fetch', () => {
                 await e._fetch('', { abc: 123, hello: 'world' }, { method: m });
                 expect(fetchMock.mock.calls.length).toEqual(1);
                 expect(fetchMock.mock.calls[0][0]).toEqual('/');
-                expect(fetchMock.mock.calls[0][1]).toEqual({
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ abc: 123, hello: 'world' }),
-                    method: m,
-                    cache: 'no-cache'
-                });
+                expect(fetchMock.mock.calls[0][1].method).toEqual(m);
+                expect(fetchMock.mock.calls[0][1].cache).toEqual('no-cache');
+                expect(fetchMock.mock.calls[0][1].body).toEqual(JSON.stringify({ abc: 123, hello: 'world' }));
+                expect(fetchMock.mock.calls[0][1].headers.get('accept')).toEqual('application/json');
+                expect(fetchMock.mock.calls[0][1].headers.get('content-type')).toEqual('application/json');
             });
         }
     });
@@ -331,7 +340,10 @@ describe('#resources', () => {
         expect(await e.resources('', null, null)).toEqual(['themes', 'products']);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/resources');
-        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'GET', cache: 'no-cache' });
+        expect(fetchMock.mock.calls[0][1].method).toEqual('GET');
+        expect(fetchMock.mock.calls[0][1].cache).toEqual('no-cache');
+        expect(fetchMock.mock.calls[0][1].headers.get('accept')).toEqual('application/json');
+        expect(fetchMock.mock.calls[0][1].headers.get('content-type')).toEqual('application/json');
     });
 });
 
@@ -351,7 +363,10 @@ describe('#get', () => {
         expect(res.returned).toBe(2);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/themes?from=themes');
-        expect(fetchMock.mock.calls[0][1]).toEqual({ method: 'GET', cache: 'no-cache' });
+        expect(fetchMock.mock.calls[0][1].method).toEqual('GET');
+        expect(fetchMock.mock.calls[0][1].cache).toEqual('no-cache');
+        expect(fetchMock.mock.calls[0][1].headers.get('accept')).toEqual('application/json');
+        expect(fetchMock.mock.calls[0][1].headers.get('content-type')).toEqual('application/json');
     });
 });
 
@@ -371,14 +386,11 @@ describe('#post', () => {
         expect(res.returned).toBe(2);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
-        expect(fetchMock.mock.calls[0][1]).toEqual({
-            method: 'POST',
-            cache: 'no-cache',
-            body: '{"to":"themes","objects":[{"id":1,"hello":"world"},{"id":2,"hello":"mars"}]}',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        expect(fetchMock.mock.calls[0][1].method).toEqual('POST');
+        expect(fetchMock.mock.calls[0][1].cache).toEqual('no-cache');
+        expect(fetchMock.mock.calls[0][1].body).toEqual('{"to":"themes","objects":[{"id":1,"hello":"world"},{"id":2,"hello":"mars"}]}');
+        expect(fetchMock.mock.calls[0][1].headers.get('accept')).toEqual('application/json');
+        expect(fetchMock.mock.calls[0][1].headers.get('content-type')).toEqual('application/json');
     });
 });
 
@@ -402,14 +414,11 @@ describe('#put', () => {
         expect(res.returned).toBe(2);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
-        expect(fetchMock.mock.calls[0][1]).toEqual({
-            method: 'PUT',
-            cache: 'no-cache',
-            body: '{"to":"themes","objects":[{"id":1,"hello":"world"},{"id":2,"hello":"mars"}],"pk":["id"]}',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        expect(fetchMock.mock.calls[0][1].method).toEqual('PUT');
+        expect(fetchMock.mock.calls[0][1].cache).toEqual('no-cache');
+        expect(fetchMock.mock.calls[0][1].body).toEqual('{"to":"themes","objects":[{"id":1,"hello":"world"},{"id":2,"hello":"mars"}],"pk":["id"]}');
+        expect(fetchMock.mock.calls[0][1].headers.get('accept')).toEqual('application/json');
+        expect(fetchMock.mock.calls[0][1].headers.get('content-type')).toEqual('application/json');
     });
 });
 
@@ -433,14 +442,11 @@ describe('#patch', () => {
         expect(res.returned).toBe(1);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
-        expect(fetchMock.mock.calls[0][1]).toEqual({
-            method: 'PATCH',
-            cache: 'no-cache',
-            body: '{"to":"themes","template":{"hello":"zoo"},"where":{"logic":"and","filters":[{"property":"id","op":"eq","value":1}]}}',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        expect(fetchMock.mock.calls[0][1].method).toEqual('PATCH');
+        expect(fetchMock.mock.calls[0][1].cache).toEqual('no-cache');
+        expect(fetchMock.mock.calls[0][1].body).toEqual('{"to":"themes","template":{"hello":"zoo"},"where":{"logic":"and","filters":[{"property":"id","op":"eq","value":1}]}}');
+        expect(fetchMock.mock.calls[0][1].headers.get('accept')).toEqual('application/json');
+        expect(fetchMock.mock.calls[0][1].headers.get('content-type')).toEqual('application/json');
     });
 });
 
@@ -465,14 +471,11 @@ describe('#delete', () => {
         expect(res.returned).toBe(1);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
-        expect(fetchMock.mock.calls[0][1]).toEqual({
-            method: 'DELETE',
-            cache: 'no-cache',
-            body: '{"from":"themes","headers":{"hello":"world"},"count":true,"where":{"logic":"and","filters":[{"property":"id","op":"eq","value":1}]}}',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        expect(fetchMock.mock.calls[0][1].method).toEqual('DELETE');
+        expect(fetchMock.mock.calls[0][1].cache).toEqual('no-cache');
+        expect(fetchMock.mock.calls[0][1].body).toEqual('{"from":"themes","headers":{"hello":"world"},"count":true,"where":{"logic":"and","filters":[{"property":"id","op":"eq","value":1}]}}');
+        expect(fetchMock.mock.calls[0][1].headers.get('accept')).toEqual('application/json');
+        expect(fetchMock.mock.calls[0][1].headers.get('content-type')).toEqual('application/json');
     });
 });
 
@@ -492,13 +495,10 @@ describe('#options', () => {
         expect(res.returned).toBe(1);
         expect(fetchMock.mock.calls.length).toEqual(1);
         expect(fetchMock.mock.calls[0][0]).toEqual('/themes');
-        expect(fetchMock.mock.calls[0][1]).toEqual({
-            method: 'OPTIONS',
-            cache: 'no-cache',
-            body: '{"from":"themes"}',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        expect(fetchMock.mock.calls[0][1].method).toEqual('OPTIONS');
+        expect(fetchMock.mock.calls[0][1].cache).toEqual('no-cache');
+        expect(fetchMock.mock.calls[0][1].body).toEqual('{"from":"themes"}');
+        expect(fetchMock.mock.calls[0][1].headers.get('accept')).toEqual('application/json');
+        expect(fetchMock.mock.calls[0][1].headers.get('content-type')).toEqual('application/json');
     });
 });
