@@ -26,7 +26,7 @@
   
   <h1><a href="./index.html">@AppKu/StashKu</a></h1>
   
-  <h2>v1.0.11</h2>
+  <h2>v1.0.16</h2>
   
   
   <ul class="meta-links">
@@ -887,7 +887,7 @@ All operations will await the engine if it is a promise.</p>
     <h4 class="method-heading">Source</h4>
     <ul>
         <li class="method-source">
-            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.653">, line 653</a>
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.649">, line 649</a>
         </li>
     </ul>
 
@@ -987,6 +987,11 @@ can be used in conjunction with <code>JSON.stringify(...)</code> and subsequentl
     <span class="param-type">
         <code><a href="global.html#ModelNameResolveCallback">ModelNameResolveCallback</a></code>
     </span>
+    |
+
+    <span class="param-type">
+        <code><a href="Modeling.html#.AnyModelType">Modeling.AnyModelType</a></code>
+    </span>
     
 
             
@@ -1005,7 +1010,8 @@ can be used in conjunction with <code>JSON.stringify(...)</code> and subsequentl
 
             
 
-            <div class="param-description"><p>Callback function that resolves a model name into a model type (constructor/class).</p></div>
+            <div class="param-description"><p>Callback function that resolves
+a model name into a model type (constructor/class). Optionally can be a model type.</p></div>
             
         </li>
 
@@ -1102,7 +1108,7 @@ can be used in conjunction with <code>JSON.stringify(...)</code> and subsequentl
     <h4 class="method-heading">Source</h4>
     <ul>
         <li class="method-source">
-            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.673">, line 673</a>
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.670">, line 670</a>
         </li>
     </ul>
 
@@ -1451,7 +1457,7 @@ await sk.patch(r => r
     <h4 class="method-heading">Source</h4>
     <ul>
         <li class="method-source">
-            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.612">, line 612</a>
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.608">, line 608</a>
         </li>
     </ul>
 
@@ -1554,7 +1560,7 @@ such as just before application exit.</p>
     <h4 class="method-heading">Source</h4>
     <ul>
         <li class="method-source">
-            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.419">, line 419</a>
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.415">, line 415</a>
         </li>
     </ul>
 
@@ -1758,7 +1764,7 @@ await sk.get(r => r
     <h4 class="method-heading">Source</h4>
     <ul>
         <li class="method-source">
-            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.495">, line 495</a>
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.491">, line 491</a>
         </li>
     </ul>
 
@@ -2159,7 +2165,7 @@ await sk.model(PersonModel).delete((r, m) => r...);</code></pre>
     <h4 class="method-heading">Source</h4>
     <ul>
         <li class="method-source">
-            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.451">, line 451</a>
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.447">, line 447</a>
         </li>
     </ul>
 
@@ -2336,7 +2342,7 @@ await sk.options(r => r
     <h4 class="method-heading">Source</h4>
     <ul>
         <li class="method-source">
-            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.636">, line 636</a>
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.632">, line 632</a>
         </li>
     </ul>
 
@@ -2528,7 +2534,7 @@ await sk.patch(r => r
     <h4 class="method-heading">Source</h4>
     <ul>
         <li class="method-source">
-            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.587">, line 587</a>
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.583">, line 583</a>
         </li>
     </ul>
 
@@ -2717,7 +2723,7 @@ await sk.post(r => r
     <h4 class="method-heading">Source</h4>
     <ul>
         <li class="method-source">
-            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.524">, line 524</a>
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.520">, line 520</a>
         </li>
     </ul>
 
@@ -2909,7 +2915,7 @@ await sk.put(r => r
     <h4 class="method-heading">Source</h4>
     <ul>
         <li class="method-source">
-            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.556">, line 556</a>
+            <a href="stashku.js.html">stashku.js</a><a href="stashku.js.html#source.552">, line 552</a>
         </li>
     </ul>
 
@@ -3092,7 +3098,7 @@ await sk.put(r => r
 
 <footer class="layout-footer">
   <div class="container">
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Thu Jun 02 2022 19:01:20 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Tue Jun 07 2022 20:22:40 GMT-0700 (Pacific Daylight Time)
   </div>
 </footer>
 
