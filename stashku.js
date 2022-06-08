@@ -339,7 +339,7 @@ class StashKu {
             let tmp = new requestType();
             request(tmp, reqModel);
             request = tmp;
-        } 
+        }
         //validate
         if ((request instanceof requestType) === false) {
             throw new Error(`The "request" argument must be a callback function or ${requestType.name} instance.`);
@@ -485,7 +485,7 @@ class StashKu {
      * 
      * @throws Error if the storage engine fails to return a response.
      * @throws Error if the storage engine returns an invalid response object.
-     * @param {GetRequest | GetRequestCallback | Request} [request] - The GET request to send to the storage engine.
+     * @param {GetRequest | GetRequestCallback} [request] - The GET request to send to the storage engine.
      * @returns {Promise.<Response.<I>>} Returns the data objects from storage matching request criteria.
      */
     async get(request) {
@@ -634,6 +634,39 @@ class StashKu {
     }
 
     /**
+     * Instructs StashKu to transform a HTTP request into a StashKu request and run it.
+     * 
+     * @throws Error when StashKu failed to transform the HTTP request into a valid StashKu request.
+     * @throws Error when used on an unsupported platform (browser).
+     * @param {Request} httpRequest - The HTTP request to be transformed and run.
+     * @param {Modeling.AnyModelType} [modelType] - The model type StashKu can use to discover the proper resource
+     * of a request. If this is specified, the resource will *always* be derived from the model's appropriate 
+     * resource value. 
+     * If your StashKu chain includes a model, that model will be used when this argument is not specified.
+     * @returns {StashKu.<M, InstanceType.<I>>}
+     */
+    async http(httpRequest, modelType) {
+        if (IS_BROWSER === false) {
+            if (httpRequest.url && httpRequest.httpVersion) {
+                let reqModel = modelType || this.config?.proxy?.model;
+                let request = await StashKu.requestFromObject(httpRequest, reqModel);
+                if (request) {
+                    switch (request.method) {
+                        case 'get': return await this._handle(request, GetRequest);
+                        case 'post': return await this._handle(request, PostRequest);
+                        case 'put': return await this._handle(request, PutRequest);
+                        case 'patch': return await this._handle(request, PatchRequest);
+                        case 'delete': return await this._handle(request, DeleteRequest);
+                        case 'options': return await this._handle(request, OptionsRequest);
+                    }
+                }
+            }
+            throw new RESTError(400, 'Failed to process request.');
+        }
+        throw new RESTError(500, 'The "requestFromFile" function is not supported on this platform.');
+    }
+
+    /**
      * @callback ModelNameResolveCallback
      * @param {String} name - The model name defined.
      * @returns {*} Returns a model type constructor/class associated with the model name.
@@ -641,6 +674,8 @@ class StashKu {
 
     /**
      * Reads a request defintion from file and returns an instance of that request.
+     * 
+     * @throws Error when used on an unsupported platform (browser).
      * @param {fs.PathOrFileDescriptor} jsonFile - The file path to the JSON formatted file defining a single StashKu request.
      * @param {{encoding: String, flag: String} | String | fs.BufferEncodingOption} [fsOptions] - File encoding options.
      * @param {ModelNameResolveCallback} [modelNameResolver] - Callback function that resolves a model name into a model type (constructor/class).
@@ -652,7 +687,7 @@ class StashKu {
             let obj = JSON.parse(f);
             return StashKu.requestFromObject(obj, modelNameResolver);
         }
-        throw new Error('The "requestFromFile" function is not supported on this platform.');
+        throw new Error(500, 'The "requestFromFile" function is not supported on this platform.');
     }
 
     /**

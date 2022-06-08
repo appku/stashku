@@ -39,7 +39,7 @@ async function HttpRequestLoader(httpReq, modelType) {
         req = new GetRequest().from(resource);
         if (url.search) {
             let clone = qs.parse(url.search.substring(1));
-            if (clone.from) {
+            if (!modelType && clone.from) {
                 req.from(clone.from);
             }
             if (clone.count) {
@@ -72,7 +72,7 @@ async function HttpRequestLoader(httpReq, modelType) {
     } else if (method === 'post') {
         req = new PostRequest().to(resource);
         let clone = bodyParse(httpReq);
-        if (clone.to) {
+        if (!modelType && clone.to) {
             req.to(clone.to);
         }
         if (clone.count) {
@@ -87,7 +87,7 @@ async function HttpRequestLoader(httpReq, modelType) {
     } else if (method === 'put') {
         req = new PutRequest().to(resource);
         let clone = bodyParse(httpReq);
-        if (clone.to) {
+        if (!modelType && clone.to) {
             req.to(clone.to);
         }
         if (clone.count) {
@@ -105,7 +105,7 @@ async function HttpRequestLoader(httpReq, modelType) {
     } else if (method === 'patch') {
         req = new PatchRequest().to(resource);
         let clone = bodyParse(httpReq);
-        if (clone.to) {
+        if (!modelType && clone.to) {
             req.to(clone.to);
         }
         if (clone.count) {
@@ -128,7 +128,7 @@ async function HttpRequestLoader(httpReq, modelType) {
     } else if (method === 'delete') {
         req = new DeleteRequest().from(resource);
         let clone = bodyParse(httpReq);
-        if (clone.from) {
+        if (!modelType && clone.from) {
             req.from(clone.from);
         }
         if (clone.count) {
@@ -148,7 +148,7 @@ async function HttpRequestLoader(httpReq, modelType) {
     } else if (method === 'options') {
         req = new OptionsRequest().from(resource);
         let clone = bodyParse(httpReq);
-        if (clone.from) {
+        if (!modelType && clone.from) {
             req.from(clone.from);
         }
         if (clone.headers) {
