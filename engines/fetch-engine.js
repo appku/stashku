@@ -13,16 +13,21 @@ import BaseEngine from './base-engine.js';
 import Sort from '../sort.js';
 
 const IS_BROWSER = (typeof window !== 'undefined');
-let globalFetch = null;
+let GlobalFetch = null;
+let GlobalFetchHeaders = null;
 /* istanbul ignore next */
 const lazyLoadGlobalFetch = async () => {
-    if (!globalFetch) {
+    if (!GlobalFetch) {
         if (IS_BROWSER) {
-            globalFetch = window.fetch; // eslint-disable-line no-undef
-        } else if (fetch) { // eslint-disable-line no-undef
-            globalFetch = fetch; // eslint-disable-line no-undef
+            GlobalFetch = window.fetch; // eslint-disable-line no-undef
+            GlobalFetchHeaders = window.Headers; // eslint-disable-line no-undef
+        } else if (fetch && Headers) { // eslint-disable-line no-undef
+            GlobalFetch = fetch; // eslint-disable-line no-undef
+            GlobalFetchHeaders = Headers; // eslint-disable-line no-undef
         } else {
-            globalFetch = await import(/* webpackIgnore: true */'node-fetch').default;
+            let module = await import(/* webpackIgnore: true */'node-fetch');
+            GlobalFetchHeaders = module.Headers;
+            GlobalFetch = module.default;
         }
     }
 };
@@ -189,9 +194,14 @@ class FetchEngine extends BaseEngine {
      * @private
      */
     async _fetch(resourcePath, data, settings) {
+        await lazyLoadGlobalFetch();
         settings = Object.assign({
             method: 'GET',
-            cache: 'no-cache'
+            cache: 'no-cache',
+            headers: new GlobalFetchHeaders({
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            })
         }, this.config.fetch, settings);
         let targetURI = this._uri(resourcePath);
         settings.method = settings.method.toUpperCase(); //always upper
@@ -205,12 +215,10 @@ class FetchEngine extends BaseEngine {
                 if (!settings.headers) {
                     settings.headers = {};
                 }
-                settings.headers['Content-Type'] = 'application/json';
                 settings.body = JSON.stringify(data);
             }
         }
-        await lazyLoadGlobalFetch();
-        return globalFetch(targetURI, settings);
+        return GlobalFetch(targetURI, settings);
     }
 
     /**
