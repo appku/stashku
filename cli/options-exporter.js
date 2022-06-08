@@ -189,7 +189,7 @@ class OptionsExporter {
         if (defaultType === 'function') {
             return `${className}.${propertyName}.default()`;
         }
-        return `${className}.${propertyName}.default ?? null`;
+        return `${className}.${propertyName}.default`;
     }
 }
 
