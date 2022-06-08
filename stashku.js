@@ -334,24 +334,20 @@ class StashKu {
         let reqModel = this.config?.proxy?.model;
         if (IS_BROWSER === false && request.url && request.httpVersion) { //looks like we want to process a StashKu request from an HTTP request.
             request = await StashKu.requestFromObject(request, reqModel);
-            if (reqModel) {
-                request.model(reqModel, false, this.config?.model?.header);
-            }
         } else if (typeof request === 'function') {
             //process callback
             let tmp = new requestType();
-            if (reqModel) {
-                request(tmp, reqModel);
-                tmp.model(reqModel, false, this.config?.model?.header);
-            } else {
-                request(tmp);
-            }
+            request(tmp, reqModel);
             request = tmp;
-        } else if ((request instanceof requestType) === false) {
+        } 
+        //validate
+        if ((request instanceof requestType) === false) {
             throw new Error(`The "request" argument must be a callback function or ${requestType.name} instance.`);
         } else if (!this.engine) {
             throw new Error('A StashKu storage engine has not been loaded. An engine must be configured before operations are allowed.');
-        } else if (reqModel) {
+        }
+        //adjust the request by model, if present
+        if (reqModel) {
             request.model(reqModel, false, this.config?.model?.header);
         }
         //access restrictions
