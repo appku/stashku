@@ -259,6 +259,12 @@ describe('#add', () => {
         f = new Filter();
         expect(f.add('||', 'Hello', Filter.OP.EQUALS, 1).tree).toEqual(Filter.or('Hello', Filter.OP.EQUALS, 1).tree);
     });
+    it('supports tokenized strings', () => {
+        let f = new Filter();
+        expect(f.add(f.LOGIC.OR, '{ID} == 123 OR {Noodle} ISNOTNULL').toString()).toEqual('({ID} EQ 123 OR {Noodle} ISNOTNULL)');
+        expect(f.add(f.LOGIC.AND, '{Noodle} ISNOTNULL').toString()).toEqual('({ID} EQ 123 OR {Noodle} ISNOTNULL) OR ({Noodle} ISNOTNULL)');
+        expect(f.add(f.LOGIC.AND, '{Moose} ~~ "Goose"').toString()).toEqual('({ID} EQ 123 OR {Noodle} ISNOTNULL) OR ({Noodle} ISNOTNULL) OR ({Moose} CONTAINS "Goose")');
+    });
 });
 
 describe('#test', () => {

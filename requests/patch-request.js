@@ -134,6 +134,7 @@ class PatchRequest {
      * @callback ConditionCallback
      * @param {Filter} f
      * @param {Filter} orig
+     * @returns {Filter}
      */
 
     /**
@@ -155,7 +156,10 @@ class PatchRequest {
         } else if (typeof conditions === 'function') {
             let originalFilter = this.metadata.where ?? new Filter();
             this.metadata.where = new Filter();
-            conditions(this.metadata.where, originalFilter);
+            let optionalReturn = conditions(this.metadata.where, originalFilter);
+            if (optionalReturn) {
+                this.metadata.where = optionalReturn;
+            }
         } else {
             throw new Error('The "conditions" argument must be null, a callback, or a Filter instance.');
         }

@@ -173,6 +173,11 @@ describe('#where', () => {
         expect(cb.mock.calls[0][1]).toBeInstanceOf(Filter);
         expect(cb.mock.calls[0][1].tree).toEqual(Filter.parse('{ID} == 3').tree);
     });
+    it('allows modification of the original where filter through the callback.', () => {
+        let r = new PatchRequest().where('{ID} == 3');
+        r.where((f, orig) => orig.and('Host', f.OP.ISNOTNULL));
+        expect(r.metadata.where.tree).toEqual(Filter.parse('{ID} == 3 AND {Host} ISNOTNULL').tree);
+    });
 });
 
 describe('#to', () => {

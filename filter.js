@@ -186,9 +186,10 @@ class Filter {
     /**
      * Adds a new condition or filter group to the tree using the given logical operator.
      * @param {String} logic - The logical operator.
-     * @param {String|Filter|Filtering.LogicalGroup|Modeling.PropertyDefinition} property - The property affected by the filter.
-     * @param {String} [op] - The filter operator.
-     * @param {*} [value] - The value used by the operator on the property value.
+     * @param {String|Filter|Filtering.LogicalGroup|Modeling.PropertyDefinition} property - The property (name) 
+     * evaluated by the filter, an existing Filter, or a tokenizable filter string.
+     * @param {String} [op] - The filter operator used when the `property` is a property name.
+     * @param {*} [value] - The value being compared to the evaluated property values using the specified operation.
      * @returns {Filter} 
      */
     add(logic, property, op, value) {
@@ -210,6 +211,13 @@ class Filter {
         if (!this.tree) {
             this.tree = this._filterLogicalGroup(logic);
             this._current = this.tree;
+        }
+        //check if possibly we have a tokenized string
+        if (typeof property === 'string' && typeof op === 'undefined' && typeof value === 'undefined') {
+            let tokenFilter = Filter.parse(property);
+            if (tokenFilter && Filter.isEmpty(tokenFilter) == false) {
+                property = tokenFilter;
+            }
         }
         //add another filter logical group
         if (property instanceof Filter) {
