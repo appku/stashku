@@ -643,7 +643,7 @@ class StashKu {
      * of a request. If this is specified, the resource will *always* be derived from the model's appropriate 
      * resource value. 
      * If your StashKu chain includes a model, that model will be used when this argument is not specified.
-     * @returns {StashKu.<M, InstanceType.<I>>}
+     * @returns {Promise.<Response.<I>>} Returns the data objects from storage matching HTTP request criteria.
      */
     async http(httpRequest, modelType) {
         if (IS_BROWSER === false) {

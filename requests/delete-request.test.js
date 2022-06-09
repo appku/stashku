@@ -144,6 +144,16 @@ describe('#where', () => {
         expect(r.where(f => f.and('a', Filter.OP.CONTAINS, 'z'))).toBe(r);
         expect(r.where(Filter.and('a', Filter.OP.CONTAINS, 'z'))).toBe(r);
     });
+    it('passes the original filter, as well as new one in a where callback.', () =>{
+        let r = new DeleteRequest().where('{ID} == 3');
+        let cb = jest.fn();
+        r.where(cb);
+        expect(cb).toHaveBeenCalled();
+        expect(cb.mock.calls[0][0]).toBeInstanceOf(Filter);
+        expect(cb.mock.calls[0][0].tree).toBeNull();
+        expect(cb.mock.calls[0][1]).toBeInstanceOf(Filter);
+        expect(cb.mock.calls[0][1].tree).toEqual(Filter.parse('{ID} == 3').tree);
+    });
 });
 
 describe('#from', () => {

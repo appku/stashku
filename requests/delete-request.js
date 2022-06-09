@@ -98,6 +98,7 @@ class DeleteRequest {
     /**
      * @callback ConditionCallback
      * @param {Filter} f
+     * @param {Filter} orig
      */
 
     /**
@@ -117,8 +118,9 @@ class DeleteRequest {
         } else if (typeof conditions === 'string') {
             this.metadata.where = Filter.parse(conditions);
         } else if (typeof conditions === 'function') {
+            let originalFilter = this.metadata.where ?? new Filter();
             this.metadata.where = new Filter();
-            conditions(this.metadata.where);
+            conditions(this.metadata.where, originalFilter);
         } else {
             throw new Error('The "conditions" argument must be null, a callback, or a Filter instance.');
         }
