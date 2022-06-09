@@ -207,9 +207,11 @@ class Filter {
         } else if (!property) {
             throw new Error('The "property" parameter argument is required.');
         }
-        //ensure there is a tree object.
+        //ensure there is a tree object && current
         if (!this.tree) {
             this.tree = this._filterLogicalGroup(logic);
+        }
+        if (!this._current) {
             this._current = this.tree;
         }
         //check if possibly we have a tokenized string
