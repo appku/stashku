@@ -1,3 +1,7 @@
+[![NPM](https://img.shields.io/npm/v/@appku/stashku)](https://npmjs.org/package/@appku/stashku)
+[![License](https://img.shields.io/npm/l/@appku/stashku)](https://npmjs.org/package/@appku/stashku)
+[![Downloads](https://img.shields.io/npm/dt/@appku/stashku)](https://npmjs.org/package/@appku/stashku)
+
 # StashKu
 StashKu is a data agnostic, flat-data framework that provides a full-stack API for RESTful operations against common data storage and communication mediums served up from built-in and pluggable custom engines. The framework provides the tools needed to begin leveraging and extending it out of the box. 
 
