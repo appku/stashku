@@ -26,7 +26,7 @@
   
   <h1><a href="./index.html">@AppKu/StashKu</a></h1>
   
-  <h2>v1.0.18</h2>
+  <h2>v1.0.20</h2>
   
   
   <ul class="meta-links">
@@ -67,11 +67,14 @@
 
     <section class="readme">
         <article><h1>StashKu</h1>
-<p>StashKu is a data storage agnostic, flat-data framework that provides an interface for RESTful operations against common data storage mediums. The framework provides the tools needed to begin leveraging and extending it out of the box. Specifically, two &quot;engines&quot; are provided to get you started- One for in-memory storage, and another for fetch requests.</p>
-<p>&quot;Engines&quot; act as the translator of StashKu RESTful requests to whatever data storage medium is on the other end - whether it's a hard disk, a hardware sensor, a database, or even an API. They are responsible for crafting standardized responses which StashKu hands back off to the requestor. As long as it can be interacted with through RESTful requests such as GET, POST, PUT, PATCH, DELETE, and OPTIONS, StashKu could <em>potentially</em> have an engine for it. If you'd like to create your own engine, check out the tutorials on our formal <a href="https://appku.github.io/stashku/index.html">documentation site</a>.</p>
+<p>StashKu is a data agnostic, flat-data framework that provides a full-stack API for RESTful operations against common data storage and communication mediums served up from built-in and pluggable custom engines. The framework provides the tools needed to begin leveraging and extending it out of the box.</p>
+<p>Engines act as the translator and handlers of StashKu RESTful requests - whether they are relaying data from a hard disk, a hardware sensor, a database, or even an API. They are responsible for crafting standardized responses which StashKu hands back off to the requestor. As long as it can be interacted with through RESTful requests such as GET, POST, PUT, PATCH, DELETE, and OPTIONS, StashKu could <em>potentially</em> have an engine for it. If you'd like to create your own engine, check out the tutorials on our formal <a href="https://appku.github.io/stashku">documentation site</a>.</p>
+<blockquote>
+<p>🔩 Two engines are provided out of the box: <a href="https://appku.github.io/stashku/tutorial-Using%20the%20Memory%20Engine.html"><code>memory</code></a> and <a href="https://appku.github.io/stashku/tutorial-Using%20the%20Fetch%20Engine.html"><code>fetch</code></a> which are the defaults for node and the browser respectively. Check out our <a href="https://github.com/appku/stashku/tree/master/demo">express+browser demo</a> to see them both in action.</p>
+</blockquote>
 <p>StashKu supports some amazing features:</p>
 <ul>
-<li>Can be used in modern browsers or on server-side (node). ─=≡Σ(((ﾉ☉ヮ⚆)ﾉ</li>
+<li>Can be used in modern browsers <em>or</em> on server-side (node). ─=≡Σ(((ﾉ☉ヮ⚆)ﾉ</li>
 <li><a href="https://en.wikipedia.org/wiki/Create,_read,_update_and_delete">CRUD</a> via <a href="https://en.wikipedia.org/wiki/Representational_state_transfer">RESTful</a> requests, paging, sorting, constraining properties, and even filtering via conditional expressions.</li>
 <li>Sorting through objects or string expressions:<br>
 <em>e.g. <code>{FirstName} DESC</code> <code>{LastName} ASC</code></em></li>
@@ -210,7 +213,7 @@ let response = await stash.options(r => r.from('Contacts'));
 <code>npx</code> command. Optionally you can <code>npm i @appku/stashku -g</code>, and with the <code>-g</code> flag the command is available anywhere
 on your system.</p>
 <blockquote>
-<p>Want to know more? Check out the <a href="https://github.com/appku/stashku/tutorial-Using%20the%20CLI.html">CLI tutorial</a> on the <a href="https://github.com/appku/stashku">official documentation site</a>.</p>
+<p><strong>Want to know more?</strong> Check out the <a href="https://github.com/appku/stashku/tutorial-Using%20the%20CLI.html">CLI tutorial</a> on the <a href="https://github.com/appku/stashku">official documentation site</a>.</p>
 </blockquote>
 <pre class="prettyprint source lang-sh"><code>npx stashku
 </code></pre>
@@ -234,11 +237,8 @@ on your system.</p>
 <p>The generated models are 100% usable in StashKu and are designed to provide VS-Code compatible intellisense proper
 JSdoc tags.</p>
 <blockquote>
-<p>Curious about models? Find the <a href="https://github.com/appku/stashku/tutorial-Going%20Next-Level%20with%20Models.html">model tutorial here</a>.</p>
+<p><strong>Curious about models?</strong> Find the <a href="https://github.com/appku/stashku/tutorial-Going%20Next-Level%20with%20Models.html">model tutorial here</a>.</p>
 </blockquote>
-<h2>Documentation</h2>
-<p>Formal documentation is <a href="https://github.com/appku/stashku">available here</a>.</p>
-<p><em>This is currently a work-in-progress as of v-1.0.0 and will continue to be improved.</em></p>
 <h2>Configuration</h2>
 <p>StashKu can be configured using the following variables.</p>
 <ul>
@@ -321,7 +321,7 @@ Instructs StashKu to add a header <code>model</code> with the value of the <code
 
 <footer class="layout-footer">
   <div class="container">
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Wed Jun 08 2022 18:23:30 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Sun Jun 12 2022 00:40:49 GMT+0000 (Coordinated Universal Time)
   </div>
 </footer>
 

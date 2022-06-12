@@ -1,11 +1,13 @@
 # StashKu
-StashKu is a data storage agnostic, flat-data framework that provides an interface for RESTful operations against common data storage mediums. The framework provides the tools needed to begin leveraging and extending it out of the box. Specifically, two "engines" are provided to get you started- One for in-memory storage, and another for fetch requests.
+StashKu is a data agnostic, flat-data framework that provides a full-stack API for RESTful operations against common data storage and communication mediums served up from built-in and pluggable custom engines. The framework provides the tools needed to begin leveraging and extending it out of the box. 
 
-"Engines" act as the translator of StashKu RESTful requests to whatever data storage medium is on the other end - whether it's a hard disk, a hardware sensor, a database, or even an API. They are responsible for crafting standardized responses which StashKu hands back off to the requestor. As long as it can be interacted with through RESTful requests such as GET, POST, PUT, PATCH, DELETE, and OPTIONS, StashKu could *potentially* have an engine for it. If you'd like to create your own engine, check out the tutorials on our formal [documentation site](https://appku.github.io/stashku/index.html).
+Engines act as the translator and handlers of StashKu RESTful requests - whether they are relaying data from a hard disk, a hardware sensor, a database, or even an API. They are responsible for crafting standardized responses which StashKu hands back off to the requestor. As long as it can be interacted with through RESTful requests such as GET, POST, PUT, PATCH, DELETE, and OPTIONS, StashKu could *potentially* have an engine for it. If you'd like to create your own engine, check out the tutorials on our formal [documentation site](https://appku.github.io/stashku).
+
+> 🔩 Two engines are provided out of the box: [`memory`](https://appku.github.io/stashku/tutorial-Using%20the%20Memory%20Engine.html) and [`fetch`](https://appku.github.io/stashku/tutorial-Using%20the%20Fetch%20Engine.html) which are the defaults for node and the browser respectively. Check out our [express+browser demo](https://github.com/appku/stashku/tree/master/demo) to see them both in action.
 
 StashKu supports some amazing features:
 
-- Can be used in modern browsers or on server-side (node). ─=≡Σ(((ﾉ☉ヮ⚆)ﾉ
+- Can be used in modern browsers *or* on server-side (node). ─=≡Σ(((ﾉ☉ヮ⚆)ﾉ
 - [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) via [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) requests, paging, sorting, constraining properties, and even filtering via conditional expressions.
 - Sorting through objects or string expressions:    
   *e.g. `{FirstName} DESC` `{LastName} ASC`*
@@ -163,7 +165,7 @@ Stashku provides a CLI that is available via the `stashku` command. This can be 
 `npx` command. Optionally you can `npm i @appku/stashku -g`, and with the `-g` flag the command is available anywhere
 on your system.
 
-> Want to know more? Check out the [CLI tutorial](https://github.com/appku/stashku/tutorial-Using%20the%20CLI.html) on the [official documentation site](https://github.com/appku/stashku).
+> **Want to know more?** Check out the [CLI tutorial](https://github.com/appku/stashku/tutorial-Using%20the%20CLI.html) on the [official documentation site](https://github.com/appku/stashku).
 
 ```sh
 npx stashku
@@ -197,12 +199,7 @@ npx stashku options ./model-list.json -x ./models/
 The generated models are 100% usable in StashKu and are designed to provide VS-Code compatible intellisense proper
 JSdoc tags.
 
-> Curious about models? Find the [model tutorial here](https://github.com/appku/stashku/tutorial-Going%20Next-Level%20with%20Models.html).
-
-## Documentation
-Formal documentation is [available here](https://github.com/appku/stashku). 
-
-*This is currently a work-in-progress as of v-1.0.0 and will continue to be improved.*
+> **Curious about models?** Find the [model tutorial here](https://github.com/appku/stashku/tutorial-Going%20Next-Level%20with%20Models.html).
 
 ## Configuration
 StashKu can be configured using the following variables.
