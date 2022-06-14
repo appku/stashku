@@ -2,11 +2,8 @@ StashKu includes the ability to build complex filters that support logical `AND`
 of comparative operators. Filters can be created using chained `and`/`or` function calls, or parsed from a string 
 expression, making it easy to write filters for use in request `where` functions quick and painless.
 
-> *Note:* The `where` function is only on `GetRequest`, `DeleteRequest` and `PatchRequest` instances.
-
 The `Filter` also can operate on a spread array of objects using the `test` function, which will return only objects
 matching the criteria.
-
 
 ## Getting Started
 You can create a new Filter from a string expression:
@@ -77,6 +74,45 @@ console.log(results);
 
 This is similar to using a JavaScript array's built-in `filter` method, but in this case we are using a portable and
 cross-domain filter that is standardized. 
+
+### Usage on a StashKu Request
+Filters power StashKu requests, and are used by engines to translation conditional expressions into their resource
+interface. Requests accept filters in their `where` function, which is only on `GetRequest`, `DeleteRequest` and
+`PatchRequest` instances. 
+
+The `where` functions accept a `Filter` string expression:
+
+```js
+await myStash.get(r => r
+    .where('{Name} ~~ "Doe" OR {Name} !~~ "Doey"')
+);
+```
+... or a `Filter` instance:
+```js
+let myConditions = Filter.and('Name', Filter.OP.CONTAINS, 'Doe');
+await myStash.delete(r => r
+    .where(myConditions)
+);
+```
+... or a callback that lets you build on a filter already set on the request. This can be useful for cross-domain
+StashKu requests.
+```js
+let myConditions = Filter.and('Name', Filter.OP.CONTAINS, 'Doe');
+await myStash.patch(r => r
+    .where(myConditions)
+    .where((f, orig) => orig.or('{Name} ~~~ "Doey"'))
+);
+```
+A cross-domain StashKu request, for example, could be a request passed from the `fetch` engine to a StashKu instance on
+the server being served up on `express`- where you want the server wants constrain the results (let's say... only where
+the `DateDeleted` property is `null`) could look like this:
+```js
+let inReq = StashKu.fromObject(httpReq);
+await myStash.patch(inReq
+    .where((f, orig) => Filter.and(orig).and('{DateDelete} ISNULL'))
+);
+```
+> Want to see this in action? Check out the [node+browser demo](https://github.com/appku/stashku/tree/master/demo).
 
 ## Logic
 The following logical conditions are available on `Filter` objects:
