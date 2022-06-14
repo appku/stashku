@@ -56,7 +56,7 @@ Best of all, you can `Filter.parse` the `toString`'d value back into a new `Filt
 
 ### Filtering Object Arrays
 In this example where we're going to filter an array of simple objects using the `test()` function, searching for
-records with the `Name` containing `Doe`:
+records with the `Name` property containing the value `"Doe"`:
 ```js
 let contacts = [
     { Name: 'John Doe', Age: 22},
@@ -123,7 +123,7 @@ The following logical conditions are available on `Filter` objects:
 | `Filter.LOGIC.OR` | `"or"` | `Filter.or(...)` |
 
 ## Operators
-The following operators are available for use in an expression. All engines built-into StashKu support these operations. In string expressions, you should use the *uppercase* value or alias, though the property name will work as well.
+The following operators are available for use in an expression. All engines built-into StashKu support these operations. In string expressions, you should use the **uppercase** *value* or *alias*, though the property name will work as well.
 
 | Property | Value | Aliases (String Expressions) |
 | - | - | - |
