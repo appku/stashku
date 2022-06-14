@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     
-    <title>@AppKu/StashKu: requests/put-request.js</title>
+    <title>@AppKu/StashKu: Tutorial: Requests: Where (Filters)</title>
     
     
       <link type="text/css" rel="stylesheet" href="styles/vendor/prism-tomorrow-night.css">
@@ -46,273 +46,203 @@
 </header>
 
 
-<main class="layout-main  layout-content--source">
+<main class="layout-main ">
   <div class="container">
-    <p class="page-kind">source</p>
-    <h1 class="page-title">requests/put-request.js</h1>
-    
+    <p class="page-kind"></p>
+    <h1 class="page-title">Tutorial: Requests: Where (Filters)</h1>
+    <section>
 
+<article>
+    <p>StashKu includes the ability to build complex filters that support logical <code>AND</code> and <code>OR</code> conditions, with a variety
+of comparative operators. Filters can be created using chained <code>and</code>/<code>or</code> function calls, or parsed from a string
+expression, making it easy to write filters for use in request <code>where</code> functions quick and painless.</p>
+<blockquote>
+<p><em>Note:</em> The <code>where</code> function is only on <code>GetRequest</code>, <code>DeleteRequest</code> and <code>PatchRequest</code> instances.</p>
+</blockquote>
+<p>The <code>Filter</code> also can operate on a spread array of objects using the <code>test</code> function, which will return only objects
+matching the criteria.</p>
+<h2>Getting Started</h2>
+<p>You can create a new Filter from a string expression:</p>
+<pre class="prettyprint source lang-js"><code>Filter.parse('{Name} ~~ &quot;Doe&quot; AND Age > 18');
+</code></pre>
+<p>...you can even using logical chain functions together into logical groups:</p>
+<pre class="prettyprint source lang-js"><code>Filter
+    .and('{Name} ~~ &quot;Doe&quot; OR {Name} !~~ &quot;Doey&quot;')
+    .and('Age > 18');
+</code></pre>
+<p>...or just group in your string:</p>
+<pre class="prettyprint source lang-js"><code>Filter.parse('({Name} ~~ &quot;Doe&quot; OR {Name} !~~ &quot;Doey&quot;) AND Age > 18')
+</code></pre>
+<blockquote>
+<p><em>Yes!</em> Nested parenthesis are 100% supported to any depth. ~(˘▾˘~)</p>
+</blockquote>
+<p>If you're feeling traditional, you can build filters in the traditional parameterized approach:</p>
+<pre class="prettyprint source lang-js"><code>Filter
+    .and(Filter
+        .or('Name', Filter.OP.CONTAINS, 'Doe')
+        .or('Name', Filter.OP.NOTCONTAINS, 'Doey')
+    )
+    .and('Age', Filter.OP.GREATERTHAN, 18);
+</code></pre>
+<h3>Peeking at The Filter</h3>
+<p>Viewing the filter's expression tree is sometimes tiresome for troubleshooting, that's why the <code>Filter</code> instance
+fully supports a <code>toString()</code> override that outputs the string expression equivalent of the tree.</p>
+<p>This makes looking at a filter defined like this:</p>
+<pre class="prettyprint source lang-js"><code>let f = Filter
+    .or('ID', Filter.OP.EQUALS, 1)
+    .or('ID', Filter.OP.EQUALS, 2)
+    .or(Filter
+        .and('Name', Filter.OP.ISNULL)
+        .and('Age', Filter.OP.GREATERTHAN, 24)
+        .or('Products', Filter.OP.IN, [1, 2, 3])
+    );
+</code></pre>
+<p>... into a string like this:</p>
+<pre class="prettyprint source"><code>{ID} EQ 1 OR {ID} EQ 2 OR (({Name} ISNULL AND {test4} GREATERTHAN 24) OR {Products} IN [1, 2, 3])
+</code></pre>
+<p>Best of all, you can <code>Filter.parse</code> the <code>toString</code>'d value back into a new <code>Filter</code> instance.</p>
+<h3>Filtering Object Arrays</h3>
+<p>In this example where we're going to filter an array of simple objects using the <code>test()</code> function, searching for
+records with the <code>Name</code> containing <code>Doe</code>:</p>
+<pre class="prettyprint source lang-js"><code>let contacts = [
+    { Name: 'John Doe', Age: 22},
+    { Name: 'Marcus Inger', Age: 45},
+    { Name: 'Gilli Mokes', Age: 18},
+    { Name: 'Susan Doe', Age: 21},
+    { Name: 'Sally Sue', Age: 55}
+];
+let results = Filter
+    .and('Name', Filter.OP.CONTAINS, 'Doe')
+    .test(...contacts);
+console.log(results);
+// [ { Name: 'John Doe', Age: 22}, { Name: 'Susan Doe', Age: 21} ]
+</code></pre>
+<p>This is similar to using a JavaScript array's built-in <code>filter</code> method, but in this case we are using a portable and
+cross-domain filter that is standardized.</p>
+<h2>Logic</h2>
+<p>The following logical conditions are available on <code>Filter</code> objects:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+<th>Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Filter.LOGIC.AND</code></td>
+<td><code>&quot;and&quot;</code></td>
+<td><code>Filter.and(...)</code></td>
+</tr>
+<tr>
+<td><code>Filter.LOGIC.OR</code></td>
+<td><code>&quot;or&quot;</code></td>
+<td><code>Filter.or(...)</code></td>
+</tr>
+</tbody>
+</table>
+<h2>Operators</h2>
+<p>The following operators are available for use in an expression. All engines built-into StashKu support these operations. In string expressions, you should use the <em>uppercase</em> value or alias, though the property name will work as well.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+<th>Aliases (String Expressions)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Filter.OP.EQUALS</code></td>
+<td><code>&quot;eq&quot;</code></td>
+<td><code>&quot;==&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.NOTEQUALS</code></td>
+<td><code>&quot;neq&quot;</code></td>
+<td><code>&quot;!=&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.ISNULL</code></td>
+<td><code>&quot;isnull&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.ISNOTNULL</code></td>
+<td><code>&quot;isnotnull&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.LESSTHAN</code></td>
+<td><code>&quot;lt&quot;</code></td>
+<td><code>&quot;&lt;&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.LESSTHANOREQUAL</code></td>
+<td><code>&quot;lte&quot;</code></td>
+<td><code>&quot;&lt;=&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.GREATERTHAN</code></td>
+<td><code>&quot;gt&quot;</code></td>
+<td><code>&quot;&gt;&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.GREATERTHANOREQUAL</code></td>
+<td><code>&quot;gte&quot;</code></td>
+<td><code>&quot;&gt;=&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.STARTSWITH</code></td>
+<td><code>&quot;startswith&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.ENDSWITH</code></td>
+<td><code>&quot;endswith&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.CONTAINS</code></td>
+<td><code>&quot;contains&quot;</code></td>
+<td><code>&quot;~~&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.DOESNOTCONTAIN</code></td>
+<td><code>&quot;doesnotcontain&quot;</code></td>
+<td><code>&quot;!~~&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.ISEMPTY</code></td>
+<td><code>&quot;isempty&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.ISNOTEMPTY</code></td>
+<td><code>&quot;isnotempty&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.IN</code></td>
+<td><code>&quot;in&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.NOTIN</code></td>
+<td><code>&quot;nin&quot;</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>Looking for More?</h2>
+<ul>
+<li>Read more about <code>Filter</code> in the <a href="https://appku.github.io/stashku/Filter.html">API documentation here</a>.</li>
+<li>Ask a question or say hello on the <a href="https://github.com/orgs/appku/discussions">AppKu discussion board</a>.</li>
+</ul>
+</article>
 
-
-    
-
-<section>
-    <article>
-        <pre id="source" class="source-page line-numbers"><code class="language-js">///&lt;reference path="../modeling/modeling.d.js" />
-import ModelUtility from '../modeling/model-utility.js';
-
-/**
- * This class defines a StashKu PUT request that instructs StashKu to update existing objects in storage.
- */
-class PutRequest {
-    /**
-     * Creates a new `PutRequest` instance. A PUT request instructs StashKu to update existing objects in storage.
-     * @param {Array.&lt;String>} [pk] - The property name(s) that are used to uniquely identify each object.
-     * @param  {...String} [objects] - Spread of objects to create in update in storage.
-     */
-    constructor(pk, ...objects) {
-
-        this.metadata = {
-            /** @type {Array.&lt;String>} */
-            pk: [],
-            /** @type {Array} */
-            objects: [],
-            /** @type {String} */
-            to: null,
-            /** @type {Boolean} */
-            count: false,
-            /** @type {Map.&lt;String, *>} */
-            headers: null
-        };
-
-        if (Array.isArray(pk)) {
-            this.pk(...pk);
-        }
-        this.objects(...objects);
-    }
-
-    /**
-     * @type {String}
-     */
-    get method() {
-        return 'put';
-    }
-
-    /**
-     * Applies a StahKu-compatible model's metadata &amp; configuration *not already defined* to this request.
-     * 
-     * If a `null` value is passed, the model is removed - but metadata on the request will remain.
-     * @throws Error when the `modelType` argument is not `null`, a class, or a constructor object.
-     * @param {Modeling.AnyModelType} modelType - The model "class" or constructor function.
-     * @param {Boolean} [overwrite = false] - Optional flag that, when `true`, overwrites request settings and values
-     * with the model's (where applicable).
-     * @param {Boolean} [header=false] - Optional flag that, when `true`, adds a `model` header to the request with
-     * the model type's `$stashku` definition.
-     * @returns {PutRequest}
-     * @private
-     */
-    model(modelType, overwrite = false, header = false) {
-        if (modelType !== null &amp;&amp; ModelUtility.isValidType(modelType) === false) {
-            throw new Error('Invalid "modelType" argument. The value must be null, a class, or a constructor object');
-        }
-        if (modelType) {
-            if (overwrite === true || !this.metadata.to) {
-                this.to(ModelUtility.resource(modelType, this.method));
-            }
-            if (header) {
-                this.headers({ model: modelType.$stashku });
-            }
-            if (overwrite === true || !this.metadata.pk || !this.metadata.pk?.length) {
-                this
-                    .pk(null)
-                    .pk(...ModelUtility.pk(modelType));
-            }
-            if (this.metadata.objects) {
-                this.metadata.objects = Array.from(ModelUtility.unmodel(modelType, this.method, ...this.metadata.objects));
-            }
-        }
-        return this;
-    }
-
-    /**
-     * Requests that the response return count numbers (total, affected, returned, etc.) but not objects.
-     * 
-     * This will result in a `Response` with an empty `data` array and may result in faster query execution if you
-     * only need the resulting numbers.
-     * 
-     * Calling this function without an argument *enables* the flag.
-     * @param {Boolean} [enabled=true] - A `true` enables the count-only result. A `false` disables it.
-     * @returns {PutRequest}
-     */
-    count(enabled) {
-        if (typeof enabled === 'undefined') {
-            this.metadata.count = true;
-        } else {
-            this.metadata.count = !!enabled;
-        }
-        return this;
-    }
-
-    /**
-     * Defines the primary key property name(s) used to uniquely identify each object defined in the request and storage
-     * resource.    
-     * If a `null` value is passed, all PKs are cleared from the request.
-     * @param  {...String|Array.&lt;String | Modeling.PropertyDefinition>} primaryKeys - Spread of property names used to uniquely identify each object.
-     * @returns {PutRequest}
-     */
-    pk(...primaryKeys) {
-        if (Array.isArray(this.metadata.pk) === false) {
-            this.metadata.pk = [];
-        }
-        if (!primaryKeys || (primaryKeys.length === 1 &amp;&amp; primaryKeys[0] === null)) {
-            this.metadata.pk = [];
-        } else {
-            primaryKeys = primaryKeys.flat();
-            for (let k of primaryKeys) {
-                let prop = k;
-                if (k.target &amp;&amp; typeof k.target === 'string') {
-                    prop = k.target;
-                }
-                if (typeof prop !== 'string') {
-                    throw new Error('Invalid "primaryKeys" argument. The array contains a non-string value.');
-                }
-                if (prop &amp;&amp; this.metadata.pk.indexOf(prop) &lt; 0) {
-                    this.metadata.pk.push(prop);
-                }
-            }
-        }
-        return this;
-    }
-
-    /**
-     * Adds objects to the PUT request. If any object has already been added to the request, it is skipped.    
-     * If a single `null` value is passed, all objects are cleared from the request.
-     * @param  {...any} [objects] - Spread of objects to update in data storage, as matched by `pk` property
-     * values.
-     * @returns {PutRequest}
-     */
-    objects(...objects) {
-        if (Array.isArray(this.metadata.objects) === false) {
-            this.metadata.objects = [];
-        }
-        if (!objects || (objects.length === 1 &amp;&amp; objects[0] === null)) {
-            this.metadata.objects.length = 0;
-        } else {
-            objects = objects.flat(Infinity);
-            for (let o of objects) {
-                let ttype = typeof o;
-                if (o !== null &amp;&amp; ttype !== 'undefined') {
-                    if (ttype !== 'object') {
-                        throw new Error('Invalid "objects" argument. Values must be an object.');
-                    } else if (this.metadata.objects.indexOf(o) &lt; 0) {
-                        this.metadata.objects.push(o);
-                    }
-                }
-            }
-        }
-        return this;
-    }
-
-    /**
-     * Sets the target resource name for the request, optionally specifying an alias for use with specifying properties
-     * across joins.
-     * 
-     * @throws Error if the "name" argument value is not a string or null.
-     * @param {String} name - The name of the target resource in data storage.
-     * @returns {PutRequest}
-     */
-    to(name) {
-        if (name !== null &amp;&amp; typeof name !== 'string') {
-            throw new Error('Invalid "name" argument. The value must be a string or null.');
-        }
-        this.metadata.to = name;
-        return this;
-    }
-
-    /**
-     * Clears all configured metadata on the request, resetting it to a default state.
-     * @returns {PutRequest}
-     */
-    clear() {
-        if (!this.metadata) {
-            this.metadata = {};
-        }
-        this.metadata.pk = [];
-        this.metadata.objects = [];
-        this.metadata.to = null;
-        this.metadata.headers = null;
-        return this;
-    }
-
-    /**
-     * Sets or clears headers on the request that can be used to set engine-specific options for the request.
-     * If a `null` value is passed, the headers are cleared.
-     * @throws Error when the dictionary argument uses a non-string key.
-     * @throws Error when the dictionary argument is not an object, null, or a Map.
-     * @param {Object | Map.&lt;String, *>} dictionary - A map or object defining the headers and values.
-     * @returns {PutRequest}
-     */
-    headers(dictionary) {
-        if (!this.metadata.headers) {
-            this.metadata.headers = new Map();
-        }
-        if (dictionary === null) {
-            this.metadata.headers.clear();
-        } else if (dictionary instanceof Map || typeof dictionary === 'object') {
-            let iterable = dictionary;
-            if ((dictionary instanceof Map) === false) {
-                iterable = Object.entries(dictionary);
-            }
-            for (let [k, v] of iterable) {
-                if (k !== null &amp;&amp; typeof k !== 'undefined') {
-                    if (typeof k !== 'string') {
-                        throw new Error('An invalid non-string key value was provided in the "dictionary" argument. Only string-based keys may be used.');
-                    }
-                    if (v === null || typeof v === 'undefined') {
-                        this.metadata.headers.delete(k);
-                    } else {
-                        this.metadata.headers.set(k, v);
-                    }
-                }
-            }
-        } else {
-            throw new Error('The "dictionary" argument must be null, a Map, or an object.');
-        }
-        return this;
-    }
-
-    /**
-     * Returns the metadata object to be utilized for stringifying into JSON.
-     * @returns {*}
-     * @protected
-     */
-    toJSON() {
-        let metaClone = { to: this.metadata.to };
-        if (this.metadata.headers) {
-            metaClone.headers = Object.fromEntries(this.metadata.headers);
-        }
-        if (this.metadata.count) {
-            metaClone.count = this.metadata.count;
-        }
-        if (this.metadata.objects &amp;&amp; this.metadata.objects.length) {
-            metaClone.objects = this.metadata.objects;
-        }
-        if (this.metadata.pk &amp;&amp; this.metadata.pk.length) {
-            metaClone.pk = this.metadata.pk;
-        }
-        return metaClone;
-    }
-
-}
-
-const STANDARD_METADATA = ['pk', 'objects', 'to', 'count', 'model', 'headers'];
-
-export default PutRequest;</code></pre>
-    </article>
 </section>
-
-
-
 
   </div>
 </main>
