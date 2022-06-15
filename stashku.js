@@ -647,17 +647,36 @@ class StashKu {
      */
     async http(httpRequest, modelType) {
         if (IS_BROWSER === false) {
+            //support someone handing off a pre-constructed request, just forward to the proper handler.
+            if (httpRequest instanceof GetRequest) {
+                return this.get(httpRequest);
+            }
+            if (httpRequest instanceof PostRequest) {
+                return this.post(httpRequest);
+            }
+            if (httpRequest instanceof PutRequest) {
+                return this.put(httpRequest);
+            }
+            if (httpRequest instanceof PatchRequest) {
+                return this.patch(httpRequest);
+            }
+            if (httpRequest instanceof DeleteRequest) {
+                return this.delete(httpRequest);
+            }
+            if (httpRequest instanceof OptionsRequest) {
+                return this.options(httpRequest);
+            }
             if (httpRequest.url && httpRequest.httpVersion) {
                 let reqModel = modelType || this.config?.proxy?.model;
                 let request = await StashKu.requestFromObject(httpRequest, reqModel);
                 if (request) {
                     switch (request.method) {
-                        case 'get': return await this._handle(request, GetRequest);
-                        case 'post': return await this._handle(request, PostRequest);
-                        case 'put': return await this._handle(request, PutRequest);
-                        case 'patch': return await this._handle(request, PatchRequest);
-                        case 'delete': return await this._handle(request, DeleteRequest);
-                        case 'options': return await this._handle(request, OptionsRequest);
+                        case 'get': return this._handle(request, GetRequest);
+                        case 'post': return this._handle(request, PostRequest);
+                        case 'put': return this._handle(request, PutRequest);
+                        case 'patch': return this._handle(request, PatchRequest);
+                        case 'delete': return this._handle(request, DeleteRequest);
+                        case 'options': return this._handle(request, OptionsRequest);
                     }
                 }
             }
