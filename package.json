@@ -19,7 +19,7 @@
         "stashku": "cli/main.js"
     },
     "author": "Append Media, LLC",
-    "license": "SEE LICENSE IN LICENSE",
+    "license": "MS-PL",
     "type": "module",
     "main": "stashku.js",
     "scripts": {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     
-    <title>@AppKu/StashKu: Modeling</title>
+    <title>@AppKu/StashKu: Tutorial: Requests: Where (Filters)</title>
     
     
       <link type="text/css" rel="stylesheet" href="styles/vendor/prism-tomorrow-night.css">
@@ -48,2020 +48,232 @@
 
 <main class="layout-main ">
   <div class="container">
-    <p class="page-kind">Namespace</p>
-    <h1 class="page-title">Modeling</h1>
-    
-
-
-
-
-<section>
-
-
-<header class="not-class">
-
-
-    
-        
-        <!-- <h2>Modeling</h2> -->
-
-        
-
-        
-
-        
-    
-</header>
+    <p class="page-kind"></p>
+    <h1 class="page-title">Tutorial: Requests: Where (Filters)</h1>
+    <section>
 
 <article>
-    <div class="container-overview">
-
-
-
-    
-        
-
-        
-
-
-<div class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</div>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-     
-
-    
-
-    
-
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Type Definitions</h3>
-
-        
-                
-
-<article class="member">
-    <div class="method-type">
-        
-    </div>
-<h4 class="member-name" id=".AnyModelType">AnyModelType</h4>
-
-
-
-
-
-
-
-
-
-
-    <h4 class="method-heading">Properties</h4>
-    
-
-<ul class="method-params">
-
-
-    <li>
-        
-            <span class="param-name">$stashku</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code><a href="Modeling.html#.Configuration">Modeling.Configuration</a></code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            
-        </div>
-
-    </li>
-    
+    <p>StashKu includes the ability to build complex filters that support logical <code>AND</code> and <code>OR</code> conditions, with a variety
+of comparative operators. Filters can be created using chained <code>and</code>/<code>or</code> function calls, or parsed from a string
+expression, making it easy to write filters for use in request <code>where</code> functions quick and painless.</p>
+<p>The <code>Filter</code> also can operate on a spread array of objects using the <code>test</code> function, which will return only objects
+matching the criteria.</p>
+<h2>Getting Started</h2>
+<p>You can create a new Filter from a string expression:</p>
+<pre class="prettyprint source lang-js"><code>Filter.parse('{Name} ~~ &quot;Doe&quot; AND Age > 18');
+</code></pre>
+<p>...you can even using logical chain functions together into logical groups:</p>
+<pre class="prettyprint source lang-js"><code>Filter
+    .and('{Name} ~~ &quot;Doe&quot; OR {Name} !~~ &quot;Doey&quot;')
+    .and('Age > 18');
+</code></pre>
+<p>...or just group in your string:</p>
+<pre class="prettyprint source lang-js"><code>Filter.parse('({Name} ~~ &quot;Doe&quot; OR {Name} !~~ &quot;Doey&quot;) AND Age > 18')
+</code></pre>
+<blockquote>
+<p><em>Yes!</em> Nested parenthesis are 100% supported to any depth. ~(˘▾˘~)</p>
+</blockquote>
+<p>If you're feeling traditional, you can build filters in the traditional parameterized approach:</p>
+<pre class="prettyprint source lang-js"><code>Filter
+    .and(Filter
+        .or('Name', Filter.OP.CONTAINS, 'Doe')
+        .or('Name', Filter.OP.NOTCONTAINS, 'Doey')
+    )
+    .and('Age', Filter.OP.GREATERTHAN, 18);
+</code></pre>
+<h3>Peeking at The Filter</h3>
+<p>Viewing the filter's expression tree is sometimes tiresome for troubleshooting, that's why the <code>Filter</code> instance
+fully supports a <code>toString()</code> override that outputs the string expression equivalent of the tree.</p>
+<p>This makes looking at a filter defined like this:</p>
+<pre class="prettyprint source lang-js"><code>let f = Filter
+    .or('ID', Filter.OP.EQUALS, 1)
+    .or('ID', Filter.OP.EQUALS, 2)
+    .or(Filter
+        .and('Name', Filter.OP.ISNULL)
+        .and('Age', Filter.OP.GREATERTHAN, 24)
+        .or('Products', Filter.OP.IN, [1, 2, 3])
+    );
+</code></pre>
+<p>... into a string like this:</p>
+<pre class="prettyprint source"><code>{ID} EQ 1 OR {ID} EQ 2 OR (({Name} ISNULL AND {test4} GREATERTHAN 24) OR {Products} IN [1, 2, 3])
+</code></pre>
+<p>Best of all, you can <code>Filter.parse</code> the <code>toString</code>'d value back into a new <code>Filter</code> instance.</p>
+<h3>Filtering Object Arrays</h3>
+<p>In this example where we're going to filter an array of simple objects using the <code>test()</code> function, searching for
+records with the <code>Name</code> property containing the value <code>&quot;Doe&quot;</code>:</p>
+<pre class="prettyprint source lang-js"><code>let contacts = [
+    { Name: 'John Doe', Age: 22},
+    { Name: 'Marcus Inger', Age: 45},
+    { Name: 'Gilli Mokes', Age: 18},
+    { Name: 'Susan Doe', Age: 21},
+    { Name: 'Sally Sue', Age: 55}
+];
+let results = Filter
+    .and('Name', Filter.OP.CONTAINS, 'Doe')
+    .test(...contacts);
+console.log(results);
+// [ { Name: 'John Doe', Age: 22}, { Name: 'Susan Doe', Age: 21} ]
+</code></pre>
+<p>This is similar to using a JavaScript array's built-in <code>filter</code> method, but in this case we are using a portable and
+cross-domain filter that is standardized.</p>
+<h3>Usage on a StashKu Request</h3>
+<p>Filters power StashKu requests, and are used by engines to translation conditional expressions into their resource
+interface. Requests accept filters in their <code>where</code> function, which is only on <code>GetRequest</code>, <code>DeleteRequest</code> and
+<code>PatchRequest</code> instances.</p>
+<p>The <code>where</code> functions accept a <code>Filter</code> string expression:</p>
+<pre class="prettyprint source lang-js"><code>await myStash.get(r => r
+    .where('{Name} ~~ &quot;Doe&quot; OR {Name} !~~ &quot;Doey&quot;')
+);
+</code></pre>
+<p>... or a <code>Filter</code> instance:</p>
+<pre class="prettyprint source lang-js"><code>let myConditions = Filter.and('Name', Filter.OP.CONTAINS, 'Doe');
+await myStash.delete(r => r
+    .where(myConditions)
+);
+</code></pre>
+<p>... or a callback that lets you build on a filter already set on the request. This can be useful for cross-domain
+StashKu requests.</p>
+<pre class="prettyprint source lang-js"><code>let myConditions = Filter.and('Name', Filter.OP.CONTAINS, 'Doe');
+await myStash.patch(r => r
+    .where(myConditions)
+    .where((f, orig) => orig.or('{Name} ~~~ &quot;Doey&quot;'))
+);
+</code></pre>
+<p>A cross-domain StashKu request, for example, could be a request passed from the <code>fetch</code> engine to a StashKu instance on
+the server being served up on <code>express</code>- where you want the server wants constrain the results (let's say... only where
+the <code>DateDeleted</code> property is <code>null</code>) could look like this:</p>
+<pre class="prettyprint source lang-js"><code>let inReq = StashKu.fromObject(httpReq);
+await myStash.patch(inReq
+    .where((f, orig) => Filter.and(orig).and('{DateDelete} ISNULL'))
+);
+</code></pre>
+<blockquote>
+<p>Want to see this in action? Check out the <a href="https://github.com/appku/stashku/tree/master/demo">node+browser demo</a>.</p>
+</blockquote>
+<h2>Logic</h2>
+<p>The following logical conditions are available on <code>Filter</code> objects:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+<th>Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Filter.LOGIC.AND</code></td>
+<td><code>&quot;and&quot;</code></td>
+<td><code>Filter.and(...)</code></td>
+</tr>
+<tr>
+<td><code>Filter.LOGIC.OR</code></td>
+<td><code>&quot;or&quot;</code></td>
+<td><code>Filter.or(...)</code></td>
+</tr>
+</tbody>
+</table>
+<h2>Operators</h2>
+<p>The following operators are available for use in an expression. All engines built-into StashKu support these operations. In string expressions, you should use the <strong>uppercase</strong> <em>value</em> or <em>alias</em>, though the property name will work as well.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+<th>Aliases (String Expressions)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Filter.OP.EQUALS</code></td>
+<td><code>&quot;eq&quot;</code></td>
+<td><code>&quot;==&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.NOTEQUALS</code></td>
+<td><code>&quot;neq&quot;</code></td>
+<td><code>&quot;!=&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.ISNULL</code></td>
+<td><code>&quot;isnull&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.ISNOTNULL</code></td>
+<td><code>&quot;isnotnull&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.LESSTHAN</code></td>
+<td><code>&quot;lt&quot;</code></td>
+<td><code>&quot;&lt;&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.LESSTHANOREQUAL</code></td>
+<td><code>&quot;lte&quot;</code></td>
+<td><code>&quot;&lt;=&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.GREATERTHAN</code></td>
+<td><code>&quot;gt&quot;</code></td>
+<td><code>&quot;&gt;&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.GREATERTHANOREQUAL</code></td>
+<td><code>&quot;gte&quot;</code></td>
+<td><code>&quot;&gt;=&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.STARTSWITH</code></td>
+<td><code>&quot;startswith&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.ENDSWITH</code></td>
+<td><code>&quot;endswith&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.CONTAINS</code></td>
+<td><code>&quot;contains&quot;</code></td>
+<td><code>&quot;~~&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.DOESNOTCONTAIN</code></td>
+<td><code>&quot;doesnotcontain&quot;</code></td>
+<td><code>&quot;!~~&quot;</code></td>
+</tr>
+<tr>
+<td><code>Filter.OP.ISEMPTY</code></td>
+<td><code>&quot;isempty&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.ISNOTEMPTY</code></td>
+<td><code>&quot;isnotempty&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.IN</code></td>
+<td><code>&quot;in&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Filter.OP.NOTIN</code></td>
+<td><code>&quot;nin&quot;</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>Looking for More?</h2>
+<ul>
+<li>Read more about <code>Filter</code> in the <a href="https://appku.github.io/stashku/Filter.html">API documentation here</a>.</li>
+<li>Ask a question or say hello on the <a href="https://github.com/orgs/appku/discussions">AppKu discussion board</a>.</li>
 </ul>
-
-
-
-
-<div class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</div>
-
-
-
-
-
-
-
-    <h4>Source</h4>
-    <ul>
-        <li class="method-source">
-            <a href="modeling_modeling.d.js.html">modeling/modeling.d.js</a><a href="modeling_modeling.d.js.html#source.6">, line 6</a>
-        </li>
-    </ul>
-
-
-</article>
-            
-                
-
-<article class="member">
-    <div class="method-type">
-        
-    </div>
-<h4 class="member-name" id=".BooleanByRequestMethod">BooleanByRequestMethod</h4>
-
-
-
-
-<div class="description">
-    <p>Defines the boolean value used for a specific request method. If a specific method is <code>undefined</code> the
-<code>all</code> property value will be used as a fallback.</p>
-</div>
-
-
-
-
-
-
-
-    <h4 class="method-heading">Properties</h4>
-    
-
-<ul class="method-params">
-
-
-    <li>
-        
-            <span class="param-name">all</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Boolean</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The default value to use if an explicit request method is not specified on this object.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">get</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Boolean</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The value to use explicitly for GET requests.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">post</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Boolean</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The value to use explicitly for POST requests.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">put</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Boolean</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The value to use explicitly for PUT requests.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">patch</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Boolean</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The value to use explicitly for PATCH requests.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">delete</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Boolean</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The value to use explicitly for DELETE requests.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">options</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Boolean</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The value to use explicitly for OPTIONS requests.</p>
-        </div>
-
-    </li>
-    
-</ul>
-
-
-
-
-<div class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</div>
-
-
-
-
-
-
-
-    <h4>Source</h4>
-    <ul>
-        <li class="method-source">
-            <a href="modeling_modeling.d.js.html">modeling/modeling.d.js</a><a href="modeling_modeling.d.js.html#source.24">, line 24</a>
-        </li>
-    </ul>
-
-
-</article>
-            
-                
-
-<article class="member">
-    <div class="method-type">
-        
-    </div>
-<h4 class="member-name" id=".Configuration">Configuration</h4>
-
-
-
-
-<div class="description">
-    <p>The StashKu resource (name) that contains objects like this model.</p>
-<p>Defines the resource name used for a model on specific request actions. If a specific action is <code>undefined</code> the
-<code>all</code> property value will be used, otherwise the target resource will not be set automatically for the model under
-a request of the <code>undefined</code> action.</p>
-</div>
-
-
-
-
-
-
-
-    <h4 class="method-heading">Properties</h4>
-    
-
-<ul class="method-params">
-
-
-    <li>
-        
-            <span class="param-name">resource</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    |
-
-    <span class="param-type">
-        <code><a href="Modeling.html#.StringByRequestMethod">Modeling.StringByRequestMethod</a></code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The resource name of the model.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">slug</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    |
-
-    <span class="param-type">
-        <code><a href="Modeling.html#.StringByRequestMethod">Modeling.StringByRequestMethod</a></code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>An optionally stored, singular, lower-kebab-case slugified representation of this model's name.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">name</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    |
-
-    <span class="param-type">
-        <code><a href="Modeling.html#.StringByRequestMethod">Modeling.StringByRequestMethod</a></code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>An optionally stored, singular, PascalCase version of this model's name.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">plural</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Object</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>An optionally stored, plural form of the model's slug and name.</p>
-        </div>
-
-    </li>
-    
-</ul>
-
-
-
-
-<div class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</div>
-
-
-
-
-
-
-
-    <h4>Source</h4>
-    <ul>
-        <li class="method-source">
-            <a href="modeling_modeling.d.js.html">modeling/modeling.d.js</a><a href="modeling_modeling.d.js.html#source.69">, line 69</a>
-        </li>
-    </ul>
-
-
-</article>
-            
-                
-
-<article class="member">
-    <div class="method-type">
-        
-    </div>
-<h4 class="member-name" id=".PropertyDefinition">PropertyDefinition</h4>
-
-
-
-
-
-
-
-
-
-
-    <h4 class="method-heading">Properties</h4>
-    
-
-<ul class="method-params">
-
-
-    <li>
-        
-            <span class="param-name">target</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-
-            
-            </span>
-        
-
-        
-            <span class="param-default">
-            
-            </span>
-        
-
-        <div class="param-description">
-            <p>The target resource property/column/field for this model's property.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">type</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-            <span class="param-default">
-            
-            </span>
-        
-
-        <div class="param-description">
-            <p>The JavaScript type intended for the property value.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">default</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>*</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-            <span class="param-default">
-            
-            </span>
-        
-
-        <div class="param-description">
-            <p>The default value for this models property. This is used when a model type is generated and set in the model constructor.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">omit</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Boolean</code>
-    </span>
-    |
-
-    <span class="param-type">
-        <code><a href="Modeling.html#.BooleanByRequestMethod">Modeling.BooleanByRequestMethod</a></code>
-    </span>
-    |
-
-    <span class="param-type">
-        <code><a href="Modeling.html#.PropertyOmitCallback">Modeling.PropertyOmitCallback</a></code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-            <span class="param-default">
-            
-                <code>false</code>
-            
-            </span>
-        
-
-        <div class="param-description">
-            <p>If true, the property is ignored (not included) from processing in a request if the model instance value is null or undefined.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">pk</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Boolean</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-            <span class="param-default">
-            
-                <code>false</code>
-            
-            </span>
-        
-
-        <div class="param-description">
-            <p>Indicates the property is a primary-key identifier for the model.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">transform</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code><a href="Modeling.html#.PropertyTransformCallback">Modeling.PropertyTransformCallback</a></code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-            <span class="param-default">
-            
-            </span>
-        
-
-        <div class="param-description">
-            <p>A callback that allows for values to be transformed whenever objects are turned into a model, or the model is &quot;unmodeled&quot; into a regular object.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">precision</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Number</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-            <span class="param-default">
-            
-            </span>
-        
-
-        <div class="param-description">
-            <p>The maximum amount of number places, including decimals that may be used. This property is not used by StashKu directly, but may be leveraged by certain engines.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">radix</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Number</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-            <span class="param-default">
-            
-            </span>
-        
-
-        <div class="param-description">
-            <p>The number of decimal places. This property is not used by StashKu directly, but may be leveraged by certain engines.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">charLength</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>Number</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-            <span class="param-default">
-            
-            </span>
-        
-
-        <div class="param-description">
-            <p>The maximum amount of storable characters. This property is not used by StashKu directly, but may be leveraged by certain engines.</p>
-        </div>
-
-    </li>
-    
-</ul>
-
-
-
-
-<div class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</div>
-
-
-
-
-
-
-
-    <h4>Source</h4>
-    <ul>
-        <li class="method-source">
-            <a href="modeling_modeling.d.js.html">modeling/modeling.d.js</a><a href="modeling_modeling.d.js.html#source.56">, line 56</a>
-        </li>
-    </ul>
-
-
-</article>
-            
-                
-
-
-    <article class="method">
-
-
-
-
-    
-
-
-    
-
-    <div class="method-type">
-    
-    </div>
-
-    <h4 class="method-name" id=".PropertyOmitCallback">PropertyOmitCallback<span class="signature">(property, value, model, method, step)</span><span class="return-type-signature"> &rarr; {Boolean}</span>
-    </h4>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h4 class="method-heading">Parameters</h4>
-    
-
-<ul class="method-params">
-    
-
-        <li>
-            
-                <span class="param-name">property</span>
-            
-
-            
-                
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-            
-
-            
-
-            
-
-            <div class="param-description"><p>The name of the property being ommitted.</p></div>
-            
-        </li>
-
-    
-
-        <li>
-            
-                <span class="param-name">value</span>
-            
-
-            
-                
-
-
-    <span class="param-type">
-        <code>*</code>
-    </span>
-    
-
-            
-
-            
-
-            
-
-            <div class="param-description"><p>The value of the property being ommitted.</p></div>
-            
-        </li>
-
-    
-
-        <li>
-            
-                <span class="param-name">model</span>
-            
-
-            
-                
-
-
-    <span class="param-type">
-        <code>*</code>
-    </span>
-    
-
-            
-
-            
-
-            
-
-            <div class="param-description"><p>The source object being modeled or unmodeled.</p></div>
-            
-        </li>
-
-    
-
-        <li>
-            
-                <span class="param-name">method</span>
-            
-
-            
-                
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-            
-
-            
-
-            
-
-            <div class="param-description"><p>The method of the request being processed, either: &quot;get&quot;, &quot;post&quot;, &quot;put&quot;, &quot;patch&quot;, &quot;delete&quot;, or &quot;options&quot;.</p></div>
-            
-        </li>
-
-    
-
-        <li>
-            
-                <span class="param-name">step</span>
-            
-
-            
-                
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-            
-
-            
-
-            
-
-            <div class="param-description"><p>Either &quot;model&quot; or &quot;unmodel&quot;, depending on whether the transformation is occuring during modelling or unmodelling.</p></div>
-            
-        </li>
-
-    
-</ul>
-
-
-
-
-
-<div class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</div>
-
-
-
-    <h4 class="method-heading">Returns</h4>
-    <ul>
-    
-        <li class="method-returns">
-            
-                <code>Boolean</code>
-            
-            
-        </li>
-    
-    </ul>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h4 class="method-heading">Source</h4>
-    <ul>
-        <li class="method-source">
-            <a href="modeling_modeling.d.js.html">modeling/modeling.d.js</a><a href="modeling_modeling.d.js.html#source.46">, line 46</a>
-        </li>
-    </ul>
-
-
-
-    </article>
-
-            
-                
-
-
-    <article class="method">
-
-
-
-
-    
-
-
-    
-
-    <div class="method-type">
-    
-    </div>
-
-    <h4 class="method-name" id=".PropertyTransformCallback">PropertyTransformCallback<span class="signature">(property, value, model, method, step)</span><span class="return-type-signature"></span>
-    </h4>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h4 class="method-heading">Parameters</h4>
-    
-
-<ul class="method-params">
-    
-
-        <li>
-            
-                <span class="param-name">property</span>
-            
-
-            
-                
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-            
-
-            
-
-            
-
-            <div class="param-description"><p>The name of the property being transformed.</p></div>
-            
-        </li>
-
-    
-
-        <li>
-            
-                <span class="param-name">value</span>
-            
-
-            
-                
-
-
-    <span class="param-type">
-        <code>*</code>
-    </span>
-    
-
-            
-
-            
-
-            
-
-            <div class="param-description"><p>The value of the property being transformed.</p></div>
-            
-        </li>
-
-    
-
-        <li>
-            
-                <span class="param-name">model</span>
-            
-
-            
-                
-
-
-    <span class="param-type">
-        <code>*</code>
-    </span>
-    
-
-            
-
-            
-
-            
-
-            <div class="param-description"><p>The source object being modeled or unmodeled.</p></div>
-            
-        </li>
-
-    
-
-        <li>
-            
-                <span class="param-name">method</span>
-            
-
-            
-                
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-            
-
-            
-
-            
-
-            <div class="param-description"><p>The method of the request being processed, either: &quot;get&quot;, &quot;post&quot;, &quot;put&quot;, &quot;patch&quot;, &quot;delete&quot;, or &quot;options&quot;.</p></div>
-            
-        </li>
-
-    
-
-        <li>
-            
-                <span class="param-name">step</span>
-            
-
-            
-                
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-            
-
-            
-
-            
-
-            <div class="param-description"><p>Either &quot;model&quot; or &quot;unmodel&quot;, depending on whether the transformation is occuring during modelling or unmodelling.</p></div>
-            
-        </li>
-
-    
-</ul>
-
-
-
-
-
-<div class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h4 class="method-heading">Source</h4>
-    <ul>
-        <li class="method-source">
-            <a href="modeling_modeling.d.js.html">modeling/modeling.d.js</a><a href="modeling_modeling.d.js.html#source.37">, line 37</a>
-        </li>
-    </ul>
-
-
-
-    </article>
-
-            
-                
-
-<article class="member">
-    <div class="method-type">
-        
-    </div>
-<h4 class="member-name" id=".StringByRequestMethod">StringByRequestMethod</h4>
-
-
-
-
-<div class="description">
-    <p>Defines the string value used for a specific request method. If a specific method is <code>undefined</code> the
-<code>all</code> property value will be used as a fallback.</p>
-</div>
-
-
-
-
-
-
-
-    <h4 class="method-heading">Properties</h4>
-    
-
-<ul class="method-params">
-
-
-    <li>
-        
-            <span class="param-name">all</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The default value to use if an explicit request method is not specified on this object.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">get</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The value to use explicitly for GET requests.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">post</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The value to use explicitly for POST requests.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">put</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The value to use explicitly for PUT requests.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">patch</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The value to use explicitly for PATCH requests.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">delete</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The value to use explicitly for DELETE requests.</p>
-        </div>
-
-    </li>
-    
-
-    <li>
-        
-            <span class="param-name">options</span>
-        
-
-        
-            
-
-
-    <span class="param-type">
-        <code>String</code>
-    </span>
-    
-
-        
-
-        
-            <span class="param-attributes">
-            
-                &lt;optional&gt;<br>
-            
-
-            
-            </span>
-        
-
-        
-
-        <div class="param-description">
-            <p>The value to use explicitly for OPTIONS requests.</p>
-        </div>
-
-    </li>
-    
-</ul>
-
-
-
-
-<div class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</div>
-
-
-
-
-
-
-
-    <h4>Source</h4>
-    <ul>
-        <li class="method-source">
-            <a href="modeling_modeling.d.js.html">modeling/modeling.d.js</a><a href="modeling_modeling.d.js.html#source.11">, line 11</a>
-        </li>
-    </ul>
-
-
-</article>
-            
-    
-
-    
 </article>
 
 </section>
-
-
-
 
   </div>
 </main>

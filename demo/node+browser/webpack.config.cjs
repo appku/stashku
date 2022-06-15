@@ -38,6 +38,7 @@ module.exports = {
         })
     ],
     devServer: {
+        allowedHosts: 'all', 
         watchFiles: ['./*'],
         onListening: async (devServer) => {
             if (devServer) {
