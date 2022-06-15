@@ -273,41 +273,37 @@ class ModelUtility {
         let mapping = ModelUtility.map(modelType);
         for (let model of models) {
             if (model) {
-                if (model instanceof modelType) {
-                    let record = {};
-                    for (let [k, v] of mapping) {
-                        if (typeof model[k] !== 'undefined') { //only set a value if the property value is defined.
-                            record[v.target] = model[k];
-                        }
-                        if (v && v.transform) { //run a transform if present.
-                            record[v.target] = v.transform.call(modelType, v.target, record[v.target], model, method, 'unmodel');
-                        }
-                        if (v && v.omit) { //omit the property if warranted
-                            let omitted = (v.omit === true);
-                            if (typeof v.omit === 'function') {
-                                omitted = v.omit.call(modelType, k, model[k], model, method, 'model');
-                            } else if (v.omit === null && model[k] === null) {
+                let record = {};
+                for (let [k, v] of mapping) {
+                    if (typeof model[k] !== 'undefined') { //only set a value if the property value is defined.
+                        record[v.target] = model[k];
+                    }
+                    if (v && v.transform) { //run a transform if present.
+                        record[v.target] = v.transform.call(modelType, v.target, record[v.target], model, method, 'unmodel');
+                    }
+                    if (v && v.omit) { //omit the property if warranted
+                        let omitted = (v.omit === true);
+                        if (typeof v.omit === 'function') {
+                            omitted = v.omit.call(modelType, k, model[k], model, method, 'model');
+                        } else if (v.omit === null && model[k] === null) {
+                            omitted = true;
+                        } else if (typeof v.omit === 'object') {
+                            if (v.omit[method] === true) {
                                 omitted = true;
-                            } else if (typeof v.omit === 'object') {
-                                if (v.omit[method] === true) {
-                                    omitted = true;
-                                } else if (typeof v.omit[method] === 'function') {
-                                    omitted = v.omit[method].call(modelType, k, model[k], model, method, 'model');
-                                } else if (v.omit[method] === null && model[k] === null) {
-                                    omitted = true;
-                                } else if (v.omit.all === true && v.omit[method] !== false) {
-                                    omitted = true;
-                                }
+                            } else if (typeof v.omit[method] === 'function') {
+                                omitted = v.omit[method].call(modelType, k, model[k], model, method, 'model');
+                            } else if (v.omit[method] === null && model[k] === null) {
+                                omitted = true;
+                            } else if (v.omit.all === true && v.omit[method] !== false) {
+                                omitted = true;
                             }
-                            if (omitted === true) {
-                                delete record[v.target];
-                            }
+                        }
+                        if (omitted === true) {
+                            delete record[v.target];
                         }
                     }
-                    yield record;
-                } else {
-                    yield model; //nothing to do, already not a modelType.
                 }
+                yield record;
             } else {
                 yield null;
             }

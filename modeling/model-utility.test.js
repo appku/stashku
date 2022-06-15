@@ -448,20 +448,21 @@ describe('.unmodel', () => {
         expect(iterator.next().value).toEqual({ First_Name: null, Last_Name: 'default' });
         expect(iterator.next().value).toEqual({ First_Name: 'abc', Last_Name: 123 });
     });
-    it('skips constructing objects over models that are not instances of the model type', () => {
+    it('unmodels object literals.', () => {
         class TestModel {
             constructor() {
                 this.A = null;
             }
-            static get A() { return 'AAA'; }
+            static get A() { return 'zoopy'; }
         }
-        let m = new TestModel();
-        m.A = 'yoyo';
-        m.B = 'b';
+        let m = {
+            A: 'yoyo',
+            B: 'b'
+        };
         let iterator = ModelUtility.unmodel(TestModel, 'get', { AAA: null }, m, { AAA: 'abc', bogus: 123 });
-        expect(iterator.next().value).toEqual({ AAA: null });
-        expect(iterator.next().value).toEqual({ AAA: 'yoyo' });
-        expect(iterator.next().value).toEqual({ AAA: 'abc', bogus: 123 });
+        expect(iterator.next().value).toEqual({});
+        expect(iterator.next().value).toEqual({ zoopy: 'yoyo' });
+        expect(iterator.next().value).toEqual({});
     });
     it('correctly omits properties that are marked so.', () => {
         class TestModel {
