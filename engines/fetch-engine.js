@@ -33,7 +33,7 @@ const lazyLoadGlobalFetch = async () => {
 };
 
 /**
- * @typedef FetchEngineModelConfiguration
+ * @typedef FetchEngine.ModelConfiguration
  * @property {String} [pathProperty="resource"] - Instructs StashKu which property from the `$stashku` object on
  * a model type to populate the resource (`to` or `from`) on a request. Can be `"name"`, `"slug"`, `"plural.name"`, 
  * `"plural.slug"`, or `"resource"` (default).
@@ -43,7 +43,7 @@ const lazyLoadGlobalFetch = async () => {
  */
 
 /**
- * @typedef FetchEngineConfiguration
+ * @typedef FetchEngine.Configuration
  * @property {String} [root] - The root URI of each fetch request. If specified, will be prefixed to each resource.
  * @property {String} [path="/api"] - The path to the URI endpoint. This is prefixed before each resource, but after 
  * the `root` (if specified).
@@ -51,7 +51,7 @@ const lazyLoadGlobalFetch = async () => {
  * @property {Boolean} [omitResource=false] - Omits `to` and `from` properties and values from the request payload
  * sent over fetch. This may help force endpoints to ensure the resource is determined on their end instead of by
  * the requestor.
- * @property {FetchEngineModelConfiguration} [model]
+ * @property {FetchEngine.ModelConfiguration} [model]
  * @property {RequestInit} [fetch] - Optional fetch defaults to apply before request-specific configuration is set.
  */
 
@@ -61,7 +61,7 @@ const lazyLoadGlobalFetch = async () => {
  */
 class FetchEngine extends BaseEngine {
     /**
-     * Creates a new `MemoryStorageEngine` instance.
+     * Creates a new `FetchEngine` instance.
      */
     constructor() {
         super('fetch');
@@ -72,7 +72,7 @@ class FetchEngine extends BaseEngine {
         this.data = new Map();
 
         /**
-         * @type {FetchEngineConfiguration}
+         * @type {FetchEngine.Configuration}
          */
         this.config = {
             root: null,
@@ -84,7 +84,7 @@ class FetchEngine extends BaseEngine {
 
     /**
      * @inheritdoc
-     * @param {FetchEngineConfiguration} config - The configuration object for the storage engine.
+     * @param {FetchEngine.Configuration} config - The configuration object for the storage engine.
      */
     configure(config) {
         super.configure(config);
