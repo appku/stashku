@@ -26,7 +26,7 @@
   
   <h1><a href="./index.html">@AppKu/StashKu</a></h1>
   
-  <h2>v1.0.21</h2>
+  <h2>v1.0.22</h2>
   
   
   <ul class="meta-links">
@@ -55,17 +55,22 @@
 <article>
     <p>StashKu includes the ability to build complex filters that support logical <code>AND</code> and <code>OR</code> conditions, with a variety
 of comparative operators. Filters can be created using chained <code>and</code>/<code>or</code> function calls, or parsed from a string
-expression, making it easy to write filters for use in request <code>where</code> functions quick and painless.</p>
-<p>The <code>Filter</code> also can operate on a spread array of objects using the <code>test</code> function, which will return only objects
+expression, making it easy to write filters for use in StashKu requests that have <code>where</code> functions.</p>
+<p>The <code>Filter</code> object can operate on an array of objects using the <code>test</code> function, which will return only objects
 matching the criteria.</p>
-<h2>Getting Started</h2>
-<p>You can create a new Filter from a string expression:</p>
+<h2 id="getting-started">Getting Started</h2>
+<p><code>Filter</code> is the class used within all StashKu GET, PATCH, and DELETE request's <code>.where</code> methods. The <code>.where</code> method
+will build the request's internal <code>Filter</code> that engines subsequently use to apply conditions to their resources
+for the purpose of the request.</p>
+<p>Take a look at the section <a href="#usage-on-a-stashku-request">Usage on a StashKu Request</a> below to see how you can leverage
+the <code>.where</code> method.</p>
+<p>You can create a new <code>Filter</code> from a string expression:</p>
 <pre class="prettyprint source lang-js"><code>Filter.parse('{Name} ~~ &quot;Doe&quot; AND Age > 18');
 </code></pre>
 <p>...you can even using logical chain functions together into logical groups:</p>
 <pre class="prettyprint source lang-js"><code>Filter
     .and('{Name} ~~ &quot;Doe&quot; OR {Name} !~~ &quot;Doey&quot;')
-    .and('Age > 18');
+    .and('{Age} > 18');
 </code></pre>
 <p>...or just group in your string:</p>
 <pre class="prettyprint source lang-js"><code>Filter.parse('({Name} ~~ &quot;Doe&quot; OR {Name} !~~ &quot;Doey&quot;) AND Age > 18')
@@ -81,7 +86,7 @@ matching the criteria.</p>
     )
     .and('Age', Filter.OP.GREATERTHAN, 18);
 </code></pre>
-<h3>Peeking at The Filter</h3>
+<h3 id="peeking-at-the-filter">Peeking at The Filter</h3>
 <p>Viewing the filter's expression tree is sometimes tiresome for troubleshooting, that's why the <code>Filter</code> instance
 fully supports a <code>toString()</code> override that outputs the string expression equivalent of the tree.</p>
 <p>This makes looking at a filter defined like this:</p>
@@ -98,7 +103,7 @@ fully supports a <code>toString()</code> override that outputs the string expres
 <pre class="prettyprint source"><code>{ID} EQ 1 OR {ID} EQ 2 OR (({Name} ISNULL AND {test4} GREATERTHAN 24) OR {Products} IN [1, 2, 3])
 </code></pre>
 <p>Best of all, you can <code>Filter.parse</code> the <code>toString</code>'d value back into a new <code>Filter</code> instance.</p>
-<h3>Filtering Object Arrays</h3>
+<h3 id="filtering-object-arrays">Filtering Object Arrays</h3>
 <p>In this example where we're going to filter an array of simple objects using the <code>test()</code> function, searching for
 records with the <code>Name</code> property containing the value <code>&quot;Doe&quot;</code>:</p>
 <pre class="prettyprint source lang-js"><code>let contacts = [
@@ -116,7 +121,7 @@ console.log(results);
 </code></pre>
 <p>This is similar to using a JavaScript array's built-in <code>filter</code> method, but in this case we are using a portable and
 cross-domain filter that is standardized.</p>
-<h3>Usage on a StashKu Request</h3>
+<h3 id="usage-on-a-stashku-request">Usage on a StashKu Request</h3>
 <p>Filters power StashKu requests, and are used by engines to translation conditional expressions into their resource
 interface. Requests accept filters in their <code>where</code> function, which is only on <code>GetRequest</code>, <code>DeleteRequest</code> and
 <code>PatchRequest</code> instances.</p>
@@ -150,7 +155,7 @@ await myStash.patch(inReq
 <blockquote>
 <p>Want to see this in action? Check out the <a href="https://github.com/appku/stashku/tree/master/demo">node+browser demo</a>.</p>
 </blockquote>
-<h2>Logic</h2>
+<h2 id="logic">Logic</h2>
 <p>The following logical conditions are available on <code>Filter</code> objects:</p>
 <table>
 <thead>
@@ -173,7 +178,7 @@ await myStash.patch(inReq
 </tr>
 </tbody>
 </table>
-<h2>Operators</h2>
+<h2 id="operators">Operators</h2>
 <p>The following operators are available for use in an expression. All engines built-into StashKu support these operations. In string expressions, you should use the <strong>uppercase</strong> <em>value</em> or <em>alias</em>, though the property name will work as well.</p>
 <table>
 <thead>
@@ -266,7 +271,7 @@ await myStash.patch(inReq
 </tr>
 </tbody>
 </table>
-<h2>Looking for More?</h2>
+<h2 id="looking-for-more%3F">Looking for More?</h2>
 <ul>
 <li>Read more about <code>Filter</code> in the <a href="https://appku.github.io/stashku/Filter.html">API documentation here</a>.</li>
 <li>Ask a question or say hello on the <a href="https://github.com/orgs/appku/discussions">AppKu discussion board</a>.</li>
@@ -280,7 +285,7 @@ await myStash.patch(inReq
 
 <footer class="layout-footer">
   <div class="container">
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Tue Jun 14 2022 18:43:04 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Thu Jun 23 2022 15:04:50 GMT-0700 (Pacific Daylight Time)
   </div>
 </footer>
 

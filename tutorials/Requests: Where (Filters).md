@@ -1,12 +1,19 @@
 StashKu includes the ability to build complex filters that support logical `AND` and `OR` conditions, with a variety
 of comparative operators. Filters can be created using chained `and`/`or` function calls, or parsed from a string 
-expression, making it easy to write filters for use in request `where` functions quick and painless.
+expression, making it easy to write filters for use in StashKu requests that have `where` functions.
 
-The `Filter` also can operate on a spread array of objects using the `test` function, which will return only objects
+The `Filter` object can operate on an array of objects using the `test` function, which will return only objects
 matching the criteria.
 
 ## Getting Started
-You can create a new Filter from a string expression:
+`Filter` is the class used within all StashKu GET, PATCH, and DELETE request's `.where` methods. The `.where` method
+will build the request's internal `Filter` that engines subsequently use to apply conditions to their resources
+for the purpose of the request. 
+
+Take a look at the section [Usage on a StashKu Request](#usage-on-a-stashku-request) below to see how you can leverage
+the `.where` method.
+
+You can create a new `Filter` from a string expression:
 ```js
 Filter.parse('{Name} ~~ "Doe" AND Age > 18');
 ```
@@ -15,7 +22,7 @@ Filter.parse('{Name} ~~ "Doe" AND Age > 18');
 ```js
 Filter
     .and('{Name} ~~ "Doe" OR {Name} !~~ "Doey"')
-    .and('Age > 18');
+    .and('{Age} > 18');
 ```
 ...or just group in your string:
 ```js

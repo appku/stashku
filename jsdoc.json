@@ -6,6 +6,9 @@
         "jsdoc-plugin-typescript",
         "jsdoc-plugin-typescript-new"
     ],
+    "markdown": {
+        "idInHeadings": true
+    },
     "source": {
         "include": [
             "./", 

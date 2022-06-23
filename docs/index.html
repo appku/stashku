@@ -26,7 +26,7 @@
   
   <h1><a href="./index.html">@AppKu/StashKu</a></h1>
   
-  <h2>v1.0.21</h2>
+  <h2>v1.0.22</h2>
   
   
   <ul class="meta-links">
@@ -69,7 +69,7 @@
         <article><p><a href="https://npmjs.org/package/@appku/stashku"><img src="https://img.shields.io/npm/v/@appku/stashku" alt="NPM"></a>
 <a href="https://npmjs.org/package/@appku/stashku"><img src="https://img.shields.io/npm/l/@appku/stashku" alt="License"></a>
 <a href="https://npmjs.org/package/@appku/stashku"><img src="https://img.shields.io/npm/dt/@appku/stashku" alt="Downloads"></a></p>
-<h1>StashKu</h1>
+<h1 id="stashku">StashKu</h1>
 <p>StashKu is a data agnostic, flat-data framework that provides a full-stack API for RESTful operations against common data storage and communication mediums served up from built-in and pluggable custom engines. The framework provides the tools needed to begin leveraging and extending it out of the box.</p>
 <p>Engines act as the translator and handlers of StashKu RESTful requests - whether they are relaying data from a hard disk, a hardware sensor, a database, or even an API. They are responsible for crafting standardized responses which StashKu hands back off to the requestor. As long as it can be interacted with through RESTful requests such as GET, POST, PUT, PATCH, DELETE, and OPTIONS, StashKu could <em>potentially</em> have an engine for it. If you'd like to create your own engine, check out the tutorials on our formal <a href="https://appku.github.io/stashku">documentation site</a>.</p>
 <blockquote>
@@ -98,11 +98,11 @@
 <li><a href="https://github.com/appku/stashku-sql">stashku-sql</a>: A library for interacting with Microsoft SQL Server and Postgres databases through StashKu.</li>
 <li><a href="https://github.com/appku/stashku-log">stashku-log</a>: A logging library that taps into the logging interface of StashKu and provides reusable log handling and output options for applications.</li>
 </ul>
-<h2>Getting Started</h2>
+<h2 id="getting-started">Getting Started</h2>
 <pre class="prettyprint source lang-sh"><code>npm i --save @appku/stashku
 </code></pre>
 <p>Once installed, you can begin using the StashKu package in your code and the <code>stashku</code> CLI.</p>
-<h3>Code Quick-Start</h3>
+<h3 id="code-quick-start">Code Quick-Start</h3>
 <p>Using StashKu is meant to be painless - easy to learn but advanced when needed.</p>
 <p>To use StashKu from the browser, you can bring in StashKu from a CDN, or copy the latest bundle from the
 <code>web/stashku-*.js</code> repository path, or use the <code>npm</code> installed package in your bundling project (React, Vue, etc.).</p>
@@ -119,7 +119,7 @@ let myEngine = new WhateverEngine();
 await myEngine.configure({ /* custom engine settings */ }, stash.log);
 let stash = new StashKu({ engine: myEngine });
 </code></pre>
-<h4>Making RESTful Requests</h4>
+<h4 id="making-restful-requests">Making RESTful Requests</h4>
 <p>The beauty of StashKu is it's alignment with REST. Out-of-the-box, StashKu provides six (6) request methods:</p>
 <ul>
 <li>GET: For retrieving resource data.</li>
@@ -139,7 +139,7 @@ StashKu would be handed to the engine and translated into a <code>SELECT</code> 
 table or view (&quot;resources&quot;) data. The engine grabs the database query results and translates them into a standardized
 StashKu <code>Response</code> and hands them back to the requestor.</p>
 </blockquote>
-<h5>GET</h5>
+<h5 id="get">GET</h5>
 <pre class="prettyprint source lang-js"><code>let stash = new StashKu();
 let response = await stash.get(r => r
     .from('Contacts')
@@ -151,7 +151,7 @@ let response = await stash.get(r => r
 );
 //Response { data: [...], total, returned, affected }
 </code></pre>
-<h5>POST</h5>
+<h5 id="post">POST</h5>
 <pre class="prettyprint source lang-js"><code>let stash = new StashKu();
 let response = await stash.post(r => r
     .to('Contacts')
@@ -163,7 +163,7 @@ let response = await stash.post(r => r
 );
 //Response { data: [...], total, returned, affected }
 </code></pre>
-<h5>PUT</h5>
+<h5 id="put">PUT</h5>
 <pre class="prettyprint source lang-js"><code>let stash = new StashKu();
 let response = await stash.put(r => r
     .to('Contacts')
@@ -172,7 +172,7 @@ let response = await stash.put(r => r
 );
 //Response { data: [...], total, returned, affected }
 </code></pre>
-<h5>PATCH</h5>
+<h5 id="patch">PATCH</h5>
 <pre class="prettyprint source lang-js"><code>let stash = new StashKu();
 let response = await stash.patch(r => r
     .to('Contacts')
@@ -186,7 +186,7 @@ let response = await stash.patch(r => r
 );
 //Response { data: [...], total, returned, affected }
 </code></pre>
-<h5>DELETE</h5>
+<h5 id="delete">DELETE</h5>
 <pre class="prettyprint source lang-js"><code>let stash = new StashKu();
 let response = await stash.delete(r => r
     .from('Contacts')
@@ -197,12 +197,12 @@ let response = await stash.delete(r => r
 );
 //Response { data: [...], total, returned, affected }
 </code></pre>
-<h5>OPTIONS</h5>
+<h5 id="options">OPTIONS</h5>
 <pre class="prettyprint source lang-js"><code>let stash = new StashKu();
 let response = await stash.options(r => r.from('Contacts'));
 //Response { data: [...], total, returned, affected }
 </code></pre>
-<h4>Responses That Make Life Easy</h4>
+<h4 id="responses-that-make-life-easy">Responses That Make Life Easy</h4>
 <p>The great thing about StashKu, is that no matter what engine you use, the request <strong>&amp;</strong> response is standard. The response from a request always has the following properties:</p>
 <ul>
 <li><code>data</code> - <code>Array.&lt;*&gt;</code>: An array of the objects or values resulting from the request to the engine.</li>
@@ -211,7 +211,7 @@ let response = await stash.options(r => r.from('Contacts'));
 <li><code>returned</code> - <code>Number</code>: The number of objects or values to be returned from the engine as a result of the request.</li>
 </ul>
 <p>Every <code>Response</code> also includes a single helper function: <code>one()</code> which will return the first value of the data, if it is present, otherwise it returns <code>null</code>.</p>
-<h3>CLI Quick-Start</h3>
+<h3 id="cli-quick-start">CLI Quick-Start</h3>
 <p>Stashku provides a CLI that is available via the <code>stashku</code> command. This can be used when installed locally with the
 <code>npx</code> command. Optionally you can <code>npm i @appku/stashku -g</code>, and with the <code>-g</code> flag the command is available anywhere
 on your system.</p>
@@ -242,7 +242,7 @@ JSdoc tags.</p>
 <blockquote>
 <p><strong>Curious about models?</strong> Find the <a href="https://github.com/appku/stashku/tutorial-Going%20Next-Level%20with%20Models.html">model tutorial here</a>.</p>
 </blockquote>
-<h2>Configuration</h2>
+<h2 id="configuration">Configuration</h2>
 <p>StashKu can be configured using the following variables.</p>
 <ul>
 <li>
@@ -296,19 +296,19 @@ Instructs StashKu to add a header <code>model</code> with the value of the <code
 <li>Memory: <a href="https://appku.github.io/stashku/tutorial-Using%20the%20Memory%20Engine.html">Tutorial</a> or <a href="https://appku.github.io/stashku/MemoryEngine.html">API</a></li>
 <li>Fetch: <a href="https://appku.github.io/stashku/tutorial-Using%20the%20Fetch%20Engine.html">Tutorial</a> or <a href="https://appku.github.io/stashku/FetchEngine.html">API</a></li>
 </ul>
-<h2>Development</h2>
+<h2 id="development">Development</h2>
 <p>StashKu is developed under the <a href="https://www.appku.com">AppKu</a> umbrella, sponsored and backed by <a href="https://append.media">Append</a>. It is built using JavaScript in module format.</p>
-<h3>Generating Documentation</h3>
+<h3 id="generating-documentation">Generating Documentation</h3>
 <p>You can generate a static JSDoc site under the <code>docs/</code> path using the command <code>npm run docs</code>. Once generated, you can run <code>npm run serve-docs</code> to run a local web server that shows the generated documentation.</p>
-<h3>Generating a Web Bundle</h3>
+<h3 id="generating-a-web-bundle">Generating a Web Bundle</h3>
 <p>To generate a new web bundle, run <code>npm run build</code>. This will compile StashKu into a single <code>.js</code> file under the <code>web/</code> directory with the local version number.</p>
-<h2>Testing</h2>
+<h2 id="testing">Testing</h2>
 <p>This project uses <code>jest</code> to perform unit tests.</p>
-<h3>Running Tests</h3>
+<h3 id="running-tests">Running Tests</h3>
 <p>Run <code>npm test</code> to run jest unit tests.</p>
 <p>Run <code>npm run lint</code> to run ESLint, optionally install the Visual Studio Code ESLint extension to have linting issues show in your &quot;Problems&quot; tab and be highlighted.</p>
 <p>If you are writing unit tests, you may need to <code>npm install @types/jest</code> to get intellisense in Visual Studio Code if for some reason it did not get installed.</p>
-<h2>Publishing</h2>
+<h2 id="publishing">Publishing</h2>
 <p>Only maintainers with proper access can publish this package to npm. To do so as maintainers, you can publish by running the following command:</p>
 <pre class="prettyprint source lang-sh"><code>npm publish --registry=https://registry.npmjs.org --access=public
 </code></pre></article>
@@ -324,7 +324,7 @@ Instructs StashKu to add a header <code>model</code> with the value of the <code
 
 <footer class="layout-footer">
   <div class="container">
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Tue Jun 14 2022 18:43:03 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Thu Jun 23 2022 15:04:50 GMT-0700 (Pacific Daylight Time)
   </div>
 </footer>
 
