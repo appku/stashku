@@ -42,11 +42,11 @@ class RequestProcessor extends BaseProcessor {
      */
     async start() {
         if (this.options.cli.test || this.options.cli.samples) {
-            this.stash = new StashKu({ engine: 'memory' });
+            this.stash = new StashKu({ engine: this.options.cli.engine || 'memory' });
             this.stash.engine.data.set('products', (await fairu.with(path.join(__dirname, '../templates/samples/data-products.json')).format(fairu.Format.json).read())[0].data);
             this.stash.engine.data.set('themes', (await fairu.with(path.join(__dirname, '../templates/samples/data-themes.json')).format(fairu.Format.json).read())[0].data);
         } else {
-            this.stash = new StashKu();
+            this.stash = new StashKu({ engine: this.options.cli.engine });
         }
         let reqFile = null;
         if (this.options.resource != '*') {
@@ -73,15 +73,16 @@ class RequestProcessor extends BaseProcessor {
             } else {
                 throw new Error(`No supported method specified for processing ("${this.options.method}" is invalid or unsupported).`);
             }
-            console.log(req);
+            console.info(`Running StashKu ${req.method.toUpperCase()} request:`, JSON.stringify(req, null, 4));
+            await this.stash.engine;
             //save query to file (do this early to help facilitate troubleshooting).
             if (this.options.save) {
                 await fairu.with(this.options.save).stringify(fairu.Format.json).write(req);
             }
             //run the request
             if (!this.options.cli.quiet && this.options.cli.verbose) {
-                console.debug(`Running GET request on "${this.stash.engine.name}" engine for the "${resource}" resource.`);
-                console.debug(JSON.stringify(req.metadata, null, 4));
+                console.debug(`Running GET request on "${this.stash.engine?.name}" engine for the "${resource}" resource.`);
+                console.debug('Request metadata:', JSON.stringify(req.metadata, null, 4));
             }
             let res = await this.stash[this.options.method](req);
             //output response to console
@@ -123,6 +124,7 @@ class RequestProcessor extends BaseProcessor {
     /**
      * Builds a `GetRequest` from the command-line/processor options.
      * @param {GetRequest} req - An exisiting `GetRequest` to build upon.
+     * @param {String} resource - The resource to retrieve.
      * @returns {GetRequest}
      */
     buildGet(req, resource) {

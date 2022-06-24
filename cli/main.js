@@ -57,6 +57,7 @@ class Main {
         this.cmd
             .version(`StashKu: v-${pkg.version}`)
             .option('-e, --env <filepath>', 'Specify a .env file to load. This .env will be loaded instead of any .env in the current working directory.')
+            .option('-E, --engine <engine>', 'The engine used by the CLI. Built-in engines are: "fetch" and "memory", you can specify the package name of an engine that is installed as well.')
             .option('-q, --quiet', 'Do not output status information to the console.')
             .option('-v, --verbose', 'Output extra details & logs about the command being executed.')
             .addOption(new Option('--format <format>', 'Defines the format of the resulting data when converted to a string.').default('json').choices(['json', 'yaml', 'toml']))
@@ -129,21 +130,20 @@ class Main {
      * @param {*} command - The CLI command that is being run.
      */
     async request(resource, options, command) {
-        let workerOptions = Object.assign({}, options);
-        workerOptions.method = command.name();
-        workerOptions.resource = resource;
-        workerOptions.cli = this.cmd.opts();
-        await this.process(new RequestProcessor(workerOptions));
-    }
-
-    /**
-     * Starts a processor after ensuring the configuration has been loaded.
-     * @param {BaseProcessor} processor - The processor to start.
-     */
-    async process(processor) {
+        let processor = null;
         try {
             //load environment
             await this.configure();
+            //run processor
+            let workerOptions = Object.assign({}, options);
+            workerOptions.method = command.name();
+            workerOptions.resource = resource;
+            workerOptions.cli = this.cmd.opts();
+            if (!workerOptions.cli.engine) {
+                workerOptions.cli.engine = process.env.STASHKU_ENGINE;
+            }
+            //run the processor
+            processor = new RequestProcessor(workerOptions);
             //start worker
             if (!this.state.opts.quiet && this.state.opts.verbose) {
                 console.debug(`Starting the "${processor.constructor.name}" with options:`, processor.options);
@@ -152,16 +152,17 @@ class Main {
             if (!this.state.opts.quiet && this.state.opts.verbose) {
                 console.log('Done.');
             }
-            if (processor.stash) {
-                await processor.stash.destroy();
-            }
         } catch (err) {
             if (this.state.opts.verbose) {
                 throw err;
             } else {
-                console.error(err.message);
+                console.error(`Error: ${err.message}`);
             }
             process.exit(1);
+        } finally {
+            if (processor && processor.stash) {
+                await processor.stash.destroy();
+            }
         }
     }
 

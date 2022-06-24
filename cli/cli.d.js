@@ -7,6 +7,7 @@
  * @typedef CLI.CommandLineOptions
  * @property {String} [log="error"]
  * @property {String} [env]
+ * @property {String} engine
  * @property {Boolean} [quiet=false]
  * @property {Boolean} [verbose=false]
  * @property {String} [format="json"]

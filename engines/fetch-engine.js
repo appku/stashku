@@ -21,7 +21,7 @@ const lazyLoadGlobalFetch = async () => {
         if (IS_BROWSER) {
             GlobalFetch = window.fetch; // eslint-disable-line no-undef
             GlobalFetchHeaders = window.Headers; // eslint-disable-line no-undef
-        } else if (fetch && Headers) { // eslint-disable-line no-undef
+        } else if (typeof fetch !== 'undefined' && Headers) { // eslint-disable-line no-undef
             GlobalFetch = fetch; // eslint-disable-line no-undef
             GlobalFetchHeaders = Headers; // eslint-disable-line no-undef
         } else {
@@ -218,7 +218,13 @@ class FetchEngine extends BaseEngine {
                 settings.body = JSON.stringify(data);
             }
         }
-        return GlobalFetch(targetURI, settings);
+        let result = null;
+        try {
+            result = await GlobalFetch(targetURI, settings);
+        } catch (err) {
+            throw new RESTError(500, `Failed to fetch URI "${targetURI}": ${err.message}`, err);
+        }
+        return result;
     }
 
     /**
