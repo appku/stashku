@@ -68,8 +68,11 @@ class GetRequest {
             }
             if (overwrite === true || !this.metadata.properties || this.metadata.properties.length === 0) {
                 let targets = [];
-                for (let v of ModelUtility.map(modelType).values()) {
-                    targets.push(v.target);
+                for (let [k, v] of ModelUtility.map(modelType)) {
+                    let omitted = ModelUtility.unmodelPropertyOmit(modelType, k, v, this.method, null);
+                    if (!omitted) {
+                        targets.push(v.target);
+                    }
                 }
                 this.properties(...targets);
             }

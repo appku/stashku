@@ -90,6 +90,44 @@ describe('#model', () => {
         let r = new GetRequest().model(MyModel);
         expect(r.metadata.properties).toEqual(['hello', 'abc']);
     });
+    it('omits properties that were omitted by definition.', () => {
+        class MyModel {
+            static get a() { return 'a'; }
+            static get b() {
+                return {
+                    target: 'b',
+                    omit: true
+                };
+            }
+            static get c() {
+                return {
+                    target: 'c',
+                    omit: {
+                        all: false
+                    }
+                };
+            }
+            static get d() {
+                return {
+                    target: 'd',
+                    omit: {
+                        all: true
+                    }
+                };
+            }
+            static get e() {
+                return {
+                    target: 'e',
+                    omit: {
+                        all: false,
+                        get: true
+                    }
+                };
+            }
+        }
+        let r = new GetRequest().model(MyModel);
+        expect(r.metadata.properties).toEqual(['a', 'c']);
+    });
 });
 
 describe('#distinct', () => {
@@ -221,7 +259,7 @@ describe('#where', () => {
         expect(r.where(f => f.and('a', Filter.OP.CONTAINS, 'z'))).toBe(r);
         expect(r.where(Filter.and('a', Filter.OP.CONTAINS, 'z'))).toBe(r);
     });
-    it('passes the original filter, as well as new one in a where callback.', () =>{
+    it('passes the original filter, as well as new one in a where callback.', () => {
         let r = new GetRequest().where('{ID} == 3');
         let cb = jest.fn();
         r.where(cb);

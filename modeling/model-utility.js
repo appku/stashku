@@ -281,26 +281,8 @@ class ModelUtility {
                     if (v && v.transform) { //run a transform if present.
                         record[v.target] = v.transform.call(modelType, v.target, record[v.target], model, method, 'unmodel');
                     }
-                    if (v && v.omit) { //omit the property if warranted
-                        let omitted = (v.omit === true);
-                        if (typeof v.omit === 'function') {
-                            omitted = v.omit.call(modelType, k, model[k], model, method, 'model');
-                        } else if (v.omit === null && model[k] === null) {
-                            omitted = true;
-                        } else if (typeof v.omit === 'object') {
-                            if (v.omit[method] === true) {
-                                omitted = true;
-                            } else if (typeof v.omit[method] === 'function') {
-                                omitted = v.omit[method].call(modelType, k, model[k], model, method, 'model');
-                            } else if (v.omit[method] === null && model[k] === null) {
-                                omitted = true;
-                            } else if (v.omit.all === true && v.omit[method] !== false) {
-                                omitted = true;
-                            }
-                        }
-                        if (omitted === true) {
-                            delete record[v.target];
-                        }
+                    if (v && this.unmodelPropertyOmit(modelType, k, v, method, model)) {
+                        delete record[v.target];
                     }
                 }
                 yield record;
@@ -308,6 +290,39 @@ class ModelUtility {
                 yield null;
             }
         }
+    }
+
+    /**
+     * Determines whether a property should be omitted when unmodeling.
+     * @param {T} modelType - The model type used for unmodelling.
+     * @param {String} propKey - The model's property key.
+     * @param {Modeling.PropertyDefinition} propertyDef - The model's property definition under the specified key.
+     * @param {String} method - The method being used.
+     * @param {Constructor.<T>} model - The model being evaluated.
+     * @returns {Boolean}
+     */
+    static unmodelPropertyOmit(modelType, propKey, propertyDef, method, model) {
+        let v = propertyDef;
+        if (v && v.omit) { //omit the property if warranted
+            let omitted = (v.omit === true);
+            if (typeof v.omit === 'function') {
+                omitted = v.omit.call(modelType, propKey, model[propKey], model, method, 'unmodel');
+            } else if (v.omit === null && model[propKey] === null) {
+                omitted = true;
+            } else if (typeof v.omit === 'object') {
+                if (v.omit[method] === true) {
+                    omitted = true;
+                } else if (typeof v.omit[method] === 'function') {
+                    omitted = v.omit[method].call(modelType, propKey, model[propKey], model, method, 'unmodel');
+                } else if (v.omit[method] === null && model[propKey] === null) {
+                    omitted = true;
+                } else if (v.omit.all === true && v.omit[method] !== false) {
+                    omitted = true;
+                }
+            }
+            return omitted;
+        }
+        return false;
     }
 
     /**

@@ -64,6 +64,10 @@ class Main {
             .option('--test, --samples', 'Use the in-memory engine preloaded with a "themes" and "products" resources for testing.')
             .showSuggestionAfterError()
             .showHelpAfterError();
+        // this.cmd
+        //     .command('utility').description('Starts a browser-based utility to validate models and try out various StashKu requests.')
+        //     .option('-p, --port <port>', 'Sets the port number the utility will start on.')
+        //     .action(this.utility.bind(this));
         this.cmd
             .command('get').description('Runs a GET request on the target resource, or from a request definition file, and then optionally saves the results to file.')
             .argument('<resource|requestFile|listingFile>', 'The name of the resource being targetted in the request, a path to a file containing a saved options request, or a path to a JSON file with an array of resources to be optioned (multiple requests).')
@@ -89,11 +93,13 @@ class Main {
                 '> stashku options dbo.Contacts -x ./models'
             )
             .argument('<resource|requestFile|listingFile|"*">', 'The name of the resource being targetted in the request, a path to a file containing a saved options request, a path to a JSON file with an array of resources to be optioned (multiple requests), or a value "*" (use quotes) to target all resources in the request.')
-            .option('-f, --force', 'Forces the overwrite of the extending JavaScript class file when using the --export (-x) option.')
             .option('--dry-run', 'Perform a dry-run of an export. Instead of writing files or creating directories directories, the generated files will be written to the console.')
             .option('--save <filepath>', 'Saves the OPTIONS request to file. You can re-use these request files in place of the resource (see: <requestFile>).')
             .option('-O, --output <outputpath>', 'Saves the engine response to the specified file.')
             .option('-x, --export <exportPath>', 'Generates base and extending JavaScript classes around the resulting OPTIONS response and writes them to a folder. If the extending class is already present, it is not overwritten, however, the base class is always written to a base/ subdirectory.')
+            .option('-f, --force', 'Combined with the -x,--export option. Forces the overwrite of the extending JavaScript model class file.')
+            // .option('-r, --remove', 'Combined with the -x,--export option. Removes any base-models and extending models not explicitly returned from the options request. Only class-based models *.js files that appear to extend a "Base*Model" class are removed.')
+            // .option('--rebuild', 'Combined with the -x,--export option. Completely remove all *.js files in the target directory before writing models.')
             .action(this.request.bind(this));
     }
 
@@ -152,6 +158,33 @@ class Main {
             if (!this.state.opts.quiet && this.state.opts.verbose) {
                 console.log('Done.');
             }
+        } catch (err) {
+            if (this.state.opts.verbose) {
+                throw err;
+            } else {
+                console.error(`Error: ${err.message}`);
+            }
+            process.exit(1);
+        } finally {
+            if (processor && processor.stash) {
+                await processor.stash.destroy();
+            }
+        }
+    }
+
+    /**
+     * Runs a local http server that provides a browser-based utility for testing models trying out StashKu requests.
+     * @param {String} resource - The name of the target resource in the StashKu resource.
+     * @param {CLI.GetCommandLineOptions | CLI.OptionsCommandLineOptions} [options] - The CLI options specified in object format.
+     * @param {*} command - The CLI command that is being run.
+     */
+    async utility(options, command) {
+        let processor = null;
+        try {
+            //load environment
+            await this.configure();
+            //run processor
+            console.log(arguments)
         } catch (err) {
             if (this.state.opts.verbose) {
                 throw err;
