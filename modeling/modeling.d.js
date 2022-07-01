@@ -67,6 +67,14 @@
  */
 
 /**
+ * @callback Modeling.ValidationCallback
+ * @property {AnyModelType} model
+ * @property {String} key
+ * @property {*} value
+ * @returns {String}
+ */
+
+/**
  * The StashKu resource (name) that contains objects like this model.
  * 
  * Defines the resource name used for a model on specific request actions. If a specific action is `undefined` the 
@@ -76,5 +84,6 @@
  * @property {String | Modeling.StringByRequestMethod} resource - The resource name of the model.
  * @property {String | Modeling.StringByRequestMethod} [slug] - An optionally stored, singular, lower-kebab-case slugified representation of this model's name.
  * @property {String | Modeling.StringByRequestMethod} [name] - An optionally stored, singular, PascalCase version of this model's name.
+ * @property {Object.<String, Array.<Modeling.ValidationCallback> | Modeling.ValidationCallback>} [validations] - A validation object with keys optionally mapped to model properties.
  * @property {{slug: String | Modeling.StringByRequestMethod, name: String | Modeling.StringByRequestMethod}} [plural] - An optionally stored, plural form of the model's slug and name.
  */

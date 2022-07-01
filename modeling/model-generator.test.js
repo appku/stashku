@@ -76,6 +76,7 @@ describe('.generateModelType', () => {
             expect(dynamicModel.D).toEqual({ target: 'z', default: 4949, required: false });
             expect(dynamicModel.E).toEqual({ pk: true });
             expect(dynamicModel.$stashku.resource).toBe('testa-bits');
+            expect(dynamicModel.$stashku.validations).toEqual({});
             expect(dynamicModel.$stashku.name).toBe('TestaBit');
             expect(dynamicModel.$stashku.slug).toBe('testa-bit');
             expect(dynamicModel.$stashku.plural.name).toBe('TestaBits');
@@ -89,7 +90,7 @@ describe('.generateModelType', () => {
         expect(model).toBeInstanceOf(TestaBitModel);
         expect(model.A).toBe(null);
         expect(model.B).toBe(null);
-        expect(model.C).toBe(null);
+        expect(model.C).toBe(undefined);
         expect(model.D).toBe(4949);
         expect(model.E).toBe(null);
     });
@@ -132,5 +133,88 @@ describe('.generateModelType', () => {
         expect(TestaBitModel.FirstName).toEqual({ target: 'first name' });
         expect(TestaBitModel.first_name).toEqual({ target: 'first_name' });
         expect(TestaBitModel['first-name']).toEqual({ target: 'first-name' });
+    });
+    describe('provides validation capability.', () => {
+        let ContactModel = null;
+        beforeEach(() => {
+            ContactModel = ModelGenerator.generateModelType('Contacts', new Map([
+                ['FirstName', { target: 'first_name' }],
+                ['LastName', { target: 'last_name' }],
+                ['Age', { target: 'age' }],
+            ]), {
+                name: 'ContactRecordModel'
+            });
+        });
+        it('returns null validation results when no validations are defined.', () => {
+            let bob = new ContactModel();
+            bob.FirstName = 'Bob';
+            bob.Age = 24;
+            expect(Object.keys(ContactModel.$stashku.validations)).toEqual([]);
+            let results = bob.validate();
+            expect(results).toEqual({ FirstName: null, LastName: null, Age: null });
+        });
+        it('only runs up to the first failed validation for a field.', () => {
+            let bob = new ContactModel();
+            expect.assertions(6);
+            ContactModel.$stashku.validations.Age = [
+                (model, key, value) => {
+                    expect(true).toBeTruthy();
+                    return null;
+                },
+                (model, key, value) => {
+                    expect(true).toBeTruthy();
+                    return 'Failed';
+                },
+                (model, key, value) => {
+                    expect(true).toBeTruthy();
+                    return null;
+                }
+            ];
+            expect(Object.keys(ContactModel.$stashku.validations)).toEqual(['Age']);
+            let results = bob.validate();
+            expect(results.FirstName).toBeNull();
+            expect(results.LastName).toBeNull();
+            expect(results.Age).toBe('Failed');
+        });
+        it('runs validation functions within the scope of the model instance (this).', () => {
+            let bob = new ContactModel();
+            bob.FirstName = 'Bob';
+            bob.Age = 24;
+            expect.assertions(4);
+            ContactModel.$stashku.validations.FirstName = function(model, key, value) {
+                expect(this).toBe(model);
+                expect(model).toBe(bob);
+                expect(key).toBe('FirstName');
+                expect(value).toBe('Bob');
+            };
+            bob.validate();
+        });
+        it('runs validation functions and returns null or the result.', () => {
+            let bob = new ContactModel();
+            bob.FirstName = 'Bob';
+            bob.Age = 24;
+            expect.assertions(13);
+            ContactModel.$stashku.validations.FirstName = (model, key, value) => {
+                expect(model).toBe(bob);
+                expect(key).toBe('FirstName');
+                expect(value).toBe('Bob');
+            };
+            ContactModel.$stashku.validations.LastName = (model, key, value) => {
+                expect(model).toBe(bob);
+                expect(key).toBe('LastName');
+                expect(value).toBeNull();
+                return 'FAILED!';
+            };
+            ContactModel.$stashku.validations.Age = (model, key, value) => {
+                expect(model).toBe(bob);
+                expect(key).toBe('Age');
+                expect(value).toBe(24);
+            };
+            expect(Object.keys(ContactModel.$stashku.validations)).toEqual(['FirstName', 'LastName', 'Age']);
+            let results = bob.validate();
+            expect(results.FirstName).toBeNull();
+            expect(results.LastName).toBe('FAILED!');
+            expect(results.Age).toBeNull();
+        });
     });
 });

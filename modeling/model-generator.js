@@ -84,7 +84,7 @@ class ModelGenerator {
             for (let [k, v] of sortedProperties) {
                 let typeOfValue = typeof v;
                 if (v === null || typeOfValue === 'undefined') {
-                    this[k] = null;
+                    this[k] = undefined;
                 } else if (typeOfValue === 'object') {
                     this[k] = typeof v.default !== 'undefined' ? v.default : null;
                 }
@@ -92,6 +92,36 @@ class ModelGenerator {
         };
         let mt = class DynamicModel {
             constructor() { mtConstructor.call(this); }
+            validate() {
+                //build initial results using all static keys
+                let validationResults = {};
+                for (let k of Object.keys(this.constructor)) {
+                    let inputType = typeof this.constructor[k];
+                    if (/^[^$_]/.test(k) && (inputType === 'string' || inputType === 'object')) {
+                        validationResults[k] = null;
+                    }
+                }
+                //run validations
+                let validations = this.constructor?.$stashku?.validations;
+                if (typeof validations === 'object') {
+                    for (let k in validations) {
+                        let v = validations[k];
+                        let res = null;
+                        if (Array.isArray(v)) {
+                            for (let func of v) {
+                                res = func.call(this, this, k, this[k]);
+                                if (res) {
+                                    break;
+                                }
+                            }
+                        } else {
+                            res = v.call(this, this, k, this[k]);
+                        }
+                        validationResults[k] = res ?? null; //ensure null instead of undefined
+                    }
+                }
+                return validationResults;
+            }
         };
         if (!className) {
             className = ModelGenerator.formatModelName(resource);
@@ -119,6 +149,9 @@ class ModelGenerator {
         //add helper names to configration if missing
         if (!mt.$stashku.resource) {
             mt.$stashku.resource = resource;
+        }
+        if (!mt.$stashku.validations) {
+            mt.$stashku.validations = {};
         }
         if (!mt.$stashku.name) {
             mt.$stashku.name = ModelGenerator.formatModelName(resource, '');

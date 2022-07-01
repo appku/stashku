@@ -35,16 +35,12 @@ class ModelUtility {
                 let descriptors = Object.getOwnPropertyDescriptors(modelType);
                 //get static "get" property names that are readable and writable or plain values.
                 for (let prop in descriptors) {
-                    if (prop !== '$stashku' && prop !== 'prototype' && prop != '__proto' && prop != 'toJSON') {
+                    let input = modelType[prop];
+                    let inputType = typeof input;
+                    if (/^[^$_]/.test(prop) && (inputType === 'string' || inputType === 'object')) {
                         let desc = descriptors[prop];
                         if (desc.enumerable || desc.get) {
                             let propDefinition = null;
-                            let input = modelType[prop];
-                            let inputType = typeof input;
-                            if (inputType === 'function') {
-                                input = input(modelType, prop);
-                                inputType = typeof input;
-                            }
                             if (inputType === 'string') {
                                 propDefinition = { target: input };
                             } else if (inputType === 'object') {

@@ -66,10 +66,9 @@ describe('.map', () => {
             static get g() { return 6; }
             static get h() { return true; }
             static get i() { return {}; }
-            static get j() { return (mt, p) => 'neat:' + p; }
         });
-        expect(Array.from(mapping.keys())).toEqual(['f', 'i', 'j']);
-        expect(Array.from(mapping.values())).toEqual([{ target: '5' }, { target: 'i' }, { target: 'neat:j' }]);
+        expect(Array.from(mapping.keys())).toEqual(['f', 'i']);
+        expect(Array.from(mapping.values())).toEqual([{ target: '5' }, { target: 'i' }]);
     });
     it('returns a map of a class type that extends another.', () => {
         class SuperBaseModelTest {
