@@ -36,22 +36,24 @@ class ModelUtility {
                 //get static "get" property names that are readable and writable or plain values.
                 for (let prop in descriptors) {
                     let input = modelType[prop];
-                    let inputType = typeof input;
-                    if (/^[^$_]/.test(prop) && (inputType === 'string' || inputType === 'object')) {
-                        let desc = descriptors[prop];
-                        if (desc.enumerable || desc.get) {
-                            let propDefinition = null;
-                            if (inputType === 'string') {
-                                propDefinition = { target: input };
-                            } else if (inputType === 'object') {
-                                propDefinition = input;
-                                if (!propDefinition.target) {
-                                    //ensure a name is set on the definition object
-                                    propDefinition.target = prop;
+                    if (/^([$_].+|prototype|name)$/.test(prop) === false) {
+                        let inputType = typeof input;
+                        if (inputType === 'string' || inputType === 'object') {
+                            let desc = descriptors[prop];
+                            if (desc.enumerable || desc.get) {
+                                let propDefinition = null;
+                                if (inputType === 'string') {
+                                    propDefinition = { target: input };
+                                } else if (inputType === 'object') {
+                                    propDefinition = input;
+                                    if (!propDefinition.target) {
+                                        //ensure a name is set on the definition object
+                                        propDefinition.target = prop;
+                                    }
                                 }
-                            }
-                            if (propDefinition && propMap.has(prop) === false) {
-                                propMap.set(prop, propDefinition);
+                                if (propDefinition && propMap.has(prop) === false) {
+                                    propMap.set(prop, propDefinition);
+                                }
                             }
                         }
                     }

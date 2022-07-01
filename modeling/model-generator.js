@@ -97,7 +97,7 @@ class ModelGenerator {
                 let validationResults = {};
                 for (let k of Object.keys(this.constructor)) {
                     let inputType = typeof this.constructor[k];
-                    if (/^[^$_]/.test(k) && (inputType === 'string' || inputType === 'object')) {
+                    if (/^([$_].+|prototype|name)$/.test(k) === false  && (inputType === 'string' || inputType === 'object')) {
                         validationResults[k] = null;
                     }
                 }

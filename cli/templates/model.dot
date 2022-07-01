@@ -13,7 +13,50 @@ class Model {
      * @type {Modeling.Configuration}
      */
     static get $stashku() {
-        throw new Error(`The "$stashku" property must be overridden in the model "${this?.constructor?.name}".`)
+        throw new Error(`The "$stashku" property must be overridden in the model "${this?.constructor?.name}".`);
+    }
+
+    validate() {
+        //build initial results using all static keys
+        let validationResults = {};
+        let modelType = this.constructor;
+        while (modelType) {
+            let descriptors = Object.getOwnPropertyDescriptors(modelType);
+            for (let prop in descriptors) {
+                if (/^([$_].+|prototype|name)$/.test(prop) === false) {
+                    let inputType = typeof modelType[prop];
+                    if (inputType === 'string' || inputType === 'object') {
+                        validationResults[prop] = null;
+                    }
+                }
+            }
+            let proto = Object.getPrototypeOf(modelType);
+            if (proto && proto.name && proto.prototype !== undefined) {
+                modelType = proto;
+            } else {
+                modelType = null;
+            }
+        }
+        //run validations
+        let validations = this.constructor?.$stashku?.validations;
+        if (typeof validations === 'object') {
+            for (let k in validations) {
+                let v = validations[k];
+                let res = null;
+                if (Array.isArray(v)) {
+                    for (let func of v) {
+                        res = func.call(this, this, k, this[k]);
+                        if (res) {
+                            break;
+                        }
+                    }
+                } else {
+                    res = v.call(this, this, k, this[k]);
+                }
+                validationResults[k] = res ?? null; //ensure null instead of undefined
+            }
+        }
+        return validationResults;
     }
     
 }
