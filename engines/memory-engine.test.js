@@ -609,8 +609,8 @@ describe('#options', () => {
         expect(res.affected).toBe(0);
         expect(res.returned).toBe(1);
         expect(res.data[0].ID.target).toBe('ID');
-        expect(res.data[0].Name.target).toBe('Name');
-        expect(res.data[0].HexCode.target).toBe('Hex_Code');
+        expect(res.data[0].resourceName.target).toBe('Name');
+        expect(res.data[0].hexCode.target).toBe('Hex_Code');
     });
     it('discovers all model types when the resource is a "*".', async () => {
         let res = await memory.options(new OptionsRequest('*'));

@@ -164,7 +164,7 @@ const StringUtility = {
                         return cv.toLowerCase();
                     } else if (uppered !== cv) { //word is not all uppercase
                         let camel = (count > 0 ? cv[0].toUpperCase() : cv[0].toLowerCase());
-                        camel += cv.substr(1);
+                        camel += cv.substring(1);
                         count++;
                         return pv + camel;
                     } else if (uppered === cv) {
@@ -174,7 +174,7 @@ const StringUtility = {
                 return pv + cv;
             }, '');
             if (pascal) {
-                return input[0].toUpperCase() + input.substr(1);
+                return input[0].toUpperCase() + input.substring(1);
             }
         }
         return input;

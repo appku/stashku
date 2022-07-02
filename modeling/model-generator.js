@@ -29,9 +29,13 @@ class ModelGenerator {
      */
     static formatModelName(dirtyResourceName, suffix = 'Model') {
         let removes = ['/^\\[?dbo\\]?./i', '/^\\[?etl\\]?./i', '/^\\[?rpt\\]?./i'];
+        let classNameCase = 'pascal';
         if (typeof process !== 'undefined' && typeof process.env === 'object') {
             if (process.env.STASHKU_MODEL_NAME_REMOVE) {
                 removes = JSON.parse(process.env.STASHKU_MODEL_NAME_REMOVE);
+            }
+            if (process.env.STASHKU_MODEL_NAME_CASE) {
+                classNameCase = process.env.STASHKU_MODEL_NAME_CASE;
             }
         }
         if (removes && Array.isArray(removes)) {
@@ -41,7 +45,7 @@ class ModelGenerator {
             }
         }
         dirtyResourceName = dirtyResourceName.replace(/[[\]{}]/g, '');
-        return StringUtility.camelify(StringUtility.singular(dirtyResourceName), true) + (suffix ?? '');
+        return StringUtility.camelify(StringUtility.singular(dirtyResourceName), (classNameCase === 'pascal')) + (suffix ?? '');
     }
 
     /**
@@ -65,12 +69,26 @@ class ModelGenerator {
         } else if ((properties instanceof Map) === false) {
             throw new RESTError(500, 'The "properties" argument must be of type Map.');
         }
+        let propertyCase = 'camel';
+        let reservedPrefix = 'Resource';
+        if (typeof process !== 'undefined' && typeof process.env === 'object') {
+            if (process.env.STASHKU_MODEL_PROPERTY_CASE) {
+                propertyCase = process.env.STASHKU_MODEL_PROPERTY_CASE;
+            }
+            if (process.env.STASHKU_MODEL_PROPERTY_RESERVED_PREFIX) {
+                reservedPrefix = process.env.STASHKU_MODEL_PROPERTY_RESERVED_PREFIX;
+            }
+        }
         let sortedProperties = new Map();
         //presort
         properties = new Map([...properties.entries()].sort());
         //pascal-case keys
         for (let [k, v] of properties) {
-            let formattedKey = StringUtility.camelify(k, true);
+            //rename reserved words
+            if (/^name|prototype$/i.test(k)) {
+                k = reservedPrefix + k.substring(0, 1).toUpperCase() + k.substring(1);
+            }
+            let formattedKey = StringUtility.camelify(k, (propertyCase === 'pascal'));
             if (formattedKey != k && sortedProperties.has(formattedKey) === false) {
                 sortedProperties.set(formattedKey, v);
             } else {
