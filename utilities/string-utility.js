@@ -154,8 +154,9 @@ const StringUtility = {
             input = words.reduce((pv, cv, i) => {
                 if (cv.length) {
                     let uppered = cv.toUpperCase();
-                    //if a single word name and uppercase, always just return lowercase.
-                    if (uppered === 'ID' || uppered == 'UUID' || uppered === 'GUID') {
+                    //if a single word name and uppercase, always just return lowercase, except when a reserved
+                    //keyword or only two characters.
+                    if ((uppered.length === 2 && uppered === cv) || /^(GU|UU)?ID$/i.test(cv)) {
                         //except for certain acronyms
                         count++;
                         return pv + uppered;

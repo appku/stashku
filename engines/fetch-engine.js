@@ -285,13 +285,13 @@ class FetchEngine extends BaseEngine {
         }
         let res = await this._fetch(resourcePath, payload);
         if (res.ok === false) {
-            throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
+            throw new RESTError(res.status, `Error from fetched resource ("${this._uri(resourcePath)}") in "${request.method}" request: ${res.statusText}`);
         }
         try {
             let payload = await res.json();
             return new Response(payload.data, payload.total, payload.affected, payload.returned, res.status);
         } catch (err) {
-            throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${err.message}`, err);
+            throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(resourcePath)}") in "${request.method}" request: ${err.message}`, err);
         }
     }
 
@@ -319,13 +319,13 @@ class FetchEngine extends BaseEngine {
             //make the request, wrap errors in RESTError
             let res = await this._fetch(resourcePath, payload, { method: request.method });
             if (res.ok === false) {
-                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
+                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(resourcePath)}") in "${request.method}" request: ${res.statusText}`);
             }
             try {
                 let payload = await res.json();
                 return new Response(payload.data, payload.total, payload.affected, payload.returned, res.status);
             } catch (err) {
-                throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${err.message}`, err);
+                throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(resourcePath)}") in "${request.method}" request: ${err.message}`, err);
             }
         }
         return Response.empty();
@@ -357,13 +357,13 @@ class FetchEngine extends BaseEngine {
             //make the request, wrap errors in RESTError
             let res = await this._fetch(resourcePath, payload, { method: request.method });
             if (res.ok === false) {
-                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
+                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(resourcePath)}") in "${request.method}" request: ${res.statusText}`);
             }
             try {
                 let payload = await res.json();
                 return new Response(payload.data, payload.total, payload.affected, payload.returned, res.status);
             } catch (err) {
-                throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${err.message}`, err);
+                throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(resourcePath)}") in "${request.method}" request: ${err.message}`, err);
             }
         }
         return Response.empty();
@@ -393,13 +393,13 @@ class FetchEngine extends BaseEngine {
             //make the request, wrap errors in RESTError
             let res = await this._fetch(resourcePath, payload, { method: request.method });
             if (res.ok === false) {
-                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${res.statusText}`);
+                throw new RESTError(res.status, `Error from fetched resource on path ("${this._uri(resourcePath)}") in "${request.method}" request: ${res.statusText}`);
             }
             try {
                 let payload = await res.json();
                 return new Response(payload.data, payload.total, payload.affected, payload.returned, res.status);
             } catch (err) {
-                throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.to)}") in "${request.method}" request: ${err.message}`, err);
+                throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(resourcePath)}") in "${request.method}" request: ${err.message}`, err);
             }
         }
         return Response.empty();
@@ -429,13 +429,13 @@ class FetchEngine extends BaseEngine {
             //make the request, wrap errors in RESTError
             let res = await this._fetch(resourcePath, payload, { method: request.method });
             if (res.ok === false) {
-                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
+                throw new RESTError(res.status, `Error from fetched resource ("${this._uri(resourcePath)}") in "${request.method}" request: ${res.statusText}`);
             }
             try {
                 let payload = await res.json();
                 return new Response(payload.data, payload.total, payload.affected, payload.returned, res.status);
             } catch (err) {
-                throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${err.message}`, err);
+                throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(resourcePath)}") in "${request.method}" request: ${err.message}`, err);
             }
         }
         return Response.empty();
@@ -462,13 +462,13 @@ class FetchEngine extends BaseEngine {
         //make the request, wrap errors in RESTError
         let res = await this._fetch(resourcePath, payload, { method: request.method });
         if (res.ok === false) {
-            throw new RESTError(res.status, `Error from fetched resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${res.statusText}`);
+            throw new RESTError(res.status, `Error from fetched resource ("${this._uri(resourcePath)}") in "${request.method}" request: ${res.statusText}`);
         }
         try {
             let payload = await res.json();
             return new Response(payload.data, payload.total, payload.affected, payload.returned, res.status);
         } catch (err) {
-            throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(request.metadata.from)}") in "${request.method}" request: ${err.message}`, err);
+            throw new RESTError(500, `Error attempting to parse fetch response as JSON resource ("${this._uri(resourcePath)}") in "${request.method}" request: ${err.message}`, err);
         }
     }
 

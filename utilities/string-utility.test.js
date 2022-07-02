@@ -80,6 +80,9 @@ describe('.camelify', () => {
         expect(StringUtility.camelify('the quick brown fox')).toBe('theQuickBrownFox');
         expect(StringUtility.camelify('the quick brown fox', false)).toBe('theQuickBrownFox');
         expect(StringUtility.camelify('the quick brown fox', true)).toBe('TheQuickBrownFox');
+        expect(StringUtility.camelify('Order-id')).toBe('orderID');
+        expect(StringUtility.camelify('Order-guid')).toBe('orderGUID');
+        expect(StringUtility.camelify('Order-uuid')).toBe('orderUUID');
         expect(StringUtility.camelify('OrderID')).toBe('orderID');
         expect(StringUtility.camelify('Order_ID')).toBe('orderID');
         expect(StringUtility.camelify('Order_ID', true)).toBe('OrderID');
