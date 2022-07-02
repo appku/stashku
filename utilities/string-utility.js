@@ -145,31 +145,28 @@ const StringUtility = {
      */
     camelify: function (input, pascal = false) {
         if (input) {
+            const alwaysUpper = /^(GU|UU)?ID$/i;
+            if (alwaysUpper.test(input)) {
+                return input.toUpperCase();
+            }
             //normalize diacritics and remove un-processable characters and split into words.
             let words = input
                 .normalize('NFKD')
                 .replace(/[^\w\s.\-_\\/,:;<>|`~!@#$%^&*()[]]/g, '')
-                .split(/[^A-Za-z0-9]/g);
-            let count = 0;
+                .split(/(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z0-9])|[^A-Za-z0-9]/g);
             input = words.reduce((pv, cv, i) => {
                 if (cv.length) {
                     let uppered = cv.toUpperCase();
+                    let lowered = cv.toLowerCase();
                     //if a single word name and uppercase, always just return lowercase, except when a reserved
                     //keyword or only two characters.
-                    if ((uppered.length === 2 && uppered === cv) || /^(GU|UU)?ID$/i.test(cv)) {
-                        //except for certain acronyms
-                        count++;
+                    if ((uppered.length <= 2 && uppered === cv) || alwaysUpper.test(cv)) {
                         return pv + uppered;
-                    } else if (words.length === 1 && uppered === cv) {
-                        count++;
-                        return cv.toLowerCase();
-                    } else if (uppered !== cv) { //word is not all uppercase
-                        let camel = (count > 0 ? cv[0].toUpperCase() : cv[0].toLowerCase());
-                        camel += cv.substring(1);
-                        count++;
-                        return pv + camel;
-                    } else if (uppered === cv) {
-                        count++;
+                    }
+                    if (!pv) {
+                        return pv + lowered;
+                    } else {
+                        return pv + uppered.substring(0, 1) + lowered.substring(1);
                     }
                 }
                 return pv + cv;

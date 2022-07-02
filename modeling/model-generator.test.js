@@ -5,7 +5,7 @@ describe('.formatPropName', () => {
         expect(ModelGenerator.formatPropName('test-prop')).toBe('testProp');
         expect(ModelGenerator.formatPropName('The Quick brown fox-jumped.')).toBe('theQuickBrownFoxJumped');
         expect(ModelGenerator.formatPropName('[john].[jumped[')).toBe('johnJumped');
-        expect(ModelGenerator.formatPropName('[acro.NYM].[OK[')).toBe('acroNYMOK');
+        expect(ModelGenerator.formatPropName('[acro.NYM].[OK[')).toBe('acroNymOK');
     });
 });
 
@@ -14,7 +14,7 @@ describe('.formatModelName', () => {
         expect(ModelGenerator.formatModelName('test-yoda')).toBe('TestYodaModel');
         expect(ModelGenerator.formatModelName('The Quick brown fox-jumped.')).toBe('TheQuickBrownFoxJumpedModel');
         expect(ModelGenerator.formatModelName('[john].[jumped[')).toBe('JohnJumpedModel');
-        expect(ModelGenerator.formatModelName('[acro.NYM].[OK[')).toBe('AcroNYMOKModel');
+        expect(ModelGenerator.formatModelName('[acro.NYM].[OK[')).toBe('AcroNymOKModel');
         expect(ModelGenerator.formatModelName('[dbo].[ContactRecords]')).toBe('ContactRecordModel');
         expect(ModelGenerator.formatModelName('{{ContactRecords}}')).toBe('ContactRecordModel');
     });
@@ -29,13 +29,13 @@ describe('.formatModelName', () => {
         expect(ModelGenerator.formatModelName('dbo.Contact_Records')).toBe('ContactRecordModel');
         expect(ModelGenerator.formatModelName('rpt.Contact_Records')).toBe('ContactRecordModel');
         expect(ModelGenerator.formatModelName('etl.Contact_Records')).toBe('ContactRecordModel');
-        expect(ModelGenerator.formatModelName('etl.ETLLog')).toBe('ETLLogModel');
+        expect(ModelGenerator.formatModelName('etl.ETLLog')).toBe('EtlLogModel');
         expect(ModelGenerator.formatModelName('rpt.Rpt.Log')).toBe('RptLogModel');
         expect(ModelGenerator.formatModelName('[dbo].test-yoda')).toBe('TestYodaModel');
         expect(ModelGenerator.formatModelName('[dbo].Contact_Records')).toBe('ContactRecordModel');
         expect(ModelGenerator.formatModelName('[rpt].Contact_Records')).toBe('ContactRecordModel');
         expect(ModelGenerator.formatModelName('[etl].Contact_Records')).toBe('ContactRecordModel');
-        expect(ModelGenerator.formatModelName('[etl].ETLLog')).toBe('ETLLogModel');
+        expect(ModelGenerator.formatModelName('[etl].ETLLog')).toBe('EtlLogModel');
         expect(ModelGenerator.formatModelName('[rpt].Rpt.Log')).toBe('RptLogModel');
     });
 });
@@ -129,7 +129,7 @@ describe('.generateModelType', () => {
         expect(TestaBitModel.$stashku.slug).toBe('contact-record-model');
         expect(TestaBitModel.$stashku.plural.name).toBe('ContactRecordModels');
         expect(TestaBitModel.$stashku.plural.slug).toBe('contact-record-models');
-        expect(TestaBitModel.fIRSTname).toEqual({ target: 'firstname' });
+        expect(TestaBitModel.firsTname).toEqual({ target: 'firstname' });
         expect(TestaBitModel.firstName).toEqual({ target: 'first name' });
         expect(TestaBitModel.first_name).toEqual({ target: 'first_name' });
         expect(TestaBitModel['first-name']).toEqual({ target: 'first-name' });
