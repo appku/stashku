@@ -35,8 +35,8 @@ class ModelUtility {
                 let descriptors = Object.getOwnPropertyDescriptors(modelType);
                 //get static "get" property names that are readable and writable or plain values.
                 for (let prop in descriptors) {
-                    let input = modelType[prop];
-                    if (/^([$_].+|prototype|name)$/.test(prop) === false) {
+                    if (propMap.has(prop) === false && /^([$_].+|prototype|name)$/.test(prop) === false) {
+                        let input = modelType[prop];
                         let inputType = typeof input;
                         if (inputType === 'string' || inputType === 'object') {
                             let desc = descriptors[prop];
@@ -51,7 +51,7 @@ class ModelUtility {
                                         propDefinition.target = prop;
                                     }
                                 }
-                                if (propDefinition && propMap.has(prop) === false) {
+                                if (propDefinition) {
                                     propMap.set(prop, propDefinition);
                                 }
                             }

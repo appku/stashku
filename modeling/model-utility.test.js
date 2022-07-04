@@ -86,6 +86,18 @@ describe('.map', () => {
         expect(Array.from(mapping.keys())).toEqual(['a', 'b', 'c']);
         expect(Array.from(mapping.values())).toEqual([{ target: 'aaa' }, { target: 'bbb' }, { target: 'ccc' }]);
     });
+    it('does not touch prototype static properties if overridden.', () => {
+        class BaseModelTest {
+            static get ohno() { throw new Error('should not see me.'); }
+        }
+        class ModelTest extends BaseModelTest {
+            constructor() { super(); }
+            static get ohno() { return 'ohyeahhh'; }
+        }
+        let mapping = ModelUtility.map(ModelTest);
+        expect(Array.from(mapping.keys())).toEqual(['ohno']);
+        expect(Array.from(mapping.values())).toEqual([{ target: 'ohyeahhh' }]);
+    });
 });
 
 describe('.schema', () => {
