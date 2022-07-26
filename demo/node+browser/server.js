@@ -18,6 +18,8 @@ async function configure(app, config) {
     stash.engine.data.set('themes', (await fairu.with('../../test/memory-engine/data-themes.json').format(fairu.Format.json).read())[0].data);
     app.all('/*', async (req, res) => {
         let method = req.method.toLowerCase();
+        res.status(400).send({code: 400, message: 'hi', data: {hello:123}});
+        return;
         try {
             let response = await stash.model(ThemeModel)[method](req);
             res.send(response);

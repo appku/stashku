@@ -221,8 +221,24 @@ class FetchEngine extends BaseEngine {
         let result = null;
         try {
             result = await GlobalFetch(targetURI, settings);
+            //check for standard response errors, and throw.
+            if (!result.ok) {
+                let payload = await result.json();
+                if (payload && typeof payload.code === 'number') {
+                    let resError = new RESTError(payload.code, payload.message || `Failed to fetch URI "${targetURI}": ${result.status} ${result.statusText}`);
+                    if (payload.data) {
+                        resError.data = payload.data;
+                    }
+                    throw resError;
+                }
+                throw new RESTError(result.status, `Failed to fetch URI "${targetURI}": ${result.status} ${result.statusText}`);
+            }
         } catch (err) {
-            throw new RESTError(500, `Failed to fetch URI "${targetURI}": ${err.message}`, err);
+            if (err instanceof RESTError) {
+                throw err;
+            } else {
+                throw new RESTError(500, `Failed run fetch for URI "${targetURI}": ${err.message}`, err);
+            }
         }
         return result;
     }
