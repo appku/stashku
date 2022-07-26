@@ -39,6 +39,7 @@ class Model {
         }
         //run validations
         let validations = this.constructor?.$stashku?.validations;
+        let isValid = true;
         if (typeof validations === 'object') {
             for (let k in validations) {
                 let v = validations[k];
@@ -53,9 +54,13 @@ class Model {
                 } else {
                     res = v.call(this, this, k, this[k]);
                 }
+                if (res) {
+                    isValid = false;
+                }
                 validationResults[k] = res ?? null; //ensure null instead of undefined
             }
         }
+        validationResults.valid = isValid;
         return validationResults;
     }
     
