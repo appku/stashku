@@ -363,7 +363,7 @@ class StashKu {
         let reqID = this.stats.requests.total.toString().padStart(16, '0');
         this.log.debug(`[${reqID}] Processing "${request.method}" request.`);
         try {
-            await this.engine; //resolve if a promise.
+            this.engine = await this.engine; //resolve if a promise.
         } catch (err) {
             throw new RESTError(500, `The StashKu storage engine "${this.config.engine}" could not be loaded. ${err.toString()}`);
         }
