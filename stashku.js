@@ -240,12 +240,11 @@ class StashKu {
         } else if (typeof this.config.engine === 'string' && IS_BROWSER === false) {
             let enginePackageName = this.config.engine;
             this.engine = import(/* webpackIgnore: true */'./node/package-loader.js')
-                .then((loader) => {
-                    return loader.default(enginePackageName)
-                        .then(m => {
-                            this.engine = new m.default();
-                            this.engine.configure(this.config[this.config.engine], this.log);
-                        });
+                .then(loader => loader.default(enginePackageName))
+                .then(m => {
+                    this.engine = new m.default();
+                    this.engine.configure(this.config[this.config.engine], this.log);
+                    return this.engine;
                 });
         } else if (this.config.engine instanceof BaseEngine) {
             this.engine = this.config.engine;

@@ -226,9 +226,7 @@ class FetchEngine extends BaseEngine {
                 let payload = await result.json();
                 if (payload && typeof payload.code === 'number') {
                     let resError = new RESTError(payload.code, payload.message || `Failed to fetch URI "${targetURI}": ${result.status} ${result.statusText}`);
-                    if (payload.data) {
-                        resError.data = payload.data;
-                    }
+                    resError.data = payload.data;
                     throw resError;
                 }
                 throw new RESTError(result.status, `Failed to fetch URI "${targetURI}": ${result.status} ${result.statusText}`);
