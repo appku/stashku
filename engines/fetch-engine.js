@@ -12,7 +12,7 @@ import ModelGenerator from '../modeling/model-generator.js';
 import BaseEngine from './base-engine.js';
 import Sort from '../sort.js';
 
-const IS_BROWSER = (typeof window !== 'undefined');
+const IS_BROWSER = !(typeof process !== 'undefined' && process.version);
 let GlobalFetch = null;
 let GlobalFetchHeaders = null;
 /* istanbul ignore next */

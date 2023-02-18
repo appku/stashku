@@ -18,7 +18,7 @@ import FetchEngine from './engines/fetch-engine.js';
 
 const SUPPORTED_METHODS = ['all', '*', 'get', 'post', 'put', 'patch', 'delete', 'options'];
 const SUPPORTED_STATES = ['log', 'request', 'response', 'done'];
-const IS_BROWSER = (typeof window !== 'undefined');
+const IS_BROWSER = !(typeof process !== 'undefined' && process.version);
 let HttpRequestLoader = null; //see .requestFromObject
 
 /**
