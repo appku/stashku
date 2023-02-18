@@ -63,6 +63,9 @@ async function HttpRequestLoader(httpReq, modelType) {
             if (clone.take) {
                 req.metadata.take = clone.take;
             }
+            if (clone.filter && !clone.where) { //support legacy where/filters
+                clone.where = clone.filter;
+            }
             if (typeof clone.where === 'string') {
                 req.where(new Filter(JSON.parse(clone.where)));
             } else {

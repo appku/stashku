@@ -710,11 +710,54 @@ class StashKu {
             return StashKu.requestFromObject(obj, modelNameResolver);
         }
         throw new Error(500, 'The "requestFromFile" function is not supported on this platform.');
+        let x = await StashKu.parseRequest(null, null, GetRequest);
+
     }
 
     /**
-     * Converts a StashKu request-like object into an instance of the appropriate StashKu request. This
-     * can be used in conjunction with `JSON.stringify(...)` and subsequently a `JSON.parse(...)` of a request.
+     * Attempts to parse (convert) a StashKu request-like object (including http requests) into the specified request
+     * type. If the request-like object does not appear to be parsable into the request type, a value of `null` is
+     * returned unless the `requestType` is falsey.
+     * 
+     * @see `StashKu.requestFromObject`
+     * @throws Error if the `requestType` is specified but not a `DeleteRequest`, `GetRequest`, `PatchRequest`,
+     * `PostRequest`, `PutRequest`, or `OptionsRequest`.
+     * @throws Error if the object is missing a method property.
+     * @throws Error if the method property value is invalid.
+     * @param {*} reqObj - The untyped request object.
+     * @param {ModelNameResolveCallback | Modeling.AnyModelType} [modelNameResolver] - Callback function that resolves 
+     * a model name into a model type (constructor/class). Optionally can be a model type.
+     * @template RT
+     * @param {RT} requestType - The request type. Must be any one of the following:
+     * `DeleteRequest`, `GetRequest`, `PatchRequest`, `PostRequest`, `PutRequest`, `OptionsRequest`.
+     * @returns {Promise.<InstanceType.<RT>>}
+     */
+    static async parseRequest(reqObj, modelNameResolver, requestType) {
+        if (requestType
+            && requestType !== DeleteRequest
+            && requestType !== GetRequest
+            && requestType !== PatchRequest
+            && requestType !== PostRequest
+            && requestType !== PutRequest
+            && requestType !== OptionsRequest
+        ) {
+            throw new Error('Invalid or unsupported request type.');
+        }
+        let r = await this.getRequestFromObject(reqObj, modelNameResolver);
+        if (requestType && r instanceof requestType) {
+            return r;
+        } else if (!requestType) {
+            return r;
+        }
+        return null;
+    }
+
+    /**
+     * @deprecated Please switch to `StashKu.parseRequest`. This function will be removed in a later version.
+     * @description
+     * Converts a StashKu request-like object (including http requests) into an instance of the appropriate StashKu 
+     * request. This can be used in conjunction with `JSON.stringify(...)` and subsequently a `JSON.parse(...)` 
+     * of a request.
      * 
      * If the object is `null` or `undefined`, a `null` value is returned.
      * @throws Error if the object is missing a method property.
