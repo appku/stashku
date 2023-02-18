@@ -743,7 +743,7 @@ class StashKu {
         ) {
             throw new Error('Invalid or unsupported request type.');
         }
-        let r = await this.getRequestFromObject(reqObj, modelNameResolver);
+        let r = await StashKu.getRequestFromObject(reqObj, modelNameResolver);
         if (requestType && r instanceof requestType) {
             return r;
         } else if (!requestType) {
