@@ -25,7 +25,8 @@ const lazyLoadGlobalFetch = async () => {
             GlobalFetch = fetch; // eslint-disable-line no-undef
             GlobalFetchHeaders = Headers; // eslint-disable-line no-undef
         } else {
-            let module = await import(/* webpackIgnore: true */'node-fetch');
+            let pkg = 'node-fetch'; //set import package as variable, so compilers like esbuild ignore the next line.
+            let module = await import(/* webpackIgnore: true */ pkg);
             GlobalFetchHeaders = module.Headers;
             GlobalFetch = module.default;
         }

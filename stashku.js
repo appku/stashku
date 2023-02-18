@@ -239,7 +239,9 @@ class StashKu {
             this.engine.configure(this.config.fetch, this.log);
         } else if (typeof this.config.engine === 'string' && IS_BROWSER === false) {
             let enginePackageName = this.config.engine;
-            this.engine = import(/* webpackIgnore: true */'./node/package-loader.js')
+            //set import package as variable, so compilers like esbuild ignore the import
+            let pkg = './node/package-loader.js';
+            this.engine = import(/* webpackIgnore: true */pkg)
                 .then(loader => loader.default(enginePackageName))
                 .then(m => {
                     this.engine = new m.default();
@@ -701,7 +703,9 @@ class StashKu {
      */
     static async requestFromFile(jsonFile, fsOptions, modelNameResolver) {
         if (IS_BROWSER === false) {
-            let f = await (await import(/* webpackIgnore: true */'fs/promises')).default.readFile(jsonFile, fsOptions);
+            //set import package as variable, so compilers like esbuild ignore the import
+            let pkg = 'fs/promises';
+            let f = await (await import(/* webpackIgnore: true */pkg)).default.readFile(jsonFile, fsOptions);
             let obj = JSON.parse(f);
             return StashKu.requestFromObject(obj, modelNameResolver);
         }
@@ -732,7 +736,9 @@ class StashKu {
             //handle http.IncomingMessageg
             if (IS_BROWSER === false && reqObj.url && reqObj.httpVersion) {
                 if (!HttpRequestLoader) {
-                    HttpRequestLoader = (await import(/* webpackIgnore: true */'./node/http-request-loader.js')).default;
+                    //set import package as variable, so compilers like esbuild ignore the import
+                    let pkg = './node/http-request-loader.js';
+                    HttpRequestLoader = (await import(/* webpackIgnore: true */pkg)).default;
                 }
                 return await HttpRequestLoader(reqObj, mt);
             }
