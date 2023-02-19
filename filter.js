@@ -312,13 +312,15 @@ class Filter {
      */
     _cloneFilterGroup(orig) {
         let g = this._filterLogicalGroup(orig.logic);
-        for (let f of orig.filters) {
-            if (f.property || f.field) {
-                g.filters.push(Object.assign({}, f));
-            } else if (f.logic) {
-                g.filters.push(this._cloneFilterGroup(f));
-            } else if (typeof f.property === 'undefined' && typeof f.op === 'undefined' && typeof f.logic === 'undefined' && typeof f.filters === 'undefined') {
-                throw new Error('Invalid filter tree. Found unexpected object that does not appear to be a condition or filter-group (missing expected properties).');
+        if (orig.filters) {
+            for (let f of orig.filters) {
+                if (f.property || f.field) {
+                    g.filters.push(Object.assign({}, f));
+                } else if (f.logic) {
+                    g.filters.push(this._cloneFilterGroup(f));
+                } else if (typeof f.property === 'undefined' && typeof f.op === 'undefined' && typeof f.logic === 'undefined' && typeof f.filters === 'undefined') {
+                    throw new Error('Invalid filter tree. Found unexpected object that does not appear to be a condition or filter-group (missing expected properties).');
+                }
             }
         }
         return g;
