@@ -710,8 +710,6 @@ class StashKu {
             return StashKu.requestFromObject(obj, modelNameResolver);
         }
         throw new Error(500, 'The "requestFromFile" function is not supported on this platform.');
-        let x = await StashKu.parseRequest(null, null, GetRequest);
-
     }
 
     /**

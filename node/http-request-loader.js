@@ -85,6 +85,11 @@ async function HttpRequestLoader(httpReq, modelType) {
             req.headers(clone.headers);
         }
         if (clone.objects && clone.objects.length) {
+            if (modelType) { //convert objects to model type
+                for (let i = 0; i < clone.objects.length; i++) {
+                    clone.objects[i] = Object.assign(new modelType(), clone.objects[i]);
+                }
+            }
             req.objects(...clone.objects);
         }
     } else if (method === 'put') {
@@ -103,6 +108,11 @@ async function HttpRequestLoader(httpReq, modelType) {
             req.pk(...clone.pk);
         }
         if (clone.objects && clone.objects.length) {
+            if (modelType) { //convert objects to model type
+                for (let i = 0; i < clone.objects.length; i++) {
+                    clone.objects[i] = Object.assign(new modelType(), clone.objects[i]);
+                }
+            }
             req.objects(...clone.objects);
         }
     } else if (method === 'patch') {
