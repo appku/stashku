@@ -60,6 +60,7 @@ class GetRequest {
             throw new Error('Invalid "modelType" argument. The value must be null, a class, or a constructor object');
         }
         if (modelType) {
+            let modelMap = ModelUtility.map(modelType);
             if (overwrite === true || !this.metadata.from) {
                 this.from(ModelUtility.resource(modelType, this.method));
             }
@@ -67,14 +68,27 @@ class GetRequest {
                 this.headers({ model: modelType.$stashku });
             }
             if (overwrite === true || !this.metadata.properties || this.metadata.properties.length === 0) {
+                //set all properties expected by the model.
                 let targets = [];
-                for (let [k, v] of ModelUtility.map(modelType)) {
+                for (let [k, v] of modelMap) {
                     let omitted = ModelUtility.unmodelPropertyOmit(modelType, k, v, this.method, null);
                     if (!omitted) {
                         targets.push(v.target);
                     }
                 }
                 this.properties(...targets);
+            } else if (this.metadata.properties && this.metadata.properties.length) {
+                this.metadata.properties = ModelUtility.unmodelProperties(modelType, ...this.metadata.properties);
+                //remove omits
+                for (let [k, v] of modelMap) {
+                    let index = this.metadata.properties.indexOf(k);
+                    if (index >= 0) {
+                        let omitted = ModelUtility.unmodelPropertyOmit(modelType, k, v, this.method, null);
+                        if (omitted) {
+                            this.metadata.properties.splice(index, 1);
+                        }
+                    }
+                }
             }
             ModelUtility.unmodelFilters(modelType, this.metadata.where);
             ModelUtility.unmodelSorts(modelType, ...this.metadata.sorts);

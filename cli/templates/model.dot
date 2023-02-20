@@ -6,6 +6,9 @@
  * @type {Modeling.AnyModel}
  */
 class Model {
+    /**
+     * @inheritdoc
+     */
     constructor() { }
 
     /**

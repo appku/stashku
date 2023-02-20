@@ -324,6 +324,31 @@ class ModelUtility {
     }
 
     /**
+     * Translates one or more modelled property names by changing them into their target property names.
+     * 
+     * If a property name cannot be translated (it is not found on the model), it is left as-is.
+     * @throws 500 `RESTError` if the "modelType" argument is missing or not a supported StashKu model type object.
+     * @template T
+     * @param {T} modelType - The model "class" or constructor function.
+     * @param  {...String} propertyNames - The property names to be unmodelled.
+     * @returns {Array.<String>} Returns an array of the unmodelled property names.
+     */
+    static unmodelProperties(modelType, ...propertyNames) {
+        let translatedProps = [];
+        let map = ModelUtility.map(modelType);
+        if (propertyNames && propertyNames.length) {
+            for (let pn of propertyNames) {
+                if (pn && map.has(pn)) {
+                    translatedProps.push(map.get(pn).target);
+                } else {
+                    translatedProps.push(pn);
+                }
+            }
+        }
+        return translatedProps;
+    }
+
+    /**
      * Translates one or more `Sort` instance's modeled property names by changing them into their target
      * property names.
      * 

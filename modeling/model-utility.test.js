@@ -530,6 +530,30 @@ describe('.unmodel', () => {
     });
 });
 
+describe('.unmodelProperties', () => {
+    class TestModel {
+        constructor() {
+        }
+        static get a() { return 'aaa'; }
+        static get b() {
+            return { target: 'bbbb' };
+        }
+        static get c() {
+            return { target: 'c' };
+        }
+    }
+    it('skips over invalid property objects.', () => {
+        expect(() => ModelUtility.unmodelProperties(null, undefined, 0, new Date())).not.toThrow();
+    });
+    it('maps modeled properties to target properties', () => {
+        let test = [ 'tacos', 'a', 'c'];
+        let results = ModelUtility.unmodelProperties(TestModel, ...test);
+        expect(results[0]).toBe('tacos');
+        expect(results[1]).toBe('aaa');
+        expect(results[2]).toBe('c');
+    });
+});
+
 describe('.unmodelSorts', () => {
     class TestModel {
         constructor() {
@@ -542,7 +566,7 @@ describe('.unmodelSorts', () => {
             return { target: 'c' };
         }
     }
-    it('skips over invalid filter objects.', () => {
+    it('skips over invalid sort objects.', () => {
         expect(() => ModelUtility.unmodelSorts(null, undefined, 0, new Date())).not.toThrow();
     });
     it('maps modeled properties to target properties', () => {
