@@ -49,6 +49,7 @@ class Model {
                 let res = null;
                 if (Array.isArray(v)) {
                     for (let func of v) {
+                        //we expect the function to return a string error message (truthy) if the validation fails.
                         res = func.call(this, this, k, this[k]);
                         if (res) {
                             break;
