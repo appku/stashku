@@ -28,6 +28,11 @@ class RESTError extends Error {
          */
         this.data = undefined;
 
+        /**
+         * @type {Error}
+         */
+        this.innerError = innerError;
+
         Error.captureStackTrace(this, RESTError);
         if (innerError && innerError.stack) {
             this.stack += `\nEngine ${innerError.stack}`;
