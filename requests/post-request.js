@@ -2,16 +2,17 @@ import ModelUtility from '../modeling/model-utility.js';
 
 /**
  * This class defines a StashKu POST request that instructs StashKu to create a new object in storage.
+ * @template M
  */
 class PostRequest {
     /**
      * Creates a new `PostRequest` instance. A POST request instructs StashKu to create a new object in storage.
-     * @param  {...String} [objects] - Spread of objects to create in data storage.
+     * @param  {...M} [objects] - Spread of objects to create in data storage.
      */
     constructor(...objects) {
 
         this.metadata = {
-            /** @type {Array} */
+            /** @type {Array.<M>} */
             objects: [],
             /** @type {String} */
             to: null,
@@ -84,7 +85,7 @@ class PostRequest {
     /**
      * Adds objects to the POST request. If any object has already been added to the request, it is skipped.    
      * If a single `null` value is passed, all objects are cleared from the request.
-     * @param  {...any} [objects] - Spread of objects to create in data storage.
+     * @param  {...M} [objects] - Spread of objects to create in data storage.
      * @returns {PostRequest}
      */
     objects(...objects) {

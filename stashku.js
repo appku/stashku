@@ -713,45 +713,113 @@ class StashKu {
     }
 
     /**
-     * Attempts to parse (convert) a StashKu request-like object (including http requests) into the specified request
-     * type. If the request-like object does not appear to be parsable into the request type, a value of `null` is
-     * returned unless the `requestType` is falsey.
-     * 
-     * @see `StashKu.requestFromObject`
-     * @throws Error if the `requestType` is specified but not a `DeleteRequest`, `GetRequest`, `PatchRequest`,
-     * `PostRequest`, `PutRequest`, or `OptionsRequest`.
-     * @throws Error if the object is missing a method property.
-     * @throws Error if the method property value is invalid.
+     * Attempts to parse (convert) a StashKu request-like object (including http requests) into a `DeleteRequest`.
+     * If the request-like object does not appear to be parsable into the request type, a value of `null` is
+     * returned.
      * @param {*} reqObj - The untyped request object.
-     * @param {ModelNameResolveCallback | Modeling.AnyModelType} [modelNameResolver] - Callback function that resolves 
+     * @param {ModelNameResolveCallback | Modeling.AnyModelType} [modelResolver] - Callback function that resolves 
      * a model name into a model type (constructor/class). Optionally can be a model type.
-     * @template RT
-     * @param {RT} requestType - The request type. Must be any one of the following:
-     * `DeleteRequest`, `GetRequest`, `PatchRequest`, `PostRequest`, `PutRequest`, `OptionsRequest`.
-     * @returns {Promise.<InstanceType.<RT>>}
+     * @returns {Promise.<DeleteRequest>}
      */
-    static async parseRequest(reqObj, modelNameResolver, requestType) {
-        if (requestType
-            && requestType !== DeleteRequest
-            && requestType !== GetRequest
-            && requestType !== PatchRequest
-            && requestType !== PostRequest
-            && requestType !== PutRequest
-            && requestType !== OptionsRequest
-        ) {
-            throw new Error('Invalid or unsupported request type.');
-        }
-        let r = await StashKu.requestFromObject(reqObj, modelNameResolver);
-        if (requestType && r instanceof requestType) {
-            return r;
-        } else if (!requestType) {
+    static async parseDelete(reqObj, modelResolver) {
+        let r = await StashKu.requestFromObject(reqObj, modelResolver);
+        if (r instanceof DeleteRequest) {
             return r;
         }
         return null;
     }
 
     /**
-     * @deprecated Please switch to `StashKu.parseRequest`. This function will be removed in a later version.
+     * Attempts to parse (convert) a StashKu request-like object (including http requests) into a `GetRequest`.
+     * If the request-like object does not appear to be parsable into the request type, a value of `null` is
+     * returned.
+     * @param {*} reqObj - The untyped request object.
+     * @param {ModelNameResolveCallback | Modeling.AnyModelType} [modelResolver] - Callback function that resolves 
+     * a model name into a model type (constructor/class). Optionally can be a model type.
+     * @returns {Promise.<GetRequest>}
+     */
+    static async parseGet(reqObj, modelResolver) {
+        let r = await StashKu.requestFromObject(reqObj, modelResolver);
+        if (r instanceof GetRequest) {
+            return r;
+        }
+        return null;
+    }
+
+    /**
+     * Attempts to parse (convert) a StashKu request-like object (including http requests) into a `PatchRequest`.
+     * If the request-like object does not appear to be parsable into the request type, a value of `null` is
+     * returned.
+     * @param {*} reqObj - The untyped request object.
+     * @param {ModelNameResolveCallback | Modeling.AnyModelType} [modelResolver] - Callback function that resolves 
+     * a model name into a model type (constructor/class). Optionally can be a model type.
+     * @returns {Promise.<PatchRequest>}
+     */
+    static async parsePatch(reqObj, modelResolver) {
+        let r = await StashKu.requestFromObject(reqObj, modelResolver);
+        if (r instanceof PatchRequest) {
+            return r;
+        }
+        return null;
+    }
+
+    /**
+     * Attempts to parse (convert) a StashKu request-like object (including http requests) into a `PostRequest`.
+     * If the request-like object does not appear to be parsable into the request type, a value of `null` is
+     * returned.
+     * @param {*} reqObj - The untyped request object.
+     * @template MT
+     * @param {ModelNameResolveCallback | Modeling.AnyModelType | MT} [modelResolver] - Callback function that resolves 
+     * a model name into a model type (constructor/class). Optionally can be a model type.
+     * @returns {Promise.<PostRequest.<InstanceType.<MT>>>}
+     */
+    static async parsePost(reqObj, modelResolver) {
+        let r = await StashKu.requestFromObject(reqObj, modelResolver);
+        if (r instanceof PostRequest) {
+            return r;
+        }
+        return null;
+    }
+
+    /**
+     * Attempts to parse (convert) a StashKu request-like object (including http requests) into a `PutRequest`.
+     * If the request-like object does not appear to be parsable into the request type, a value of `null` is
+     * returned.
+     * @param {*} reqObj - The untyped request object.
+     * @template {MT}
+     * @param {ModelNameResolveCallback | Modeling.AnyModelType | MT} [modelResolver] - Callback function that resolves 
+     * a model name into a model type (constructor/class). Optionally can be a model type.
+     * @returns {Promise.<PutRequest.<InstanceType.<MT>>>}
+     */
+    static async parsePut(reqObj, modelResolver) {
+        let r = await StashKu.requestFromObject(reqObj, modelResolver);
+        if (r instanceof PutRequest) {
+            return r;
+        }
+        return null;
+    }
+
+    /**
+     * Attempts to parse (convert) a StashKu request-like object (including http requests) into a `OptionsRequest`.
+     * If the request-like object does not appear to be parsable into the request type, a value of `null` is
+     * returned.
+     * @param {*} reqObj - The untyped request object.
+     * @template {MT}
+     * @param {ModelNameResolveCallback | Modeling.AnyModelType | MT} [modelResolver] - Callback function that resolves 
+     * a model name into a model type (constructor/class). Optionally can be a model type.
+     * @returns {Promise.<OptionsRequest>}
+     */
+    static async parseOptions(reqObj, modelResolver) {
+        let r = await StashKu.requestFromObject(reqObj, modelResolver);
+        if (r instanceof OptionsRequest) {
+            return r;
+        }
+        return null;
+    }
+
+    /**
+     * @deprecated Please switch to `StashKu.parse***` functions. 
+     * This function will be removed in a later versions.
      * @description
      * Converts a StashKu request-like object (including http requests) into an instance of the appropriate StashKu 
      * request. This can be used in conjunction with `JSON.stringify(...)` and subsequently a `JSON.parse(...)` 
