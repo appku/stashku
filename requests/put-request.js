@@ -3,19 +3,20 @@ import ModelUtility from '../modeling/model-utility.js';
 
 /**
  * This class defines a StashKu PUT request that instructs StashKu to update existing objects in storage.
+ * @template M
  */
 class PutRequest {
     /**
      * Creates a new `PutRequest` instance. A PUT request instructs StashKu to update existing objects in storage.
      * @param {Array.<String>} [pk] - The property name(s) that are used to uniquely identify each object.
-     * @param  {...String} [objects] - Spread of objects to create in update in storage.
+     * @param  {...M} [objects] - Spread of objects to create in update in storage.
      */
     constructor(pk, ...objects) {
 
         this.metadata = {
             /** @type {Array.<String>} */
             pk: [],
-            /** @type {Array} */
+            /** @type {Array.<M>} */
             objects: [],
             /** @type {String} */
             to: null,
@@ -48,7 +49,7 @@ class PutRequest {
      * with the model's (where applicable).
      * @param {Boolean} [header=false] - Optional flag that, when `true`, adds a `model` header to the request with
      * the model type's `$stashku` definition.
-     * @returns {PutRequest}
+     * @returns {PutRequest.<M>}
      * @private
      */
     model(modelType, overwrite = false, header = false) {
@@ -82,7 +83,7 @@ class PutRequest {
      * 
      * Calling this function without an argument *enables* the flag.
      * @param {Boolean} [enabled=true] - A `true` enables the count-only result. A `false` disables it.
-     * @returns {PutRequest}
+     * @returns {PutRequest.<M>}
      */
     count(enabled) {
         if (typeof enabled === 'undefined') {
@@ -98,7 +99,7 @@ class PutRequest {
      * resource.    
      * If a `null` value is passed, all PKs are cleared from the request.
      * @param  {...String|Array.<String | Modeling.PropertyDefinition>} primaryKeys - Spread of property names used to uniquely identify each object.
-     * @returns {PutRequest}
+     * @returns {PutRequest.<M>}
      */
     pk(...primaryKeys) {
         if (Array.isArray(this.metadata.pk) === false) {
@@ -127,9 +128,9 @@ class PutRequest {
     /**
      * Adds objects to the PUT request. If any object has already been added to the request, it is skipped.    
      * If a single `null` value is passed, all objects are cleared from the request.
-     * @param  {...any} [objects] - Spread of objects to update in data storage, as matched by `pk` property
+     * @param  {...M} [objects] - Spread of objects to update in data storage, as matched by `pk` property
      * values.
-     * @returns {PutRequest}
+     * @returns {PutRequest.<M>}
      */
     objects(...objects) {
         if (Array.isArray(this.metadata.objects) === false) {
@@ -159,7 +160,7 @@ class PutRequest {
      * 
      * @throws Error if the "name" argument value is not a string or null.
      * @param {String} name - The name of the target resource in data storage.
-     * @returns {PutRequest}
+     * @returns {PutRequest.<M>}
      */
     to(name) {
         if (name !== null && typeof name !== 'string') {
@@ -171,7 +172,7 @@ class PutRequest {
 
     /**
      * Clears all configured metadata on the request, resetting it to a default state.
-     * @returns {PutRequest}
+     * @returns {PutRequest.<M>}
      */
     clear() {
         if (!this.metadata) {
@@ -190,7 +191,7 @@ class PutRequest {
      * @throws Error when the dictionary argument uses a non-string key.
      * @throws Error when the dictionary argument is not an object, null, or a Map.
      * @param {Object | Map.<String, *>} dictionary - A map or object defining the headers and values.
-     * @returns {PutRequest}
+     * @returns {PutRequest.<M>}
      */
     headers(dictionary) {
         if (!this.metadata.headers) {

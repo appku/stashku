@@ -42,7 +42,7 @@ class PostRequest {
      * with the model's (where applicable).
      * @param {Boolean} [header=false] - Optional flag that, when `true`, adds a `model` header to the request with
      * the model type's `$stashku` definition.
-     * @returns {PostRequest}
+     * @returns {PostRequest.<M>}
      * @private
      */
     model(modelType, overwrite = false, header = false) {
@@ -71,7 +71,7 @@ class PostRequest {
      * 
      * Calling this function without an argument *enables* the flag.
      * @param {Boolean} [enabled=true] - A `true` enables the count-only result. A `false` disables it.
-     * @returns {PostRequest}
+     * @returns {PostRequest.<M>}
      */
     count(enabled) {
         if (typeof enabled === 'undefined') {
@@ -86,7 +86,7 @@ class PostRequest {
      * Adds objects to the POST request. If any object has already been added to the request, it is skipped.    
      * If a single `null` value is passed, all objects are cleared from the request.
      * @param  {...M} [objects] - Spread of objects to create in data storage.
-     * @returns {PostRequest}
+     * @returns {PostRequest.<M>}
      */
     objects(...objects) {
         if (Array.isArray(this.metadata.objects) === false) {
@@ -116,7 +116,7 @@ class PostRequest {
      * 
      * @throws Error if the "name" argument value is not a string or null.
      * @param {String} name - The name of the target resource in data storage.
-     * @returns {PostRequest}
+     * @returns {PostRequest.<M>}
      */
     to(name) {
         if (name !== null && typeof name !== 'string') {
@@ -128,7 +128,7 @@ class PostRequest {
 
     /**
      * Clears all configured metadata on the request, resetting it to a default state.
-     * @returns {PostRequest}
+     * @returns {PostRequest.<M>}
      */
     clear() {
         if (!this.metadata) {
@@ -146,7 +146,7 @@ class PostRequest {
      * @throws Error when the dictionary argument uses a non-string key.
      * @throws Error when the dictionary argument is not an object, null, or a Map.
      * @param {Object | Map.<String, *>} dictionary - A map or object defining the headers and values.
-     * @returns {PostRequest}
+     * @returns {PostRequest.<M>}
      */
     headers(dictionary) {
         if (!this.metadata.headers) {
