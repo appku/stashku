@@ -535,6 +535,36 @@ describe('#_filterCondition', () => {
     });
 });
 
+describe('.tmpl', () => {
+    it('successfully escapes quotes in resulting string expressions.', () => {
+        let tests = [
+            [Filter.tmpl``, ''],
+            [Filter.tmpl`\\`, '\\'],
+            // eslint-disable-next-line quotes
+            [Filter.tmpl`hello ${"some\"thing that shouldn't be"}`, 'hello some\\"thing that shouldn\\\'t be'],
+            [Filter.tmpl`hello ${'""""\''}`, 'hello \\"\\"\\"\\"\\\'']
+        ];
+        for (let t of tests) {
+            expect(t[0]).toEqual(t[1]);
+        }
+    });
+    it('escapes string results of object expressions.', () => {
+        let x = {
+            toString() {
+                return 'INJECT-this:"\';-- --';
+            }
+        };
+        let tests = [
+            [Filter.tmpl`${null}`, 'null'],
+            [Filter.tmpl`${null}-${undefined}`, 'null-undefined'],
+            [Filter.tmpl`${x}`, 'INJECT-this:\\"\\\';-- --'],
+        ];
+        for (let t of tests) {
+            expect(t[0]).toEqual(t[1]);
+        }
+    });
+});
+
 describe('.parse', () => {
     it('matches toString filters.', () => {
         let tests = [

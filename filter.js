@@ -521,6 +521,48 @@ class Filter {
     }
 
     /**
+     * Converts a string template literal with expressions into an quote-escaped filter string. All string expressions
+     * in the template literal are escaped.
+     * 
+     * Note that other characters are still allowed.
+     * 
+     * @example
+     * ```js
+     * let fn = 'john';
+     * let ln = 'jane"\'\'';
+     * let x = Filter.tmpl`{FirstName} EQ "${fn}" OR {LastName} CONTAINS "${ln}"`;
+     * console.log(x);
+     * //"{FirstName} EQ "john" OR {LastName} CONTAINS "jane\"\'\'""
+     * ```
+     * @param {Array.<String>} inputs - The template strings
+     * @param  {...any} exp - Expressions in the string
+     * @returns {String}
+     */
+    static tmpl(inputs, ...exp) {
+        let output = '';
+        let expCounter = 0;
+        for (let i = 0; i < inputs.length; i++) {
+            output += inputs[i];
+            if (expCounter < exp.length) {
+                let value = exp[expCounter];
+                let vType = typeof value;
+                if (vType !== 'string') {
+                    if (vType === 'undefined') {
+                        value = 'undefined';
+                    } else if (value === null) {
+                        value = 'null';
+                    } else {
+                        value = value.toString(); //get resulting expression string value, don't care what.
+                    }
+                }
+                output += value.replaceAll('"', '\\"').replaceAll('\'', '\\\'');
+                expCounter++;
+            }
+        }
+        return output;
+    }
+
+    /**
      * Recursive function that parses each "group" it finds into a new `Filter` instance.
      * @throws SyntaxError if the string is unparsable.
      * @param {String|Array.<ParserToken>} input - The input string to parse into a new `Filter` instance.

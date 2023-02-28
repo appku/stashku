@@ -58,7 +58,8 @@
  * @property {String} target - The target resource property/column/field for this model's property.
  * @property {String} [type] - The JavaScript type intended for the property value.
  * @property {*} [default] - The default value for this models property. This is used when a model type is generated and set in the model constructor.
- * @property {Boolean | Modeling.BooleanByRequestMethod | Modeling.PropertyOmitCallback} [omit=false] - If true, the property is ignored (not included) from processing in a request if the model instance value is null or undefined.
+ * @property {Boolean | Modeling.BooleanByRequestMethod | Modeling.PropertyOmitCallback} [omit=false] - If `true`, the property is ignored (not included) from processing in a request. 
+ * If the value is `null` and the model instance value is `null` or `undefined`, then it is omitted from being processed in the request.
  * @property {Boolean} [pk=false] - Indicates the property is a primary-key identifier for the model.
  * @property {Modeling.PropertyTransformCallback} [transform] - A callback that allows for values to be transformed whenever objects are turned into a model, or the model is "unmodeled" into a regular object.
  * @property {Number} [precision] - The maximum amount of number places, including decimals that may be used. This property is not used by StashKu directly, but may be leveraged by certain engines.
