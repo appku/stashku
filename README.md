@@ -81,13 +81,15 @@ No matter the engine, the *request* and *response* structure and interface is th
 
 ##### GET
 ```js
+import StashKu, { Filter } from '@appku/stashku';
 let stash = new StashKu();
+let name = 'Bob\'s Car Wash'
 let response = await stash.get(r => r
     .from('Contacts')
     .properties('ID', 'First_Name', 'Last_Name')
     .skip(5)
     .take(10)
-    .where('{First_Name} CONTAINS "Bob" AND {Age} GTE 33')
+    .where(Filter.tmpl`{First_Name} CONTAINS "${name}" AND {Year} GTE 1953`)
     .sort('{ID} ASC', 'First_Name', 'Last_Name')
 );
 //Response { data: [...], total, returned, affected }
