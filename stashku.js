@@ -786,7 +786,7 @@ class StashKu {
      * If the request-like object does not appear to be parsable into the request type, a value of `null` is
      * returned.
      * @param {*} reqObj - The untyped request object.
-     * @template {MT}
+     * @template MT
      * @param {ModelNameResolveCallback | Modeling.AnyModelType | MT} [modelResolver] - Callback function that resolves 
      * a model name into a model type (constructor/class). Optionally can be a model type.
      * @returns {Promise.<PutRequest.<InstanceType.<MT>>>}
@@ -804,8 +804,7 @@ class StashKu {
      * If the request-like object does not appear to be parsable into the request type, a value of `null` is
      * returned.
      * @param {*} reqObj - The untyped request object.
-     * @template {MT}
-     * @param {ModelNameResolveCallback | Modeling.AnyModelType | MT} [modelResolver] - Callback function that resolves 
+     * @param {ModelNameResolveCallback | Modeling.AnyModelType} [modelResolver] - Callback function that resolves 
      * a model name into a model type (constructor/class). Optionally can be a model type.
      * @returns {Promise.<OptionsRequest>}
      */
