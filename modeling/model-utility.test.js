@@ -320,6 +320,20 @@ describe('.model', () => {
         expect(iterator.next().value).toEqual({ firstName: 'abc', lastName: 123 });
         expect(iterator.next().value).toEqual({ firstName: 'def', lastName: null });
     });
+    it('converts a modelled object literal back to a typed object.', () => {
+        class TestModel {
+            constructor() {
+                this.firstName = null;
+                this.lastName = null;
+            }
+            static get firstName() { return 'First_Name'; }
+            static get lastName() { return { target: 'Last_Name' }; }
+        }
+        let iterator = ModelUtility.model(TestModel, 'get', { firstName: null }, { firstName: 'abc', lastName: 123 }, { firstName: 'def', lastName: null });
+        expect(iterator.next().value).toEqual({ firstName: null });
+        expect(iterator.next().value).toEqual({ firstName: 'abc', lastName: 123 });
+        expect(iterator.next().value).toEqual({ firstName: 'def', lastName: null });
+    });
     it('runs a transform on the model.', () => {
         class TestModel {
             constructor() {

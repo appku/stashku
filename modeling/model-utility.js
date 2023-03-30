@@ -194,8 +194,11 @@ class ModelUtility {
                 } else {
                     let model = new modelType();
                     for (let [k, v] of mapping) {
-                        if (typeof obj[v.target] !== 'undefined') {
+                        if (typeof obj[v.target] !== 'undefined' || typeof obj[k] !== 'undefined') {
                             model[k] = obj[v.target];
+                            if (typeof obj[k] !== 'undefined') {
+                                model[k] = obj[k];
+                            }
                             //handle type conversion for objects that may have come from JSON
                             let valueType = typeof model[k];
                             if (v.type === 'Date' && (valueType === 'string' || valueType === 'number')) {
