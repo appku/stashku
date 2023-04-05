@@ -392,7 +392,10 @@ class StashKu {
                 await this.middlerun('response', request, response);
             } catch (err) {
                 if ((err instanceof RESTError) === false) {
+                    this.log.debug(`[${reqID}] A StashKu internal error occurred while using storage engine "${this.engine.name}": ${err.message}`, err);
                     throw new RESTError(500, `A StashKu internal error occurred while using storage engine "${this.engine.name}": ${err.message}`, err);
+                } else {
+                    this.log.debug(`[${reqID}] A StashKu internal REST error occurred while using storage engine "${this.engine.name}": ${err.message}`, err);
                 }
                 throw err;
             }
