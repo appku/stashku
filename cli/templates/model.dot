@@ -1,5 +1,20 @@
 ///<reference path="./modeling.d.js" />
 /**
+ * Returns all error messages from a validation result, separated by a newline.
+ * If there are no errors, the string will be empty.
+ * @returns {String}
+ */
+const ValidationToString = function () {
+    let messages = [];
+    for (let k in this) {
+        if (this[k] && this[k].length) {
+            messages.push(this[k]);
+        }
+    }
+    return messages.join('\n');
+};
+
+/**
  * The base class for for all models.
  * This class is generated *once* unless you perform a forced OPTIONS export over it.
  * You can add customizations to this class to customize the model behavior throughout all extending classes.
@@ -9,7 +24,130 @@ class Model {
     /**
      * @inheritdoc
      */
-    constructor() { }
+    constructor() {
+
+        /**
+         * Indicates changes have been detected on the model.
+         * @readonly
+         * @protected
+         */
+        this.tracking = {
+            /**
+             * Enables or disables change tracking on this model.
+             * @type {Boolean}
+             */
+            enabled: false,
+            /**
+             * Enables or disables validation checks when a value has been changed.
+             * @type {Boolean}
+             */
+            validate: true,
+            /**
+             * Indicates changes are present on the model or not.
+             * @type {Boolean}
+             */
+            changes: false,
+            /**
+             * List of property keys on this model to be ignored by change tracking.
+             * @type {Array.<String>}
+             */
+            ignore: null,
+            /**
+             * An object storing the original unchanged values.
+             * @type {*}
+             */
+            original: null
+        };
+
+        /**
+         * Model validation results that are set during validated change tracking.
+         */
+        this.validation = undefined;
+
+        //init proxy
+        return new Proxy(this, {
+            set: this.change.bind(this)
+        });
+    }
+
+    /**
+     * The StashKu resource configuration for this model.
+     * @type {Modeling.Configuration}
+     */
+    static get $stashku() {
+        throw new Error(`The "$stashku" property must be overridden in the model "${this?.constructor?.name}".`);
+    }
+
+    /**
+     * Returns whether change tracking is enabled or not, and optionally togges it on or off using the "enable"
+     * argument.
+     * 
+     * Disabling change tracking removes the original tracked model data.
+     * @param {Boolean} [enable] - Optional `true` or `false` to enable or disable change tracking.
+     * @param {Boolean} [validate=true] - Optional `true` or `false` to enable or disable validation on change.
+     * Defaults to `true`.
+     * @returns {Boolean} Returns `true` if change tracking enabled, and `false` if not.
+     */
+    track(enable, validate) {
+        if (typeof enable !== 'undefined') {
+            this.tracking.enabled = !!enable;
+            if (!enable) {
+                this.tracking.original = null;
+            }
+        }
+        if (typeof validate !== 'undefined') {
+            this.tracking.validate = !!validate;
+        }
+        return this.tracking.enabled;
+    }
+
+    /**
+     * Resets the model back to it's last un-changed state. 
+     */
+    reset() {
+        if (this.tracking.enabled && this.tracking.changes) {
+            this.tracking.enabled = false;
+            Object.assign(this, this.tracking.original);
+            this.tracking.changes = false;
+            this.tracking.original = null;
+            this.tracking.enabled = true;
+        }
+    }
+
+    /**
+     * The change tracking change handler. This is called from the internal proxy to save and set values.
+     * 
+     * If you choose to override this, you should call this underlying function via `super.change`.
+     * @param {Object} target - The proxied object, in this case, the model instance.
+     * @param {String} key - The property key.
+     * @param {*} value - The value being set.
+     * @returns {Boolean}
+     * @abstract
+     */
+    change(target, key, value) {
+        if (key !== 'tracking' && key !== 'validation') {
+            let track = this.tracking.enabled 
+                && (
+                    Array.isArray(this.tracking.ignore) === false
+                    || this.tracking.ignore.indexOf(key) < 0
+                );
+            if (track) {
+                if (!this.tracking.original) {
+                    this.tracking.original = {};
+                }
+                if (typeof this.tracking.original[key] === 'undefined') {
+                    this.tracking.original[key] = target[key];
+                }
+                this.tracking.changes = true;
+            }
+            target[key] = value;
+            if (track && this.tracking.validate) {
+                this.validation = this.validate();
+            }
+            return true;
+        }
+        return false;
+    }
 
     /**
      * The StashKu resource configuration for this model.
@@ -65,6 +203,7 @@ class Model {
             }
         }
         validationResults.valid = isValid;
+        validationResults.toString = ValidationToString;
         return validationResults;
     }
     
