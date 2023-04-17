@@ -86,9 +86,7 @@ async function HttpRequestLoader(httpReq, modelType) {
         }
         if (clone.objects && clone.objects.length) {
             if (modelType) { //convert objects to model type
-                for (let i = 0; i < clone.objects.length; i++) {
-                    clone.objects[i] = Object.assign(new modelType(), clone.objects[i]);
-                }
+                clone.objects = ModelUtility.model(modelType, 'POST', ...clone.objects);
             }
             req.objects(...clone.objects);
         }
@@ -109,9 +107,7 @@ async function HttpRequestLoader(httpReq, modelType) {
         }
         if (clone.objects && clone.objects.length) {
             if (modelType) { //convert objects to model type
-                for (let i = 0; i < clone.objects.length; i++) {
-                    clone.objects[i] = Object.assign(new modelType(), clone.objects[i]);
-                }
+                clone.objects = ModelUtility.model(modelType, 'PUT', ...clone.objects);
             }
             req.objects(...clone.objects);
         }

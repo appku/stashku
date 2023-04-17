@@ -193,6 +193,10 @@ class ModelUtility {
                     yield obj; //nothing to do, already modelType
                 } else {
                     let model = new modelType();
+                    let changeTracking = this.tracking?.enabled;
+                    if (changeTracking) {
+                        model.track(false); //turn off change tracking until we're done.
+                    }
                     for (let [k, v] of mapping) {
                         if (typeof obj[v.target] !== 'undefined' || typeof obj[k] !== 'undefined') {
                             model[k] = obj[v.target];
@@ -240,6 +244,9 @@ class ModelUtility {
                                 delete model[k];
                             }
                         }
+                    }
+                    if (changeTracking) {
+                        model.track(true); //re-enable change tracking if it was enabled in the model prior.
                     }
                     yield model;
                 }
