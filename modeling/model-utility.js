@@ -313,16 +313,20 @@ class ModelUtility {
         let v = propertyDef;
         if (v && v.omit) { //omit the property if warranted
             let omitted = (v.omit === true);
+            let value = undefined;
+            if (model) {
+                value = model[propKey];
+            }
             if (typeof v.omit === 'function') {
-                omitted = v.omit.call(modelType, propKey, model[propKey], model, method, 'unmodel');
-            } else if (v.omit === null && model[propKey] === null) {
+                omitted = v.omit.call(modelType, propKey, value, model, method, 'unmodel');
+            } else if (v.omit === null && (value === null || typeof value === 'undefined')) {
                 omitted = true;
             } else if (typeof v.omit === 'object') {
                 if (v.omit[method] === true) {
                     omitted = true;
                 } else if (typeof v.omit[method] === 'function') {
-                    omitted = v.omit[method].call(modelType, propKey, model[propKey], model, method, 'unmodel');
-                } else if (v.omit[method] === null && model[propKey] === null) {
+                    omitted = v.omit[method].call(modelType, propKey, v, model, method, 'unmodel');
+                } else if (v.omit[method] === null && (value === null || typeof value === 'undefined')) {
                     omitted = true;
                 } else if (v.omit.all === true && v.omit[method] !== false) {
                     omitted = true;

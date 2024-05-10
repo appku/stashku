@@ -1,5 +1,4 @@
-test/extract
-test/model-schema/save*.actual*
+
 #Custom
 .env
 *-key.*

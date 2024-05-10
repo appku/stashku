@@ -70,8 +70,8 @@ class Main {
         //     .action(this.utility.bind(this));
         this.cmd
             .command('get').description('Runs a GET request on the target resource, or from a request definition file, and then optionally saves the results to file.')
-            .argument('<resource|requestFile|listingFile>', 'The name of the resource being targetted in the request, a path to a file containing a saved options request, or a path to a JSON file with an array of resources to be optioned (multiple requests).')
-            .option('-w, --where <filter>', 'Specify a StashKu compatable filter string to utilize as a where-clause for the get query.')
+            .argument('<resource|requestFile|listingFile>', 'The name of the resource being targeted in the request, a path to a file containing a saved options request, or a path to a JSON file with an array of resources to be optioned (multiple requests).')
+            .option('-w, --where <filter>', 'Specify a StashKu compatible filter string to utilize as a where-clause for the get query.')
             .option('-s, --skip <skip>', 'Skip over a number of records.', parseInt)
             .option('-t, --take <take>', 'Take only the first number of records.', parseInt)
             .option('-p, --prop, --property <properties...>', 'Retrieve only the specified properties.')
@@ -92,7 +92,7 @@ class Main {
                 'Run a request on a specific resource and export to a "models" directory.\n' +
                 '> stashku options dbo.Contacts -x ./models'
             )
-            .argument('<resource|requestFile|listingFile|"*">', 'The name of the resource being targetted in the request, a path to a file containing a saved options request, a path to a JSON file with an array of resources to be optioned (multiple requests), or a value "*" (use quotes) to target all resources in the request.')
+            .argument('<resource|requestFile|listingFile|"*">', 'The name of the resource being targeted in the request, a path to a file containing a saved options request, a path to a JSON file with an array of resources to be optioned (multiple requests), or a value "*" (use quotes) to target all resources in the request.')
             .option('--dry-run', 'Perform a dry-run of an export. Instead of writing files or creating directories directories, the generated files will be written to the console.')
             .option('--save <filepath>', 'Saves the OPTIONS request to file. You can re-use these request files in place of the resource (see: <requestFile>).')
             .option('-O, --output <outputpath>', 'Saves the engine response to the specified file.')
