@@ -325,7 +325,7 @@ class ModelUtility {
                 if (v.omit[method] === true) {
                     omitted = true;
                 } else if (typeof v.omit[method] === 'function') {
-                    omitted = v.omit[method].call(modelType, propKey, v, model, method, 'unmodel');
+                    omitted = v.omit[method].call(modelType, propKey, value, model, method, 'unmodel');
                 } else if (v.omit[method] === null && (value === null || typeof value === 'undefined')) {
                     omitted = true;
                 } else if (v.omit.all === true && v.omit[method] !== false) {
