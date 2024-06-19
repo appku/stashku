@@ -1,0 +1,34 @@
+name: "Help/Support/Questions"
+description: "Have a question, experiencing a problem, or just unsure where to turn? Let our team try to help."
+title: "Requesting help..."
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # We are Here to Help.
+        This form can be filled out to have your AppKu™ team...
+        - Triage, investigate, and resolve problems with your digital process (app).
+        - Answer questions.
+        - Help create documentation, including designs and concepts.
+        - ...and in general, help out!
+        
+  - type: dropdown
+    attributes:
+      label: Request Type
+      description: What is the nature of your request?
+      multiple: false
+      options:
+        - Experiencing problems.
+        - Need questions answered.
+        - Need help with something else.
+      default: 0
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Subject of your Request
+      description: "Describe the details of your request."
+      value:
+    validations:
+      required: true
