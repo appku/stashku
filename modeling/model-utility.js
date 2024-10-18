@@ -1,5 +1,5 @@
 ///<reference path="./modeling.d.js" />
-import StringUtility from '../utilities/string-utility.js';
+import {Strings} from '@appku/common';
 import RESTError from '../rest-error.js';
 import Sort from '../sort.js';
 import Filter from '../filter.js';
@@ -135,7 +135,7 @@ class ModelUtility {
                 //fallback to null if resource is present but no valid match
             } else {
                 //no resource property, so default to the class/constructor name pluralized
-                return StringUtility.plural(modelType.name) || null;
+                return Strings.plural(modelType.name) || null;
             }
         }
         return null;

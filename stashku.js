@@ -11,7 +11,7 @@ import Logger from './logger.js';
 import Sort from './sort.js';
 import ModelGenerator from './modeling/model-generator.js';
 import ModelUtility from './modeling/model-utility.js';
-import StringUtility from './utilities/string-utility.js';
+import {Strings} from '@appku/common';
 import BaseEngine from './engines/base-engine.js';
 import MemoryEngine from './engines/memory-engine.js';
 import FetchEngine from './engines/fetch-engine.js';
@@ -917,5 +917,5 @@ export {
     Sort,
     ModelGenerator,
     ModelUtility,
-    StringUtility
+    Strings as StringUtility
 };

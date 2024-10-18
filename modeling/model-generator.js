@@ -1,6 +1,6 @@
 import RESTError from '../rest-error.js';
 import ModelUtility from './model-utility.js';
-import StringUtility from '../utilities/string-utility.js';
+import {Strings} from '@appku/common';
 
 /**
  * A utility class for working with StashKu-compatible model objects.
@@ -13,7 +13,7 @@ class ModelGenerator {
      * @returns {String}
      */
     static formatPropName(dirtyPropName) {
-        return StringUtility.camelify(dirtyPropName);
+        return Strings.camelify(dirtyPropName);
     }
 
     /**
@@ -40,12 +40,12 @@ class ModelGenerator {
         }
         if (removes && Array.isArray(removes)) {
             for (let rStr of removes) {
-                let reg = StringUtility.toRegExp(rStr);
+                let reg = Strings.toRegExp(rStr);
                 dirtyResourceName = dirtyResourceName.replace(reg, '');
             }
         }
         dirtyResourceName = dirtyResourceName.replace(/[[\]{}]/g, '');
-        return StringUtility.camelify(StringUtility.singular(dirtyResourceName), (classNameCase === 'pascal')) + (suffix ?? '');
+        return Strings.camelify(Strings.singular(dirtyResourceName), (classNameCase === 'pascal')) + (suffix ?? '');
     }
 
     /**
@@ -88,7 +88,7 @@ class ModelGenerator {
             if (/^name|prototype$/i.test(k)) {
                 k = reservedPrefix + k.substring(0, 1).toUpperCase() + k.substring(1);
             }
-            let formattedKey = StringUtility.camelify(k, (propertyCase === 'pascal'));
+            let formattedKey = Strings.camelify(k, (propertyCase === 'pascal'));
             if (formattedKey != k && sortedProperties.has(formattedKey) === false) {
                 sortedProperties.set(formattedKey, v);
             } else {
@@ -175,16 +175,16 @@ class ModelGenerator {
             mt.$stashku.name = ModelGenerator.formatModelName(resource, '');
         }
         if (!mt.$stashku.slug) {
-            mt.$stashku.slug = StringUtility.slugify(mt.$stashku.name, '-', true, true);
+            mt.$stashku.slug = Strings.slugify(mt.$stashku.name, '-', true, true);
         }
         if (!mt.$stashku.plural) {
             mt.$stashku.plural = {};
         }
         if (!mt.$stashku.plural.name) {
-            mt.$stashku.plural.name = StringUtility.camelify(StringUtility.plural(mt.$stashku.name), true);
+            mt.$stashku.plural.name = Strings.camelify(Strings.plural(mt.$stashku.name), true);
         }
         if (!mt.$stashku.plural.slug) {
-            mt.$stashku.plural.slug = StringUtility.slugify(mt.$stashku.plural.name, '-', true, true);
+            mt.$stashku.plural.slug = Strings.slugify(mt.$stashku.plural.name, '-', true, true);
         }
         return mt;
     }

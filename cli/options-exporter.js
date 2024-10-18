@@ -3,7 +3,7 @@ import dot from 'dot';
 import OptionsRequest from '../requests/options-request.js';
 import Response from '../response.js';
 import ModelUtility from '../modeling/model-utility.js';
-import StringUtility from '../utilities/string-utility.js';
+import {Strings} from '@appku/common';
 import fairu from '@appku/fairu';
 import path from 'path';
 
@@ -39,7 +39,7 @@ class OptionsExporter {
             for (let mt of optionsResponse.data) {
                 let blueprint = {
                     name: mt.name,
-                    slug: mt?.$stashku?.slug || StringUtility.slugify(mt.name, '-', true, true),
+                    slug: mt?.$stashku?.slug || Strings.slugify(mt.name, '-', true, true),
                     config: mt.$stashku,
                     timestamp: new Date(),
                     resource: mt.$stashku.resource,
@@ -139,7 +139,7 @@ class OptionsExporter {
                     output += 'Buffer.alloc(0)';
                 }
             } else if (valueType === 'function') {
-                output += StringUtility.indent(value.toString(), 1, null, indentRoot);
+                output += Strings.indent(value.toString(), 1, null, indentRoot);
             }
         }
         return output;

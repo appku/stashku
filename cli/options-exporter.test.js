@@ -1,5 +1,5 @@
 import OptionsExporter from './options-exporter.js';
-import StringUtility from '../utilities/string-utility.js';
+import {Strings} from '@appku/common';
 
 function TestFunc(a, b, c) {
     if (c === 5) return a + b;
@@ -39,8 +39,8 @@ describe('#toJavaScriptString', () => {
     for (let test of tests) {
         it(`converts ${test[0]} value.`, () => {
             expect(exporter.toJavaScriptString(test[1])).toBe(test[2]);
-            expect(exporter.toJavaScriptString(test[1], 1, false)).toBe(StringUtility.indent(test[2], 1));
-            expect(exporter.toJavaScriptString(test[1], 1, true)).toBe(StringUtility.indent(test[2]));
+            expect(exporter.toJavaScriptString(test[1], 1, false)).toBe(Strings.indent(test[2], 1));
+            expect(exporter.toJavaScriptString(test[1], 1, true)).toBe(Strings.indent(test[2]));
         });
     }
 });
